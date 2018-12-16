@@ -1,0 +1,80 @@
+## Basic Configuration
+
+baseurl = "http://localhost:1313"
+builddrafts = true
+canonifyurls = false
+languageCode = "en-US"
+
+contentdir = "content"
+layoutdir = "layouts"
+publishdir = "public"
+
+author = "Pierre Zemb"
+title = "Pierre Zemb"
+
+theme = "hugo-goa"
+
+## Hugo Built-in Features
+# disqusShortname = "https-shenoybr-github-io-hugo-goa-demo" # Comment out to disable Disqus.
+# googleAnalytics = "XYZ"
+enableRobotsTXT = true
+
+## Site Settings
+[params]
+author = "Pierre Zemb"
+intro = "Infrastructure Engineer"
+description = "Currentrly working at [OVH](https://www.ovh.com/) on Metrics Data Platform.<br>Co-founder of [HelloExoWorld](https://helloexo.world).<br>Co-organizer of the [DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh)"
+authorimage = "myself.png"
+dateformat = "Jan 2, 2006"
+
+## Site Meta Settings
+[params.meta]
+description = "Pierre Zemb"
+keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb"
+
+## Social Accounts
+[params.social]
+github = "PierreZ"
+medium = "@PierreZ"
+linkedin = "pierre-zemb-8004125b"
+twitter = "PierreZ"
+#facebook = "pierre.zemb"
+#google = "pierre.zemb"
+stackoverflow = "pierrezemb"
+hackernews = "PierreZ"
+#steam = "pierrezemb"
+reddit = "pierrezemb"
+keybase = "PierreZ"
+email = "contact@pierrezemb.fr"
+
+## Extras
+[params.extra]
+copyright = "© 2018. Pierre Zemb. [Some Rights Reserved](http://creativecommons.org/licenses/by/3.0/)."
+poweredby = true
+highlightjs = false
+socialmarkup = true
+
+## Main Menu
+[[menu.main]]
+    name = "about"
+    identifier = "about"
+    weight = 200
+    url = "/about/"
+
+[[menu.main]]
+    name = "Blog"
+    identifier = "blog"
+    weight = 250
+    url = "https://medium.com/@PierreZ"
+
+[[menu.main]]
+    name = "Talks"
+    identifier = "talks"
+    weight = 300
+    url = "/talks/"
+
+[[menu.main]]
+    name = "Résumé"
+    identifier = "resume"
+    weight = 300
+    url = "/CV.pdf"
