@@ -15,3 +15,4 @@ The slides are available [here](https://docs.google.com/presentation/d/15wm8euZB
 
 # Photos and Tweets
 
+{{<tweet 938700613029912576>}}

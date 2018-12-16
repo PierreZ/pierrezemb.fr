@@ -1,5 +1,5 @@
 ---
-title: "Rediscover the known data Universe with NASA dataset"
+title: "Rediscover the known data universe with NASA dataset"
 date: 2018-12-15T19:11:11+01:00
 draft: false
 ---
