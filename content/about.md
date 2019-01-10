@@ -24,10 +24,11 @@ I'm currently working on **[Metrics Data Platform](https://www.ovh.com/fr/data-p
 
 ## Outside work
 
-On the other side, I'm giving a hand to local events, such as the GDG/JUG **[FinistDevs](https://finistdevs.org/)**, **[Devoxx4Kids](https://twitter.com/devoxx4kidsbes)** and **[DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh/)**, a technical conference. I'm also the founder of **[HelloExoWorld](https://helloexo.world/)**, a association to search for exoplanets using Warp10. 
+On the other side, I'm giving a hand to local events, such as the GDG/JUG **[FinistDevs](https://finistdevs.org/)**, **[Devoxx4Kids](https://twitter.com/devoxx4kidsbes)** and **[DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh/)**, a technical conference. 
+
+I cofounded in 2017 **[HelloExoWorld](https://helloexo.world/)**, a association to search for exoplanets using Warp10. 
 
 I'm also a teaching assistant in my former Engineer School, and sometimes I'm giving **[talks](/talks)** and **[writing stuff online](https://medium.com/@PierreZ/)**.
-
 
 <p align="center">
 Feel free to contact me!

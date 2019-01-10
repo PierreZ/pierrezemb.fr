@@ -1,6 +1,6 @@
 ## Basic Configuration
 
-baseurl = "http://localhost:1313"
+baseurl = "https://pierrezemb.fr"
 builddrafts = true
 canonifyurls = false
 languageCode = "en-US"
@@ -23,7 +23,7 @@ enableRobotsTXT = true
 [params]
 author = "Pierre Zemb"
 intro = "Infrastructure Engineer"
-description = "Currentrly working at [OVH](https://www.ovh.com/) on Metrics Data Platform.<br>Co-founder of [HelloExoWorld](https://helloexo.world).<br>Co-organizer of the [DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh)"
+description = "Currently working at [OVH](https://www.ovh.com/) on Metrics Data Platform.<br>Co-founder of [HelloExoWorld](https://helloexo.world).<br>Co-organizer of the [DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh) and [FinistDevs](https://finistdevs.org/)"
 authorimage = "myself.png"
 dateformat = "Jan 2, 2006"
 
@@ -49,9 +49,9 @@ email = "contact@pierrezemb.fr"
 
 ## Extras
 [params.extra]
-copyright = "© 2018. Pierre Zemb. [Some Rights Reserved](http://creativecommons.org/licenses/by/3.0/)."
+copyright = "© 2019. Pierre Zemb. [Some Rights Reserved](http://creativecommons.org/licenses/by/3.0/)."
 poweredby = true
-highlightjs = false
+highlightjs = true 
 socialmarkup = true
 
 ## Main Menu
@@ -65,7 +65,7 @@ socialmarkup = true
     name = "Blog"
     identifier = "blog"
     weight = 250
-    url = "https://medium.com/@PierreZ"
+    url = "/posts/"
 
 [[menu.main]]
     name = "Talks"
@@ -76,5 +76,5 @@ socialmarkup = true
 [[menu.main]]
     name = "Résumé"
     identifier = "resume"
-    weight = 300
+    weight = 310
     url = "/CV.pdf"

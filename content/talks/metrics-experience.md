@@ -11,7 +11,7 @@ draft: false
 
 # Ressources
 
-The slides are available [here](https://docs.google.com/presentation/d/15wm8euZBrM4nsIJcSni-os1m9GIOf8xhmOfnKJtHZ8Q)
+The slides are available **[here](https://docs.google.com/presentation/d/15wm8euZBrM4nsIJcSni-os1m9GIOf8xhmOfnKJtHZ8Q)**.
 
 # Photos and Tweets
 

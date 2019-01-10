@@ -26,7 +26,7 @@ During this Hands-on, we will guide you through the different stages of rediscov
 
 # Ressources
 
-The lab can be done [online](https://helloexoworld.github.io/hew-hands-on/), and the slides are available [here](https://docs.google.com/presentation/d/1-nK1aOsan8w9KGXu-4T0F2KknG90Eiq-tNf_fUzHhu0/edit?usp=sharing).
+The hands-on can be done **[online](https://helloexoworld.github.io/hew-hands-on/)**, and the slides are available **[here](https://docs.google.com/presentation/d/1-nK1aOsan8w9KGXu-4T0F2KknG90Eiq-tNf_fUzHhu0/edit?usp=sharing)**.
 
 # Photos and tweets
 
