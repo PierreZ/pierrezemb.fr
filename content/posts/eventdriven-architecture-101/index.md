@@ -10,6 +10,11 @@ categories:
 
 ---
 
+**update 2019:** this is a repost on my own blog. original article can be read on [medium](https://medium.com/@PierreZ/event-driven-architecture-101-d8e13cc4c656).
+
+---
+
+
 ![image](/posts/eventdriven-architecture-101/images/1.png)
 
 Do your own cover on [http://dev.to/rly](http://dev.to/rly)
@@ -86,7 +91,7 @@ We didn’t changed much, but we enable many things over here:
 
 # **What about serverless?**
 
-> [](https://twitter.com/kiyototamura/status/717420657655418880)
+{{< tweet 717420657655418880 >}}
 Serverless is so 2016
 
 

@@ -5,8 +5,12 @@ date: 2016-01-04T18:52:19.698Z
 lastmod: 2019-01-10T21:56:50+01:00
 showpagemeta: true
 
-tags:
+categories:
  - operating 
+
+---
+
+**update 2019:** this is a repost on my own blog. original article can be read on [medium](https://medium.com/@pierrez/let-s-talk-about-containers-1f11ee68c470).
 
 ---
 

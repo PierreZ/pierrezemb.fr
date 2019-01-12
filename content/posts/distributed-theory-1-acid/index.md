@@ -42,3 +42,4 @@ As developers, we are interacting oftenly with data, whenever handling it from a
 
 ## Atomic
 
+Atomic, as you may have guessed, represent something that cannot be splitted. 

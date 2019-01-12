@@ -9,6 +9,10 @@ categories:
 
 ---
 
+**update 2019:** this is a repost on my own blog. original article can be read on [medium](https://medium.com/helloexoworld/introducing-helloexoworld-the-quest-to-discover-exoplanets-with-warp10-and-tensorflow-e50f6e669915).
+
+---
+
 ![image](/posts/introducing-helloexoworld-the-quest-to-discover-exoplanets-with-warp10-and-tensorflow/images/1.jpeg)
 *Artist’s impression of the super-Earth exoplanet LHS 1140b By [ESO/spaceengine.org](https://www.eso.org/public/images/eso1712a/) — [CC BY 4.0](http://creativecommons.org/licenses/by/4.0)*
 
@@ -108,10 +112,9 @@ Then [**Kepler2Warp10**](https://github.com/PierreZ/kepler2warp10) is used to **
 
 To ease importation, an [**Ansible role**](https://github.com/PierreZ/kepler2warp10-ansible)  has been made, to spread the work across multiples small **virtual machines**.
 
-> [](https://twitter.com/PierreZ/status/908784580450295808?ref_src=twsrc%5Etfw&amp;ref_url=http%3A%2F%2Flocalhost%3A1313%2Fblog%2Fthe-quest-to-discover-exoplanets-with-warp10-and-tensorflow%2F)
+Principles of transaction-oriented database recovery
 
-
-The import took one week on 16 machines. It represents:
+{{< tweet 908784580450295808>}}
 
 *   **550k distincts stars**
 *   around **50k datapoints per star**

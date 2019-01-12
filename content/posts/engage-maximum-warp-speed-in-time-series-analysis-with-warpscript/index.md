@@ -8,20 +8,16 @@ categories:
  - Timeseries 
 
 ---
+**update 2019:** this is a repost on my own blog. original article can be read on [medium](https://medium.com/@PierreZ/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript-c97a9f4a0016).
+
+---
 
 ![image](/posts/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript/images/1.png)
 
 
 We, at [Metrics Data Platform](https://www.ovh.com/fr/data-platforms/metrics/), are working everyday with [Warp10 Platform](http://www.warp10.io/), an open source Time Series database. You may not know it because it’s not as famous as [Prometheus](https://prometheus.io/) or [InfluxDB](https://docs.influxdata.com/influxdb/) but Warp10 is the most **powerful and generic solution** to store and analyze sensor data. It’s the **core** of Metrics, and many internal teams from OVH are using [Metrics Data Platform](https://www.ovh.com/fr/data-platforms/metrics/) to monitor their infrastructure. As a result, we are handling a pretty nice traffic 24/7/365, as you can see below:
 
-
-> [](https://twitter.com/OvhMetrics/status/860792423647203331)
-[Yes, that’s more than **4M datapoints/sec** on our frontends](https://twitter.com/OvhMetrics/status/860792423647203331).
-
-
-> [](https://twitter.com/OvhMetrics/status/860791293693317121)
-[And more than **5M commits/sec** on HBase, our storage layer](https://twitter.com/OvhMetrics/status/860791293693317121).
-
+![image](/posts/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript/images/6.png)
 
 
 Not only Warp10 allows us to reach an unbelievable scalability but it also comes with his own language called **WarpScript**, to manipulate and perform heavy time series analysis. Before digging into the need of a new language, let’s talk a bit about the need of time series analysis.### What is a time serie ?
@@ -118,20 +114,19 @@ WarpScript can be used in **batch** mode, or in **real-time**, because you need 
 ### Geez, give me an example!
 
 Here’s an example of a simple but advanced query:
-``// Fetching all values  
-[ $token ‘temperature’ {} NOW 1 h ] FETCH ````// Get max value for each minute  
-[ SWAP bucketizer.max	0 1 m 0 ] BUCKETIZE````// Round to nearest long  
-[ SWAP mapper.round 0 0 0 ] MAP````// reduce the data by keeping the max, grouping by &#39;buildingID&#39;  
-[ SWAP [ &#39;buildingID&#39; ] reducer.max ] REDUCE``
+```
+// Fetching all values  
+[ $token ‘temperature’ {} NOW 1 h ] FETCH // Get max value for each minute  
+[ SWAP bucketizer.max	0 1 m 0 ] BUCKETIZE // Round to nearest long  
+[ SWAP mapper.round 0 0 0 ] MAP // reduce the data by keeping the max, grouping by 'buildingID'  
+[ SWAP [ 'buildingID' ] reducer.max ] REDUCE
+```
 
 Have you guessed the goal? The result will **display the temperature from now to 1 hour of the hottest room per buildingID**.
 
 ### What about a more complex example?
 
 You’re still here? Good, let’s have a more complex example. Let’s say that I want to do some patterns recognition. Let’s take an example. Here’s a cosinus with an increasing amplitude:
-
-
-
 
 ![image](/posts/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript/images/3.png)
 
@@ -143,24 +138,23 @@ I want to **detect the green part** of the time series, because I know that my s
 *   **PATTERNDETECTION** is running the list of motifs on all the time series you have.
 
 Here’s the code
-``// defining some variables  
-32 &#39;windowSize&#39; STORE  
-8 &#39;patternLength&#39; STORE  
-16 &#39;quantizationScale&#39; STORE  
+```
+// defining some variables  
+32 'windowSize' STORE  
+8 'patternLength' STORE  
+16 'quantizationScale' STORE  
 
 // Generate patterns   
 $pattern.to.detect 0 GET   
 $windowSize $patternLength $quantizationScale PATTERNS  
-VALUES &#39;patterns&#39; STORE  
+VALUES 'patterns' STORE  
 
 // Running the patterns through a list of GTS (Geo Time Series)  
 $list.of.gts $patterns   
-$windowSize $patternLength $quantizationScale  PATTERNDETECTION``
+$windowSize $patternLength $quantizationScale  PATTERNDETECTION
+```
 
 Here’s the result:
-
-
-
 
 ![image](/posts/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript/images/4.png)
 
