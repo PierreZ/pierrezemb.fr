@@ -1,28 +1,13 @@
 ---
-title: "the Hitchhiker's Guide to Distributed Systems Theory - chapter 1: ACID transactions"
+title: "What are ACID transactions?"
 date: 2019-01-10T23:24:27+01:00
 draft: true
 showpagemeta: true
 categories:
  - distributed-systems
 tags:
- - hitchhikers-guide
+ - transaction
 ---
-
-<p align="center">
-<a title="nclm [CC0 or OFL (http://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web)], from Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:The_Hitchhiker%27s_Guide_to_the_Galaxy.svg"><img width="512" alt="The Hitchhiker&#039;s Guide to the Galaxy" src="/posts/distributed-theory-1-acid/images/dontpanic.png"/></a>
-</p>
-
-Getting started with distributed systems can be overwhelming. When trying to learn about them, the most common response to learn is something like:
-
-> *"you should really read the (BigTable|MapReduce|Paxos|MVCC) paper"*.
-
-In practice, papers:
-
-* are usually deep and complex
-* require serious study and significant experience to glean their important contributions and to place them in context.
-
-Like the [the original encyclopedia](https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy), this serie called `the Hitchhiker's Guide to Distributed Systems Theory` will help you survive and understand the distributed world through examples, links and extract of code.
 
 # Transaction?
 
@@ -42,4 +27,27 @@ As developers, we are interacting oftenly with data, whenever handling it from a
 
 ## Atomic
 
-Atomic, as you may have guessed, represent something that cannot be splitted. 
+Atomic, as you may have guessed, `atomic` represents something that **cannot be splitted**. In the database transaction world, it means for example that if a transaction whith several writes is **started and failed** at some point, **none of the write will be committed**.
+
+--- 
+## Consistency
+
+You will hear about `consistency` a lot of this serie. Unfortunately, this word can be used in a lot of context. In the ACID definition, it refers to the fact that a transaction will **bring the database from one valid state to another.**
+
+--- 
+## Isolation
+
+Think back to your database. Were you the only user on it? I don't think so. Maybe they were concurrent transactions at the same time, beside yours. `isolation` simplify the access model to the database by virtually **isolate transactions from each other**, like they were done one after the other(this is also called **serially**).
+
+--- 
+
+## Durability
+
+`Durability` ensure that your database is a **safe place** where data can be stored without fear of losing it. If a transaction has commited successfully, any written data will not be forgotten. 
+
+
+> **All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and knowledge. I look forward to dig into each properties on several databases!
+
+--- 
+
+**Thank you** for reading my post! feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.

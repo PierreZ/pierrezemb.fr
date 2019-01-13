@@ -4,9 +4,6 @@ date: 2018-12-15T18:34:45+01:00
 draft: false
 ---
 
-<p align="center">
-  <img src="/img/myself.png"/>
-</p>
 
 ## $ whoami
 
@@ -28,7 +25,7 @@ On the other side, I'm giving a hand to local events, such as the GDG/JUG **[Fin
 
 I cofounded in 2017 **[HelloExoWorld](https://helloexo.world/)**, a association to search for exoplanets using Warp10. 
 
-I'm also a teaching assistant in my former Engineer School, and sometimes I'm giving **[talks](/talks)** and **[writing stuff online](https://medium.com/@PierreZ/)**.
+I'm also a teaching assistant in my former Engineer School, and sometimes I'm giving **[talks](/talks)** and **[writing stuff online](/posts)**.
 
 <p align="center">
 Feel free to contact me!
