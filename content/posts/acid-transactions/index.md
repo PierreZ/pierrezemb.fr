@@ -51,8 +51,8 @@ Think back to your database. Were you the only user on it? I don't think so. May
     * But [non-repeatable read](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads)(when during the course of a transaction, a row is retrieved twice and the values within the row differ between reads) are possible.
 
 * **Repeatable Reads** will provide:
-    * [non-repeatable read](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads)
-    * But [phantom reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Phantom_reads)(reading of rows which were added by other transaction after this one was started, are possible) are possible.
+    * [repeatable read](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads)
+    * But [phantom reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Phantom_reads)(reading of rows which were added by other transaction after this one was started) are possible.
 
 Phantom reads are a real problem for batch queries. This is why most modern datastore are not using a Lock-based concurrency control, but Multi-Versioned Concurrency Control.
 
