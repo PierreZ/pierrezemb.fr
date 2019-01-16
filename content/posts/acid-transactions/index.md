@@ -29,38 +29,49 @@ As developers, we are interacting oftenly with data, whenever handling it from a
 
 Atomic, as you may have guessed, `atomic` represents something that **cannot be splitted**. In the database transaction world, it means for example that if a transaction whith several writes is **started and failed** at some point, **none of the write will be committed**. As stated by many, the word `atomic` could be reword as `abortability`.
 
---- 
+---
 ## Consistency
 
 You will hear about `consistency` a lot of this serie. Unfortunately, this word can be used in a lot of context. In the ACID definition, it refers to the fact that a transaction will **bring the database from one valid state to another.**
 
---- 
+---
 ## Isolation
 
-Think back to your database. Were you the only user on it? I don't think so. Maybe they were concurrent transactions at the same time, beside yours. `isolation` simplify the access model to the database by virtually **isolate transactions from each other**, like they were done one after the other(this is also called **serially**). 
+Think back to your database. Were you the only user on it? I don't think so. Maybe they were concurrent transactions at the same time, beside yours. `isolation` simplify the access model to the database by virtually **isolate transactions from each other**, like they were done one after the other(this is also called **serially**).
 
-**Isolation while keeping good performance is the most difficult item on the list.** There is different transaction isolation levels:
+**Isolation while keeping good performance is the most difficult item on the list.** There's a lot of litterature and papers about it, and we will only scratch the surface. There is different transaction isolation levels, depending on the number of guarantees provided.
 
-* Lock-based Concurrency Control, which rely on locks. You can have:
-    * Read Committed: 
-    * Repeatable Reads:
-    * Serializable: [Two-phase locking](https://en.wikipedia.org/wiki/Two-phase_locking)
-* Multi-Versioned Concurrency Control (MVCC), which rely on snapshots. It is used by tikv, HBase or PostgreSQL
+### Lock-based Concurrency Control
 
+**Lock-based Concurrency Control** are relying on locks: if one transaction uses some piece of data, a lock is set on this row, and is kept until the transaction succeeds or fails. The most known are:
 
+* **Read Committed** will provide:
+    * no [dirty reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Dirty_reads)(you can see only commited data)
+    * no [dirty writes]()(you can only overwrite data that has been commited)
+    * But [non-repeatable read](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads)(when during the course of a transaction, a row is retrieved twice and the values within the row differ between reads) are possible.
 
---- 
+* **Repeatable Reads** will provide:
+    * [non-repeatable read](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads)
+    * But [phantom reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Phantom_reads)(reading of rows which were added by other transaction after this one was started, are possible) are possible.
+
+Phantom reads are a real problem for batch queries. This is why most modern datastore are not using a Lock-based concurrency control, but Multi-Versioned Concurrency Control.
+
+### Multi-Versioned Concurrency Control
+
+**Multi-Versioned Concurrency Control** or **MVCC**, is relying on a different approach. Instead of locking that row for reading when somebody starts working on it, it ensures that **any transaction will see a version of the data that is corresponding to the start of the query**. We will cover it later, as MVCC deserves its own blogpost!
+
+---
 
 ## Durability
 
-`Durability` ensure that your database is a **safe place** where data can be stored without fear of losing it. If a transaction has commited successfully, any written data will not be forgotten. 
+`Durability` ensure that your database is a **safe place** where data can be stored without fear of losing it. If a transaction has commited successfully, any written data will not be forgotten.
 
 # That's it?
 
-**All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and knowledge. Consistency and isolation for example deserve their own blogposts!  
+**All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and knowledge. Consistency and isolation for example deserve their own blogposts!
 
 I look forward to dig into each properties on several databases!
 
---- 
+---
 
 **Thank you** for reading my post! feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.
