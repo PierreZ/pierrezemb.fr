@@ -61,7 +61,7 @@ The implementation is hold by [DefaultMemStore](https://github.com/apache/hbase/
 
 ## Flush on HDFS
 
-As we seen above, the `MemStore` is supporting all the puts. At some (configuration) point in time, the `MemStore` is flushed as a immutable file ([HFile](https://github.com/apache/hbase/blob/rel/2.1.2/hbase-server/src/main/java/org/apache/hadoop/hbase/io/hfile/HFile.java)) on the Hadoop Distributed File System called `HDFS`. HFile are similar to `SSTables` introduced by the official [BigTable paper](https://research.google.com/archive/bigtable-osdi06.pdf).
+As we seen above, the `MemStore` is supporting all the puts. When asked to flush, the current memstore is **moved to snapshot and is cleared**. Flushed file are called ([HFiles](https://github.com/apache/hbase/blob/rel/2.1.2/hbase-server/src/main/java/org/apache/hadoop/hbase/io/hfile/HFile.java)) and they are similar to `SSTables` introduced by the official [BigTable paper](https://research.google.com/archive/bigtable-osdi06.pdf). HFiles are flushed on the Hadoop Distributed File System called `HDFS`.
 
 >  If you want deeper insight about SSTables, I recommend reading [Table Format from the awesome RocksDB wiki](https://github.com/facebook/rocksdb/wiki/Rocksdb-BlockBasedTable-Format)
 
