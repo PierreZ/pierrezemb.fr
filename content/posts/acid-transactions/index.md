@@ -54,7 +54,7 @@ Think back to your database. Were you the only user on it? I don't think so. May
     * [repeatable read](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads)
     * But [phantom reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Phantom_reads)(reading of rows which were added by other transaction after this one was started) are possible.
 
-Phantom reads are a real problem for batch queries. This is why most modern datastore are not using a Lock-based concurrency control, but Multi-Versioned Concurrency Control.
+Lock-based Concurrency Control are coming with performance issues due to the lock. Also, phantom reads are a real problem for batch queries. This is why most modern datastore are not using a Lock-based concurrency control, but Multi-Versioned Concurrency Control.
 
 ### Multi-Versioned Concurrency Control
 
@@ -68,7 +68,7 @@ Phantom reads are a real problem for batch queries. This is why most modern data
 
 # That's it?
 
-**All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and knowledge. Consistency and isolation for example deserve their own blogposts!
+**All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and knowledge.
 
 I look forward to dig into each properties on several databases!
 
