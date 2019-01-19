@@ -45,7 +45,7 @@ Think back to your database. Were you the only user on it? I don't think so. May
 
 ### Isolation by the theory
 
-The SQL standard defines four isolation levels that can be sum-up like this:
+The SQL standard defines four isolation levels: `Serializable`, `Repeatable Read`, `Read Commited` and `Read Uncommited`. The strongest isolation is `Serializable` where transaction are **not runned in parallel**. As you may have guessed, it is also the slowest. **Weaker isolation level are trading speed against anomalies** that can be sum-up like this:
 
 | Isolation level 	| [dirty reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Dirty_reads) | [Non-repeatable reads](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads) 	| [Non-repeatable reads](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads) 	| Performance 	|
 |-----------------	|-----------	|--------------------	|--------------	|-------------	|
