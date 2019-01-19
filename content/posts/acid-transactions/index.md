@@ -41,7 +41,7 @@ Think back to your database. Were you the only user on it? I don't think so. May
 
 **Isolation while keeping good performance is the most difficult item on the list.** There's a lot of litterature and papers about it, and we will only scratch the surface. There is different transaction isolation levels, depending on the number of guarantees provided.
 
-### Lock-based Concurrency Control
+### Lock Isolation
 
 **Lock-based Concurrency Control** are relying on locks: if one transaction uses some piece of data, a lock is set on this row, and is kept until the transaction succeeds or fails. The most known are:
 
@@ -56,9 +56,14 @@ Think back to your database. Were you the only user on it? I don't think so. May
 
 Lock-based Concurrency Control are coming with performance issues due to the lock. Also, phantom reads are a real problem for batch queries. This is why most modern datastore are not using a Lock-based concurrency control, but Multi-Versioned Concurrency Control.
 
-### Multi-Versioned Concurrency Control
+### Snapshot Isolation
 
-**Multi-Versioned Concurrency Control** or **MVCC**, is relying on a different approach. Instead of locking that row for reading when somebody starts working on it, it ensures that **any transaction will see a version of the data that is corresponding to the start of the query**. We will cover it later, as MVCC deserves its own blogpost!
+**Multi-Versioned Concurrency Control** or **MVCC**, is relying on a different approach. Instead of locking that row for reading when somebody starts working on it, it ensures that **any transaction will see a version of the data that is corresponding to the start of the query**. Thanks to it:
+
+* readers never block writers
+* writers never block readers.
+
+We will cover it later, as MVCC deserves its own blogpost!
 
 ---
 
