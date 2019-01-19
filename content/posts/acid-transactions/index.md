@@ -37,33 +37,52 @@ You will hear about `consistency` a lot of this serie. Unfortunately, this word 
 ---
 ## Isolation
 
-Think back to your database. Were you the only user on it? I don't think so. Maybe they were concurrent transactions at the same time, beside yours. `isolation` simplify the access model to the database by virtually **isolate transactions from each other**, like they were done one after the other(this is also called **serially**).
+Think back to your database. Were you the only user on it? I don't think so. Maybe they were concurrent transactions at the same time, beside yours. **Isolation while keeping good performance is the most difficult item on the list.** There's a lot of litterature and papers about it, and we will only scratch the surface. There is different transaction isolation levels, depending on the number of guarantees provided.
 
-**Isolation while keeping good performance is the most difficult item on the list.** There's a lot of litterature and papers about it, and we will only scratch the surface. There is different transaction isolation levels, depending on the number of guarantees provided.
 
-### Lock Isolation
+### Isolation by the SQL Standards
 
-**Lock-based Concurrency Control** are relying on locks: if one transaction uses some piece of data, a lock is set on this row, and is kept until the transaction succeeds or fails. The most known are:
+The SQL standard defines four isolation levels:
 
-* **Read Committed** will provide:
-    * no [dirty reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Dirty_reads)(you can see only commited data)
-    * no [dirty writes]()(you can only overwrite data that has been commited)
-    * But [non-repeatable read](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads)(when during the course of a transaction, a row is retrieved twice and the values within the row differ between reads) are possible.
+#### Serializable
 
-* **Repeatable Reads** will provide:
-    * [repeatable read](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads)
-    * But [phantom reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Phantom_reads)(reading of rows which were added by other transaction after this one was started) are possible.
+`SERIALIZABLE` transactions run as if **only one transaction is running**. As you may have guessed, this is the **strongest but slowest isolation level**. The other levels are trading scalability againts what we could call `anomalies`.
 
-Lock-based Concurrency Control are coming with performance issues due to the lock. Also, phantom reads are a real problem for batch queries. This is why most modern datastore are not using a Lock-based concurrency control, but Multi-Versioned Concurrency Control.
+---
 
-### Snapshot Isolation
 
-**Multi-Versioned Concurrency Control** or **MVCC**, is relying on a different approach. Instead of locking that row for reading when somebody starts working on it, it ensures that **any transaction will see a version of the data that is corresponding to the start of the query**. Thanks to it:
+#### Repeatable Read
 
-* readers never block writers
-* writers never block readers.
+`Repeatable read` is **avoiding the [Non-repeatable reads](https://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Non-repeatable_reads) problem:** A transaction who re-reads data that has previously read and has been modified by another transaction will see the newest value.
 
-We will cover it later, as MVCC deserves its own blogpost!
+The `repeatable Read` isolation is weak againts **[phantom reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Phantom_reads)** (reading of rows which were added by other transaction after this one was started) are possible.
+
+---
+
+#### Read Commited
+
+`Read commited` means that there is no **[dirty reads](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Dirty_reads)**(you can see only commited data).
+
+---
+
+
+#### Read uncommited
+
+This is the weakest isolation level, where dirty reads mentionned above are possible.
+
+---
+
+### Isolation in Real Databases
+
+Now that we saw some theory, let's have a look on a particular well-known database: PostgreSQL. What can kind of isolation PostgreSQL is offering?
+
+> PostgreSQL provides a rich set of tools for developers to manage concurrent access to data. Internally, data consistency is maintained by using a multiversion model (**Multiversion Concurrency Control, MVCC**). 
+
+--- [Concurrency Control introduction](https://www.postgresql.org/docs/current/mvcc-intro.html) 
+
+Wait what? What is MVCC? Well, turns out that after the SQL standards came another type of Isolation: **Snapshot Isolation**. Instead of locking that row for reading when somebody starts working on it, it ensures that **any transaction will see a version of the data that is corresponding to the start of the query**.  It provides a good balance between **performance and consistency**.
+
+[As MVCC is pretty well a well established standard](https://en.wikipedia.org/wiki/List_of_databases_using_MVCC), I look forward to dig into it and do a blogpost!
 
 ---
 
@@ -74,8 +93,6 @@ We will cover it later, as MVCC deserves its own blogpost!
 # That's it?
 
 **All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and knowledge.
-
-I look forward to dig into each properties on several databases!
 
 ---
 
