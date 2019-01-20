@@ -29,7 +29,7 @@ The data model is simple: it's like a multi-dimensional map:
 * Values are stored into what we call a **cell** and are versioned with a timestamp.
 * A column is divided between a **Column Family** and a **Column Qualifier**. Long story short, a Column Family is kind of like a column in classic SQL, and a qualifier is a sub-structure inside a Colum family. A column Family is **static**, you need to create at creation, whereas Column Qualifiers can be created on the fly.
 
-Not as easy as you thought? Here's an example! Let's say that we're trying to **save the whole internet**. To do this, we need to store the content of each pages, and versioned it. We can use **the page addres as the row key**, and and store the contents in a **column called "Contents"**. Nowadays, website **contents can be anything**, from a HTML file to a binary such as a PDF. To handle that, we can create as many **qualifiers** as we want, such as "content:html" or "content:video". 
+Not as easy as you thought? Here's an example! Let's say that we're trying to **save the whole internet**. To do this, we need to store the content of each pages, and versioned it. We can use **the page addres as the row key**, and store the contents in a **column called "Contents"**. Nowadays, website **contents can be anything**, from a HTML file to a binary such as a PDF. To handle that, we can create as many **qualifiers** as we want, such as "content:html" or "content:video". 
 
 ```json
 {
