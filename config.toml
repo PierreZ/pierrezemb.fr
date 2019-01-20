@@ -1,7 +1,6 @@
 ## Basic Configuration
 
 baseurl = "https://pierrezemb.fr"
-builddrafts = false
 canonifyurls = false
 languageCode = "en-US"
 
@@ -18,6 +17,7 @@ theme = "hugo-goa"
 # disqusShortname = "https-shenoybr-github-io-hugo-goa-demo" # Comment out to disable Disqus.
 # googleAnalytics = "XYZ"
 enableRobotsTXT = true
+buildDrafts = true
 
 ## Site Settings
 [params]
@@ -30,7 +30,7 @@ dateformat = "Jan 2, 2006"
 ## Site Meta Settings
 [params.meta]
 description = "Pierre Zemb"
-keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb"
+keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb,pierrez"
 
 ## Social Accounts
 [params.social]
@@ -53,6 +53,7 @@ copyright = "© 2019. Pierre Zemb. [Some Rights Reserved](http://creativecommons
 poweredby = true
 highlightjs = true 
 socialmarkup = true
+rss = true
 
 ## Main Menu
 [[menu.main]]

@@ -1,11 +1,11 @@
 ---
 title: "What are ACID transactions?"
-date: 2019-01-10T23:24:27+01:00
 draft: true
 showpagemeta: true
 categories:
- - distributed-systems
+ - transaction 
 tags:
+ - acid
  - transaction
 ---
 
@@ -72,7 +72,7 @@ Wait what? What is MVCC? Well, turns out that after the SQL standards came anoth
 
 # That's it?
 
-**All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and knowledge.
+**All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and researchs. And this is only valid for a single machine, **the distributed transaction field** is even more complicated, but we will get to it in another blogpost!
 
 ---
 

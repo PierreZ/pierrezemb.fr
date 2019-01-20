@@ -7,6 +7,9 @@ showpagemeta: true
 categories:
  - Timeseries 
 
+tags:
+    - warp10
+    - analytics
 ---
 **update 2019:** this is a repost on my own blog. original article can be read on [medium](https://medium.com/@PierreZ/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript-c97a9f4a0016).
 
