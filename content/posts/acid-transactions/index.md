@@ -54,9 +54,11 @@ The SQL standard defines four isolation levels: `Serializable`, `Repeatable Read
 | Read Commited 	| 😎 	| 😱 	| 😱 	| 👍👍👍   	|
 | Read uncommited 	| 😱 	| 😱 	| 😱 	| 👍👍👍👍    	|
 
+I encourage you to click on all the links within the table to **see everything that could go wront in a weak database!**
+
 ### Isolation in Real Databases
 
-Now that we saw some theory, let's have a look on a particular well-known database: PostgreSQL. What can kind of isolation PostgreSQL is offering?
+Now that we saw some theory, let's have a look on a particular well-known database: PostgreSQL. What kind of isolation PostgreSQL is offering?
 
 > PostgreSQL provides a rich set of tools for developers to manage concurrent access to data. Internally, data consistency is maintained by using a multiversion model (**Multiversion Concurrency Control, MVCC**). 
 
@@ -72,8 +74,8 @@ Wait what? What is MVCC? Well, turns out that after the SQL standards came anoth
 
 # That's it?
 
-**All these properties may seems obvious to you, but they are really not.** Each of the item is involving a lot of engineering and researchs. And this is only valid for a single machine, **the distributed transaction field** is even more complicated, but we will get to it in another blogpost!
+**All these properties may seems obvious to you**m but Each of the item is involving a lot of engineering and researchs. And this is only valid for a single machine, **the distributed transaction field** is even more complicated, but we will get to it in another blogpost!
 
 ---
 
-**Thank you** for reading my post! feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.
+**Thank you** for reading my post! Feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.

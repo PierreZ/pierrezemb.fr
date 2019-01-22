@@ -106,4 +106,4 @@ Serverless is the “new” buzz word. Ignited by Amazon with their product [AWS
 * Meetup LeboncoinTech — AMQP 101 by [Quentin ADAM](https://medium.com/u/58ea5a89aaae) (French sorry)
 * vert.x 3 — be reactive on the JVM but not only in Java by Clement Escoffier/Paulo Lopes DEVOXX 2015
 
-Please, feel free to react to this article, you can reach me on [Twitter](https://twitter.com/PierreZ), or have a look on my [website](https://pierrezemb.fr).
+Please, Feel free to react to this article, you can reach me on [Twitter](https://twitter.com/PierreZ), or have a look on my [website](https://pierrezemb.fr).

@@ -67,6 +67,11 @@ Frustration with existing open source monitoring tools like **Nagios** and **Gan
 
 Now the time series ecosystem is bigger than ever, here’s a short list of what you can find to handle time series data:
 
+* InfluxDB.
+* Prometheus.
+* Riak TS.
+* OpenTSDB.
+
 Then there’s **Warp10**. The difference is quite simple, Warp10 is **a platform** whereas all the time series listed above are **stores**. This is game changing, for multiples reasons.
 
 #### Security-first design

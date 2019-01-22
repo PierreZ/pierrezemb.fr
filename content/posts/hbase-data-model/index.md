@@ -27,9 +27,9 @@ The data model is simple: it's like a multi-dimensional map:
 * A range of rows is called a **region**. It is similar to a shard.
 * A row in HBase consists of a **row key** and **one or more columns**, which are holding the cells.
 * Values are stored into what we call a **cell** and are versioned with a timestamp.
-* A column is divided between a **Column Family** and a **Column Qualifier**. Long story short, a Column Family is kind of like a column in classic SQL, and a qualifier is a sub-structure inside a Colum family. A column Family is **static**, you need to create at creation, whereas Column Qualifiers can be created on the fly.
+* A column is divided between a **Column Family** and a **Column Qualifier**. Long story short, a Column Family is kind of like a column in classic SQL, and a qualifier is a sub-structure inside a Colum family. A column Family is **static**, you need to create it during table creation, whereas Column Qualifiers can be created on the fly.
 
-Not as easy as you thought? Here's an example! Let's say that we're trying to **save the whole internet**. To do this, we need to store the content of each pages, and versioned it. We can use **the page addres as the row key**, and store the contents in a **column called "Contents"**. Nowadays, website **contents can be anything**, from a HTML file to a binary such as a PDF. To handle that, we can create as many **qualifiers** as we want, such as "content:html" or "content:video". 
+Not as easy as you thought? Here's an example! Let's say that we're trying to **save the whole internet**. To do this, we need to store the content of each pages, and versioned it. We can use **the page address as the row key** and store the contents in a **column called "Contents"**. Nowadays, website **contents can be anything**, from a HTML file to a binary such as a PDF. To handle that, we can create as many **qualifiers** as we want, such as "content:html" or "content:video". 
 
 ```json
 {
@@ -63,7 +63,7 @@ As stated by the official [documentation](https://hbase.apache.org/book.html#row
 
 > Hotspotting occurs when a **large amount of client traffic is directed at one node, or only a few nodes, of a cluster**. This traffic may represent reads, writes, or other operations. The traffic overwhelms the single machine responsible for hosting that region, causing performance degradation and potentially leading to region unavailability.
 
-As you may have guessed, this is why we are using the **reverse adress name** in my example, because `www` is too generic, we would have hotspot the poor region holding data for `www`.
+As you may have guessed, this is why we are using the **reverse address name** in my example, because `www` is too generic, we would have hotspot the poor region holding data for `www`.
 
 If you are curious about Hbase schema, you should have a look on [Designing Your BigTable Schema](https://cloud.google.com/bigtable/docs/schema-design), as BigTable is the proprietary version of Hbase.
 
@@ -81,4 +81,4 @@ I have been working with Hbase for the past three years, **including operation a
 
 --- 
 
-**Thank you** for reading my post! feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.
+**Thank you** for reading my post! Feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.
