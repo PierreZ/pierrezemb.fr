@@ -30,7 +30,7 @@ As developers, we are interacting oftenly with data, whenever handling it from a
 
 ## Atomic
 
-Atomic, as you may have guessed, `atomic` represents something that **cannot be splitted**. In the database transaction world, it means for example that if a transaction whith several writes is **started and failed** at some point, **none of the write will be committed**. As stated by many, the word `atomic` could be reword as `abortability`.
+Atomic, as you may have guessed, `atomic` represents something that **cannot be splitted**. In the database transaction world, it means for example that if a transaction with several writes is **started and failed** at some point, **none of the write will be committed**. As stated by many, the word `atomic` could be reword as `abortability`.
 
 ---
 ## Consistency
@@ -54,7 +54,7 @@ The SQL standard defines four isolation levels: `Serializable`, `Repeatable Read
 | Read Commited 	| 😎 	| 😱 	| 😱 	| 👍👍👍   	|
 | Read uncommited 	| 😱 	| 😱 	| 😱 	| 👍👍👍👍    	|
 
-I encourage you to click on all the links within the table to **see everything that could go wront in a weak database!**
+I encourage you to click on all the links within the table to **see everything that could go wrong in a weak database!**
 
 ### Isolation in Real Databases
 
