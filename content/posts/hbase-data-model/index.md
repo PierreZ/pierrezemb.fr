@@ -1,7 +1,6 @@
 ---
-title: "Hbase data model"
-date: 2019-01-11T23:24:27+01:00
-draft: true
+title: "Hbase Data Model"
+date: 2019-01-27T20:24:27+01:00
 showpagemeta: true
 categories:
  - distributed-systems
@@ -42,7 +41,8 @@ Not as easy as you thought? Here's an example! Let's say that we're trying to **
           "<html>..."             // Another cell
       },
       "content:pdf": {            // Another Column qualifier
-        "2015-01-01": "<pdf>..."  // my website may only contained a pdf in 2015
+        "2015-01-01": 
+          "<pdf>..."  // my website may only contained a pdf in 2015
       }
     }
   }
@@ -65,7 +65,7 @@ As stated by the official [documentation](https://hbase.apache.org/book.html#row
 
 As you may have guessed, this is why we are using the **reverse address name** in my example, because `www` is too generic, we would have hotspot the poor region holding data for `www`.
 
-If you are curious about Hbase schema, you should have a look on [Designing Your BigTable Schema](https://cloud.google.com/bigtable/docs/schema-design), as BigTable is the proprietary version of Hbase.
+If you are curious about Hbase schema, you should have a look on [Designing Your BigTable Schema](https://cloud.google.com/bigtable/docs/schema-design), as BigTable is kind of the proprietary version of Hbase.
 
 # Be warned
 
