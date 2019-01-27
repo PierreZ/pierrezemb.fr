@@ -9,7 +9,7 @@ layoutdir = "layouts"
 publishdir = "public"
 
 author = "Pierre Zemb"
-title = "Pierre Zemb"
+title = "website"
 
 theme = "hugo-goa"
 

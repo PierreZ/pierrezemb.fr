@@ -54,7 +54,7 @@ The SQL standard defines four isolation levels: `Serializable`, `Repeatable Read
 | Read Commited 	| 😎 	| 😱 	| 😱 	| 👍👍👍   	|
 | Read uncommited 	| 😱 	| 😱 	| 😱 	| 👍👍👍👍    	|
 
-I encourage you to click on all the links within the table to **see everything that could go wrong in a weak database!**
+> I encourage you to click on all the links within the table to **see everything that could go wrong in a weak database!**
 
 ### Isolation in Real Databases
 
@@ -74,7 +74,7 @@ Wait what? What is MVCC? Well, turns out that after the SQL standards came anoth
 
 # That's it?
 
-**All these properties may seems obvious to you**m but Each of the item is involving a lot of engineering and researchs. And this is only valid for a single machine, **the distributed transaction field** is even more complicated, but we will get to it in another blogpost!
+**All these properties may seems obvious to you** but each of the item is involving a lot of engineering and researchs. And this is only valid for a single machine, **the distributed transaction field** is even more complicated, but we will get to it in another blogpost!
 
 ---
 
