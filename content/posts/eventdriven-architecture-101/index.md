@@ -4,7 +4,7 @@ author: "Pierre Zemb"
 date: 2016-05-13T17:19:23.788Z
 lastmod: 2019-01-10T21:57:01+01:00
 showpagemeta: true
-
+canonical: https://medium.com/@PierreZ/event-driven-architecture-101-d8e13cc4c656
 categories:
   - programming
 

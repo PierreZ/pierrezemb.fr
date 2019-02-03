@@ -6,7 +6,7 @@ lastmod: 2019-01-10T21:57:19+01:00
 showpagemeta: true
 categories:
  - Timeseries 
-
+canonical: https://medium.com/@PierreZ/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript-c97a9f4a0016
 tags:
     - warp10
     - analytics
