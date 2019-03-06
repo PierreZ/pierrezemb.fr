@@ -15,8 +15,6 @@ This conference is a feedback that will present:
 * How to develop a Flink job from 0
 * Deploying and operating a Flink cluster
 
-
-
 # Occurences
 
 * FinistDevs, 2019
