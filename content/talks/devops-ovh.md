@@ -19,4 +19,5 @@ Have you been wondered what is like to be working at the largest European Cloud 
 
 # Photos and tweets
 
-Soon!
+{{<tweet 1103981210286673920>}}
+{{<tweet 1103982161810599936>}}
