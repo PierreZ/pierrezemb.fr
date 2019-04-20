@@ -24,7 +24,7 @@ buildDrafts = true
 author = "Pierre Zemb"
 intro = "Infrastructure Engineer"
 description = "Currently working at [OVH](https://www.ovh.com/) on Metrics Data Platform.<br>Co-founder of [HelloExoWorld](https://helloexo.world).<br>Co-organizer of the [DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh) and [FinistDevs](https://finistdevs.org/)"
-authorimage = "myself.png"
+authorimage = "myself.jpg"
 dateformat = "Jan 2, 2006"
 
 ## Site Meta Settings

@@ -1,6 +1,6 @@
 ---
 title: "Handling alerts at OVH-Scale with Apache Flink"
-date: 2019-02-10T22:22:36+01:00
+date: 2019-04-18T22:22:36+01:00
 draft: false
 ---
 
@@ -22,9 +22,12 @@ This conference is a feedback that will present:
 
 # Ressources
 
-* [slides](https://docs.google.com/presentation/d/118FjhLZzOb1ue-ya__hxBn1lSTwzLFuHtHErApsOfDg/edit?usp=sharing)
+* [slides](https://docs.google.com/presentation/d/1kIU3UNyhSSFFptA0_sJiIuV_SCzbvrYt0qEuQEv3vVg/edit?usp=sharing)
 * [Github](https://github.com/PierreZ/ovh-alerts-flink-demo)
 
 # Photos and tweets
 
-Soon!
+{{<tweet 1118857461748858881 >}}
+{{<tweet 1118881288432312320 >}}
+{{<tweet 1118843759398195202 >}}
+{{<tweet 1118856425688719366 >}}
