@@ -22,6 +22,8 @@ This conference is a feedback that will present:
 
 # Ressources
 
+{{< youtube id="kDr9HAr25L0" autoplay="false" >}}
+
 * [slides](https://docs.google.com/presentation/d/1kIU3UNyhSSFFptA0_sJiIuV_SCzbvrYt0qEuQEv3vVg/edit?usp=sharing)
 * [Github](https://github.com/PierreZ/ovh-alerts-flink-demo)
 
