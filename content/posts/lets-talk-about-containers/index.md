@@ -7,6 +7,7 @@ showpagemeta: true
 canonical: https://medium.com/@PierreZ/let-s-talk-about-containers-1f11ee68c470
 categories:
  - operating 
+ - containers
 
 ---
 

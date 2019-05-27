@@ -7,6 +7,7 @@ showpagemeta: true
 canonical: https://medium.com/@PierreZ/event-driven-architecture-101-d8e13cc4c656
 categories:
   - programming
+  - event
 
 ---
 

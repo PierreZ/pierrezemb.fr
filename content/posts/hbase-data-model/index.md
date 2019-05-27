@@ -10,7 +10,7 @@ tags:
 
 # HBase?
 
-![hbase image](/posts/hbase-data-model/images/hbase.png)
+![hbase image](/posts/hbase-data-model/images/hbase.jpg)
 
 > [Apache HBase™](https://hbase.apache.org/) is a type of "NoSQL" database. "NoSQL" is a general term meaning that the database isn’t an RDBMS which supports SQL as its primary access language. Technically speaking, HBase is really more a "Data Store" than "Data Base" because it lacks many of the features you find in an RDBMS, such as typed columns, secondary indexes, triggers, and advanced query languages, etc.
 
