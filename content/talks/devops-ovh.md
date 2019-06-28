@@ -13,7 +13,10 @@ Have you been wondered what is like to be working at the largest European Cloud 
 
 * Incontro DevOps Italia, 2019
 
+
 # Ressources
+
+{{< vimeo 333920323 >}}
 
 * [slides](https://docs.google.com/presentation/d/1qfr8Mb3TqWLn9dOq_3aqPYDt29wCqD2Mb7RuYit_oCA/edit?usp=sharing)
 
