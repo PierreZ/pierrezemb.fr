@@ -8,9 +8,7 @@ categories:
  - colossus
 ---
 
-<header class="row text-center header">
-   <img src="/posts/colossus-google/hadoop-logo.jpg" alt="hadoop Image" class="text-center"> 
-</header>
+{{< image src="/posts/colossus-google/hadoop-logo.jpg" alt="Hello Friend" position="center" style="border-radius: 8px;" >}}
 
 In the last few months, there has been numerous blogposts about the end of the Hadoop-era. It is true that:
 

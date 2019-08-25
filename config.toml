@@ -1,63 +1,83 @@
-## Basic Configuration
+baseURL = "https://pierrezemb.fr"
+title   = "Pierre Zemb"
 
-baseurl = "https://pierrezemb.fr"
-canonifyurls = false
-languageCode = "en-US"
+DefaultContentLanguage = "en"
 
-contentdir = "content"
-layoutdir = "layouts"
-publishdir = "public"
+theme = "hello-friend-ng"
 
-author = "Pierre Zemb"
-title = "website"
+PygmentsCodeFences = true
+PygmentsStyle = "monokai"
 
-theme = "hugo-goa"
+rssLimit  = 10  # Maximum number of items in the RSS feed.
+copyright = "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." # This message is only used by the RSS template.
 
-## Hugo Built-in Features
-# disqusShortname = "https-shenoybr-github-io-hugo-goa-demo" # Comment out to disable Disqus.
-# googleAnalytics = "XYZ"
-enableRobotsTXT = true
-buildDrafts = true
+# googleAnalytics = ""
+# disqusShortname = ""
 
-## Site Settings
+[author]
+  name = "Pierre Zemb"
+
+[blackfriday]
+  hrefTargetBlank = true
+
 [params]
-author = "Pierre Zemb"
-intro = "Infrastructure Engineer"
-description = "Currently working at [OVH](https://www.ovh.com/) on Metrics Data Platform.<br>Co-founder of [HelloExoWorld](https://helloexo.world).<br>Co-organizer of the [DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh) and [FinistDevs](https://finistdevs.org/)"
-authorimage = "myself.jpg"
-dateformat = "Jan 2, 2006"
+  dateform        = "Jan 2, 2006"
+  dateformShort   = "Jan 2"
+  dateformNum     = "2006-01-02"
+  dateformNumTime = "2006-01-02 15:04 -0700"
 
-## Site Meta Settings
-[params.meta]
-description = "Pierre Zemb"
-keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb,pierrez"
+  # Metadata mostly used in document's head
+  description = "Nice theme for homepages and blogs"
+  keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb,pierrez" 
+  images = ["myself.jpg"]
 
-## Social Accounts
-[params.social]
-github = "PierreZ"
-medium = "@PierreZ"
-linkedin = "pierre-zemb-8004125b"
-twitter = "PierreZ"
-#facebook = "pierre.zemb"
-#google = "pierre.zemb"
-stackoverflow = "2477534"
-hackernews = "PierreZ"
-#steam = "pierrezemb"
-reddit = "pierrezemb"
-keybase = "PierreZ"
-email = "contact@pierrezemb.fr"
+  homeSubtitle = "Infrastructure Engineer"
 
-## Extras
-[params.extra]
-copyright = "© 2019. Pierre Zemb. [Some Rights Reserved](http://creativecommons.org/licenses/by/3.0/)."
-poweredby = true
-highlightjs = true 
-socialmarkup = true
-rss = true
+  # Prefix of link to the git commit detail page. GitInfo must be enabled.
+  # gitUrl = ""
 
-## Main Menu
+  # Integrate Javascript files or stylesheets by adding the url to the external assets or by
+  # linking local files with their path relative to the static folder, e.g. "css/styles.css"
+  customCSS = []
+  customJS  = []
+
+  # Toggle this option need to rebuild SCSS, requires extended version of Hugo
+  justifyContent = false  # Set "text-align: justify" to .content.
+
+  # Directory name of your blog content (default is `content/posts`)
+  contentTypeName = "posts"
+  # Default theme "light" or "dark"
+  defaultTheme = "dark"
+  themeColor = "#252627"
+
+  [params.logo]
+    logoText     = "$ cd ~/blog"
+    logoHomeLink = "/"
+
+  # Social icons
+  [[params.social]]
+    name = "twitter"
+    url  = "https://twitter.com/PierreZ"
+
+  [[params.social]]
+    name = "email"
+    url  = "mailto:contact@pierrezemb/"
+
+  [[params.social]]
+    name = "github"
+    url  = "https://github.com/PierreZ"
+
+  [[params.social]]
+    name = "linkedin"
+    url  = "https://linkedin.com/in/pierre-zemb-8004125b"
+
+[languages]
+  [languages.en]
+    weight    = 1
+    copyright = '<a href="http://creativecommons.org/licenses/by/3.0/">Some Rights Reserved</a>'
+
 [[menu.main]]
-    name = "about"
+    name = "About"
     identifier = "about"
     weight = 200
     url = "/about/"

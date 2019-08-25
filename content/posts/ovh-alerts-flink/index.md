@@ -51,15 +51,13 @@ At his core, Beacon is reading events from **Kafka**. Everything is represented 
 
 Then everything is merged to **generate** **a** **notification**, that is going to be forward to the right person. A notification message is pushed into Kafka, that will be consumed by another component called **beacon-notifier.**
 
-![Beacon architecture][11]
-
-Beacon architecture
+{{< image src="https://www.ovh.com/fr/blog/wp-content/uploads/2019/01/002.png?x70472" style="background: white" alt="Hello Friend" position="center" caption="architecture" >}}
 
 ## Handling States
 
 If you are new to streaming architecture, I recommend reading [Dataflow Programming Model][12] from Flink official documentation.
 
-![Handling state][13]
+{{< image src="https://www.ovh.com/fr/blog/wp-content/uploads/2019/01/003.png?x70472" style="background: white" alt="Hello Friend" position="center" caption="beacon architecture">}}
 
 Everything is merged into a dataStream, **partitionned** ([keyed by ][14]in Flink API) by users. Here's an example:
 ```java

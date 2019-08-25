@@ -12,5 +12,6 @@ $RECYCLE.BIN/
 .DS_Store
 
 themes/
+resources/
 
 .vscode
