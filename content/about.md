@@ -10,8 +10,12 @@ draft: false
 
 I'm an **Infrastructure Engineer** at **[OVH](https://www.ovh.com)**.
 
-I have a passion for **distributed systems** problems, specifically when it comes with **scalability and performance issues**.
+I have a passion for **distributed systems** problems, specifically when it comes with **scalability and performance issues**. I love contributing to different open-sources projects, such as:
 
+* Warp10
+* Apache
+    * HBase
+    * Flink
 
 # Work
 
@@ -30,7 +34,7 @@ I was using `Flink`, `HBase`, `Hadoop,` `Kafka`, `Ansible`, `Go`, `Rust`, `Java`
 I was **on-call duty** on more than 700 servers, including:
 
 * 3 Warp10 fully distributed clusters, including one that handling 1.5 millions datapoints per second
-* 3 Hadoop clusters, including a 240 nodes Hadoop cluster running a 75k regions Hbase table
+* 3 Hadoop clusters, including a 250 nodes Hadoop cluster running a 75k regions Hbase table
 * Various Apache technologies, such as Kafka, Zookeeper and Flink
 
 I gave training and support for both external and internal client of Metrics, including WarpScript.
