@@ -76,4 +76,4 @@ Wait what? What is MVCC? Well, turns out that after the SQL standards came anoth
 
 ---
 
-**Thank you** for reading my post! Feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.
+**Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) if needed.

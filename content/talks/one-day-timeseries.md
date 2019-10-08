@@ -7,7 +7,7 @@ draft: false
 
 # Abstract
 
-This is a one-day course I'm giving at my former engineering school ISEN Brest.
+This is a one-day course I am giving at my former engineering school ISEN Brest.
 
 
 # Schedule

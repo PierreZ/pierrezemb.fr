@@ -131,4 +131,4 @@ Notice that we are using a timestamp at the end of the `put` method? This will *
 
 ---
 
-**Thank you** for reading my post! Feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.
+**Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) if needed.

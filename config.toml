@@ -27,11 +27,11 @@ copyright = "This work is licensed under a Creative Commons Attribution-NonComme
   dateformNumTime = "2006-01-02 15:04 -0700"
 
   # Metadata mostly used in document's head
-  description = "Nice theme for homepages and blogs"
-  keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb,pierrez" 
+  description = "Pierre Zemb's website"
+  keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb,pierrez,tech,lead"
   images = ["myself.jpg"]
 
-  homeSubtitle = "Infrastructure Engineer"
+  homeSubtitle = "Tech Lead @ OVHcloud"
 
   # Prefix of link to the git commit detail page. GitInfo must be enabled.
   # gitUrl = ""

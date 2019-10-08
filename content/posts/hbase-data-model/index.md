@@ -81,4 +81,4 @@ I have been working with Hbase for the past three years, **including operation a
 
 --- 
 
-**Thank you** for reading my post! Feel free to react to this article, I'm also available on [Twitter](https://twitter.com/PierreZ) if needed.
+**Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) if needed.
