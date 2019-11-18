@@ -16,7 +16,7 @@ I enjoy being part of open-source communities, with **[talks](/talks)**, **[blog
 * Apache
     * [HBase](https://github.com/apache/hbase/commits/master?author=PierreZ)
     * [Flink](https://github.com/apache/flink/commits/master?author=PierreZ)
-    * [Flink](https://github.com/apache/pulsar/commits/master?author=PierreZ)
+    * [Pulsar](https://github.com/apache/pulsar/commits/master?author=PierreZ)
 * and [others](https://github.com/PierreZ/).
 
 On my free time, I am giving a hand to local events, such as the local GDG/JUG **[FinistDevs](https://finistdevs.org/)**, **[Devoxx4Kids](https://twitter.com/devoxx4kidsbes)** and **[DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh/)**, a technical conference. I am also a **teaching assistant** in my former Engineer School.

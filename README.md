@@ -1,7 +1,5 @@
 # Portfolio
 
-Theme: https://github.com/shenoybr/hugo-goa
-
 ## Add a talk
 
 ```sh
