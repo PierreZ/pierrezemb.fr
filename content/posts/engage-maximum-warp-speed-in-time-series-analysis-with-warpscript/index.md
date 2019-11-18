@@ -4,8 +4,8 @@ author: "Pierre Zemb"
 date: 2017-10-08T20:43:05.198Z
 lastmod: 2019-01-10T21:57:19+01:00
 showpagemeta: true
-categories:
- - Timeseries 
+tags:
+ - timeseries 
  - warp10
  - analytics
 canonical: https://medium.com/@PierreZ/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript-c97a9f4a0016

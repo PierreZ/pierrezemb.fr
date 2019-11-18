@@ -4,8 +4,11 @@ author: "Pierre Zemb"
 date: 2017-10-11T10:23:11.770Z
 lastmod: 2019-01-10T22:16:31+01:00
 showpagemeta: true
-categories:
- - Timeseries 
+tags:
+ - timeseries
+ - helloexoworld
+ - analytics
+ - warp10
 
 canonical: https://medium.com/@PierreZ/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript-c97a9f4a0016
 

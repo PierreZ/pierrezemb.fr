@@ -3,8 +3,9 @@ title: "What are ACID transactions?"
 draft: false
 date: 2019-02-03T15:37:27+01:00
 showpagemeta: true
-categories:
- - transaction 
+tags:
+ - transaction
+ - sql
 ---
 
 # Transaction?

@@ -2,7 +2,7 @@
 title: What can be gleaned about GFS successor codenamed Colossus?
 date: 2019-08-04T15:07:11+02:00
 draft: false
-categories:
+tags:
  - distributed-systems
  - hadoop
  - colossus

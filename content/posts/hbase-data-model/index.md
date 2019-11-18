@@ -2,9 +2,8 @@
 title: "Hbase Data Model"
 date: 2019-01-27T20:24:27+01:00
 showpagemeta: true
-categories:
- - distributed-systems
 tags:
+ - distributed-systems
  - hbase
 ---
 
