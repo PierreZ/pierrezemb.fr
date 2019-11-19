@@ -1,14 +1,14 @@
 ---
-title: "Under the hood: Hbase's MemStore"
+title: "Diving into Hbase's MemStore"
 date: 2019-11-17T10:24:27+01:00
 draft: false
 showpagemeta: true
 tags:
  - hbase
- - under the hood
+ - diving into
 ---
 
-`Under the hood` is a blogpost serie where we are digging a specific part of of the project's basecode. In this episode, we will digg into the implementation behind Hbase's MemStore.
+`Diving into` is a blogpost serie where we are digging a specific part of of the project's basecode. In this episode, we will digg into the implementation behind Hbase's MemStore.
 
 ---
 
