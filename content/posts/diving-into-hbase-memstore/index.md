@@ -8,7 +8,9 @@ tags:
  - diving into
 ---
 
-`Diving into` is a blogpost serie where we are digging a specific part of of the project's basecode. In this episode, we will digg into the implementation behind Hbase's MemStore.
+![hbase image](/posts/hbase-data-model/images/hbase.jpg)
+
+[Diving Into](/tags/diving-into/) is a blogpost serie where we are digging a specific part of of the project's basecode. In this episode, we will digg into the implementation behind Hbase's MemStore.
 
 ---
 
