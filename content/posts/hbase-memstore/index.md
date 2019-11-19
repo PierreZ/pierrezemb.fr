@@ -12,7 +12,7 @@ tags:
 
 ---
 
-tl;dr: Hbase is using the [ConcurrentSkipListMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentSkipListMap.html).
+`tl;dr:` Hbase is using the [ConcurrentSkipListMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentSkipListMap.html).
 
 # What is the MemStore?
 
@@ -22,8 +22,9 @@ As rows are **sorted lexicographically** in Hbase, when data comes in, you need 
 
 Let's dig into how the MemStore internally works in Hbase 1.X.
 
-#  Hbase 1.X.X
-**All extract of code for this section are taken from [rel/1.4.9](https://github.com/apache/hbase/tree/rel/1.4.9) tag.**
+#  Hbase 1
+
+All extract of code for this section are taken from [rel/1.4.9](https://github.com/apache/hbase/tree/rel/1.4.9) tag.
 
 ## in-memory storage
 
@@ -65,7 +66,8 @@ As we seen above, the `MemStore` is supporting all the puts. When asked to flush
 Compaction are only run on HFiles. It means that **if hot data is continuously updated, we are overusing memory due to duplicate entries per row per MemStore**. Accordion tends to solve this problem through *in-memory compactions*. Let's have a look to Hbase 2.X!
 
 
-#  Hbase 2.X.X
+#  Hbase 2
+
 ## storing data
 
 **All extract of code starting from here are taken from [rel/2.1.2](https://github.com/apache/hbase/tree/rel/2.1.2) tag.**
