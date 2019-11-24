@@ -43,15 +43,14 @@ sequenceDiagram
     KafkaClient ->> Broker0: SASL_HANDSHAKE request
 
     Note right of Broker0: Yes I can handle <br/> SASL_PLAIN <br/> among others
-        Broker0 ->> KafkaClient: SASL_HANDSHAKE response
+    Broker0 ->> KafkaClient: SASL_HANDSHAKE response
 
     Note left of KafkaClient: Awesome, here's <br/> my credentials!
-        KafkaClient ->> Broker0: SASL_AUTHENTICATE request
+    KafkaClient ->> Broker0: SASL_AUTHENTICATE request
 
     Note right of Broker0: Checking...
     Note right of Broker0: You are <br/>authenticated!
     Broker0 ->> KafkaClient: SASL_AUTHENTICATE response
-    
 
     Note left of KafkaClient: Cool! <br/> Can you give <br/> the cluster topology?<br/> I want to <br/> use 'my-topic'
     KafkaClient ->> Broker0: METADATA request
@@ -73,13 +72,14 @@ sequenceDiagram
     Note over KafkaClient,Broker0: ...handshaking, see above...
 
     loop pull msg
-      Note left of KafkaClient: I have a batch <br/> containing one <br/> message for the <br/> partition-0 <br/> of 'my-topic'
+        Note left of KafkaClient: I have a batch <br/> containing one <br/> message for the <br/> partition-0 <br/> of 'my-topic'
         KafkaClient ->>+ Broker0: PRODUCE request
 
-      Note right of Broker0: Processing...<br/>
-      Note right of Broker0: Done!
+        Note right of Broker0: Processing...<br/>
+        Note right of Broker0: Done!
         Broker0 -->>- KafkaClient: PRODUCE response
-      Note left of KafkaClient: Thanks
+        
+        Note left of KafkaClient: Thanks
     end
 
 {{</mermaid>}}
@@ -156,7 +156,6 @@ sequenceDiagram
         Broker0 ->>- KafkaClient: OFFSET_COMMIT response
             
         opt At the same time...
-
             Note left of KafkaClient: I am still alive!  
             KafkaClient ->> Broker1: HEARTBEAT request
             Note left of Broker1: Perfect 
