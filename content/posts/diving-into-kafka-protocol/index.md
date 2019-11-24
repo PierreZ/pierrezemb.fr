@@ -28,6 +28,7 @@ The common handhake can be divided in three parts:
 * Establish Auth using **SASL** if needed,
 * Retrieve the topology of the cluster using **Metadata**.
 
+> All the following diagrams are generated with [MermaidJS](https://mermaidjs.github.io/#/).
 
 {{<mermaid>}}
 sequenceDiagram
@@ -163,3 +164,7 @@ sequenceDiagram
         end
     end 
 {{</mermaid>}}
+
+--- 
+
+**Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) if needed.
