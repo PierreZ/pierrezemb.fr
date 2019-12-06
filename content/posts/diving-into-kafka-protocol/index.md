@@ -1,6 +1,6 @@
 ---
 title: "Diving into Kafka's Protocol"
-date: 2019-11-24T10:24:27+01:00
+date: 2019-12-04T10:24:27+01:00
 draft: true
 showpagemeta: true
 tags:
@@ -16,7 +16,7 @@ tags:
 
 # The protocol reference
 
-For the last few months, I worked a lot around Kafka's protocols, first by creating a fully async Kafka to Pulsar in Rust, and now by contributing directly to Pulsar on the feature called [KoP (Kafka On Pulsar)](https://www.slideshare.net/streamnative/2-kafkaonpulsarjia). The full Protocol documentation is available [here](https://kafka.apache.org/protocol.html), but it does not offer a global view of what is happening for a classic Producer and Consumer. Let's dive in!
+For the last few months, I worked a lot around Kafka's protocols, first by creating a fully async Kafka to Pulsar Proxy in Rust, and now by contributing directly to [KoP (Kafka On Pulsar)](https://www.slideshare.net/streamnative/2-kafkaonpulsarjia). The full Kafka Protocol documentation is available [here](https://kafka.apache.org/protocol.html), but it does not offer a global view of what is happening for a classic Producer and Consumer exchange. Let's dive in!
 
 ## Common handshake
 
@@ -24,9 +24,9 @@ After a client established the TCP connection, there is a few common requests an
 
 The common handhake can be divided in three parts:
 
-* Being able to understand each other. For this, we are using **API_VERSIONS** to know which versions of which TCP frames can be uses,
-* Establish Auth using **SASL** if needed,
-* Retrieve the topology of the cluster using **Metadata**.
+* Being able to understand each other. For this, we are using **[API_VERSIONS](https://kafka.apache.org/protocol.html#The_Messages_ApiVersions)** to know which versions of which TCP frames can be uses,
+* Establish Auth using **SASL** if needed, thanks to **[SASL_HANDSHAKE](https://kafka.apache.org/protocol.html#The_Messages_SaslHandshake)** and **[SASL_AUTHENTICATE](https://kafka.apache.org/protocol.html#The_Messages_SaslAuthenticate)**
+* Retrieve the topology of the cluster using **[Metadata](https://kafka.apache.org/protocol.html#The_Messages_Metadata)**.
 
 > All the following diagrams are generated with [MermaidJS](https://mermaidjs.github.io/#/).
 
@@ -35,29 +35,29 @@ sequenceDiagram
 
     Note left of KafkaClient: I'm speaking Kafka <br/> 2.3,but can the <br/> broker understand <br/> me?
 
-    KafkaClient ->> Broker0: API_VERSIONS request
+    KafkaClient ->>+ Broker0: API_VERSIONS request
 
     Note right of Broker0: I can handle theses <br/> structures in theses <br/>versions: ...
-    Broker0 ->> KafkaClient: API_VERSIONS response
+    Broker0 ->>- KafkaClient: API_VERSIONS response
 
     Note left of KafkaClient: Thanks!<br/> I see you can handle <br/> SASL, let's auth! <br/> can you handle <br/> SASL_PLAIN?
-    KafkaClient ->> Broker0: SASL_HANDSHAKE request
+    KafkaClient ->>+ Broker0: SASL_HANDSHAKE request
 
     Note right of Broker0: Yes I can handle <br/> SASL_PLAIN <br/> among others
-    Broker0 ->> KafkaClient: SASL_HANDSHAKE response
+    Broker0 ->>- KafkaClient: SASL_HANDSHAKE response
 
     Note left of KafkaClient: Awesome, here's <br/> my credentials!
-    KafkaClient ->> Broker0: SASL_AUTHENTICATE request
+    KafkaClient ->>+ Broker0: SASL_AUTHENTICATE request
 
     Note right of Broker0: Checking...
     Note right of Broker0: You are <br/>authenticated!
-    Broker0 ->> KafkaClient: SASL_AUTHENTICATE response
+    Broker0 ->>- KafkaClient: SASL_AUTHENTICATE response
 
     Note left of KafkaClient: Cool! <br/> Can you give <br/> the cluster topology?<br/> I want to <br/> use 'my-topic'
-    KafkaClient ->> Broker0: METADATA request
+    KafkaClient ->>+ Broker0: METADATA request
 
     Note right of Broker0: There is one topic <br/> with one partition<br/> called 'my-topic'<br/>The partition's leader <br/> is Broker0
-    Broker0 ->> KafkaClient: METADATA response
+    Broker0 ->>- KafkaClient: METADATA response
 
 Note left of KafkaClient: That is you, I don't <br/> need to handshake <br/> again with <br/> another broker
 
@@ -78,7 +78,7 @@ sequenceDiagram
 
         Note right of Broker0: Processing...<br/>
         Note right of Broker0: Done!
-        Broker0 -->>- KafkaClient: PRODUCE response
+        Broker0 ->>- KafkaClient: PRODUCE response
         
         Note left of KafkaClient: Thanks
     end
@@ -87,11 +87,11 @@ sequenceDiagram
 
 ## Consuming
 
-Consuming is more complicated than producing. You can learn more in [The Magical Group Coordination Protocol of Apache Kafka](https://www.youtube.com/watch?v=maJulQ4ABNY) By Gwen Shapira, Principal Data Architect @ Confluent.
+Consuming is more complicated than producing. You can learn more in [The Magical Group Coordination Protocol of Apache Kafka](https://www.youtube.com/watch?v=maJulQ4ABNY) By Gwen Shapira, Principal Data Architect @ Confluent and also in the [Kafka Client-side Assignment Proposal](https://cwiki.apache.org/confluence/display/KAFKA/Kafka+Client-side+Assignment+Proposal).
 
 Consuming can be divided in two parts:
 
-* coordonating the consumers to assign them partitions,
+* coordinating the consumers to assign them partitions,
 * then fetch messages.
 
 For the sake of the explanation, we have now another Broker1 which is holding the coordinator for topic 'my-topic'. In real-life, it could be the same.
@@ -102,10 +102,10 @@ sequenceDiagram
     Note over KafkaClient,Broker0: ...handshaking, see above...
 
     Note left of KafkaClient: Who is the <br/> coordinator for<br/> 'my-topic'?
-    KafkaClient ->> Broker0: FIND_COORDINATOR request
+    KafkaClient ->>+ Broker0: FIND_COORDINATOR request
 
     Note right of Broker0: It is Broker1!
-    Broker0 ->> KafkaClient: FIND_COORDINATOR response
+    Broker0 ->>- KafkaClient: FIND_COORDINATOR response
 
     Note left of KafkaClient: OK, let's connect<br/> to Broker1
     Note over KafkaClient,Broker1: ...handshaking, see above...
@@ -115,51 +115,54 @@ sequenceDiagram
 
     Note right of Broker1: Welcome! I will be <br/> waiting a bit for any <br/>of your friends.
     Note right of Broker1: You are now leader. <br/>Your group contains <br/> only one member.<br/> You now  need to <br/> assign partitions to <br/> them. 
-    Broker1 ->> KafkaClient: JOIN_GROUP response
+    Broker1 ->>- KafkaClient: JOIN_GROUP response
 
     Note left of KafkaClient: Computing <br/>the assigment...
     Note left of KafkaClient: Done! I will be <br/> in charge of handling <br/> partition-0 of <br/>'my-topic'
-    KafkaClient ->> Broker1: SYNC_GROUP request
+    KafkaClient ->>+ Broker1: SYNC_GROUP request
 
     Note right of Broker1: Thanks, I will <br/>broadcast the <br/>assigmnents to <br/>everyone
-    Broker1 ->> KafkaClient: SYNC_GROUP response
+    Broker1 ->>- KafkaClient: SYNC_GROUP response
 
     Note left of KafkaClient: Can I get the <br/> committed offsets <br/> for partition-0?
-    KafkaClient ->> Broker1: OFFSET_FETCH request
+    KafkaClient ->>+ Broker1: OFFSET_FETCH request
 
     Note right of Broker1: Found no <br/>committed offset<br/> for partition-0
-    Broker1 ->> KafkaClient: OFFSET_FETCH response
+    Broker1 ->>- KafkaClient: OFFSET_FETCH response
 
-    Note left of KafkaClient: Thanks, I will <br/>connect to Broker0
+    Note left of KafkaClient: Thanks, I will now <br/>connect to Broker0
 
     Note over KafkaClient,Broker0: ...handshaking again...
 
     Note left of KafkaClient: Can you give me<br/> the earliest position<br/> for partition-0?
-    KafkaClient ->> Broker0: LIST_OFFSETS request
+    KafkaClient ->>+ Broker0: LIST_OFFSETS request
         
     Note right of Broker0: Here's the earliest <br/> position: ...
-    Broker0 ->> KafkaClient: LIST_OFFSETS response
+    Broker0 ->>- KafkaClient: LIST_OFFSETS response
     
     loop pull msg
 
-        Note left of KafkaClient: Can you give me<br/> some messages <br/> starting  at offset X?
-        KafkaClient ->>+ Broker0: FETCH request
+        opt Consume
+            Note left of KafkaClient: Can you give me<br/> some messages <br/> starting  at offset X?
+            KafkaClient ->>+ Broker0: FETCH request
 
-        Note right of Broker0: Here some records...
-        Broker0 ->>- KafkaClient: FETCH response
+            Note right of Broker0: Here some records...
+            Broker0 ->>- KafkaClient: FETCH response
 
-        Note left of KafkaClient: Processing...
-        Note left of KafkaClient: Can you commit <br/>offset X?
-        KafkaClient ->>+ Broker0: OFFSET_COMMIT request
+            Note left of KafkaClient: Processing...
+            Note left of KafkaClient: Can you commit <br/>offset X?
+            KafkaClient ->>+ Broker1: OFFSET_COMMIT request
 
-        Note right of Broker0: Committing...
-        Note right of Broker0: Done!
-        Broker0 ->>- KafkaClient: OFFSET_COMMIT response
-            
-        opt At the same time...
+            Note right of Broker1: Committing...
+            Note right of Broker1: Done!
+            Broker1 ->>- KafkaClient: OFFSET_COMMIT response
+        end
+
+        Note left of KafkaClient: I need to send <br/> some lifeness proof <br/> to the coordinator           
+        opt Healthcheck
             Note left of KafkaClient: I am still alive!  
-            KafkaClient ->> Broker1: HEARTBEAT request
-            Note left of Broker1: Perfect 
+            KafkaClient ->>+ Broker1: HEARTBEAT request
+            Note right of Broker1: Roger that
             Broker1 ->>- KafkaClient: HEARTBEAT response
         end
     end 
