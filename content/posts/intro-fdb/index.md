@@ -1,16 +1,16 @@
 ---
-title: "Hello FoundationDB!"
+title: "Links and notes about FoundationDB"
 date: 2020-01-03T10:24:27+01:00
 draft: true
 showpagemeta: true
 tags:
  - foundationdb
- - hello
+ - linksandnotes
 ---
 
 ![fdb image](/posts/intro-fdb/images/fdb-logo.png)
 
-[Hello](/tags/hello/) is a blogpost serie where we are discovering a new piece of technology. You will find a lot of **links, videos, podcasts to click on**. Today we will discover FoundationDB.
+[linksandnotes](/tags/linksandnotes/) is a blogpost serie where we are discovering a new piece of technology. You will find a lot of **links, videos, podcasts to click on**. Today we will discover FoundationDB.
 
 ---
 
@@ -46,8 +46,6 @@ From the [Engineering page](https://apple.github.io/foundationdb/engineering.htm
 > FoundationDB began with ambitious goals for both high performance per node and scalability. We knew that to achieve these goals we would face serious engineering challenges that would require tool breakthroughs. We’d need efficient asynchronous communicating processes like in Erlang or the Async in .NET, but we’d also need the raw speed, I/O efficiency, and control of C++. To meet these challenges, we developed several new tools, the most important of which is **Flow**, a new programming language that brings actor-based concurrency to C++11.
 
 Flow is more of a **stateful distributed system framework** than an asynchronous library. It takes a number of highly opinionated stances on how the overall distributed system should be written, and isn’t trying to be a widely reusable building block.
-
-
 
 > Flow adds about 10 keywords to C++11 and is technically a trans-compiler: the Flow compiler reads Flow code and compiles it down to raw C++11, which is then compiled to a native binary with a traditional toolchain.
 
@@ -129,18 +127,53 @@ An awesome recap is available on the [Software Engineering Daily podcast](https:
 
 # The Architecture
 
+According to the [fdbmonitor and fdbserver](https://apple.github.io/foundationdb/administration.html#fdbmonitor-and-fdbserver):
+
+> The core FoundationDB server process is `fdbserver`. Each `fdbserver` process uses up to one full CPU core, so a production FoundationDB cluster will usually run N such processes on an N-core system.
+
+> To make configuring, starting, stopping, and restarting fdbserver processes easy, FoundationDB also comes with a singleton daemon process, `fdbmonitor`, which is started automatically on boot. `fdbmonitor` reads the `foundationdb.conf` file and starts the configured set of fdbserver processes. It is also responsible for starting backup-agent.
+
 ## Microservices
 
-A typical FDB cluster is composed of different actors which are describe [here](https://github.com/apple/foundationdb/blob/master/documentation/sphinx/source/kv-architecture.rst). Because everything is written in an async way, **you can start a single FDB node running all the actors.**
+A typical FDB cluster is composed of different actors which are describe [here](https://github.com/apple/foundationdb/blob/master/documentation/sphinx/source/kv-architecture.rst).
 
+
+tl;dr:
+
+The most important role in FDB is the `Coordinator`, it uses `Paxos` to manage membership on a quorum to do writes. The `Coordinator` is mostly only used to elect some peers and during recovery. You can view it as a Zookeeper-like stack.
+
+The Coordinator starts by electing a `Cluster Controller`. It provides administratives informations about the cluster(I have 4 storage processes). Every process needs to register to the `Cluster Controller` and then it will assign roles to them. It is the one that will heart-beat all the processes.
+
+The `Master` process is reponsible for the `data distribution` algorithms. The mapping between keys and storage servers is stored within FDB, which is enabling transaction to move data. He is also the one providing `read versions` and `version number`.
+
+`The Proxy` sits between storage nodes and clients. It has the mapping-cache to know where any key is located. It batchs transactions from different clients
+
+`The Transaction Resolvers` are responsible determining conflicts between transactions. A transaction conflicts if it reads a key that has been written between the transaction’s read version and commit version. The resolver does this by holding the last 5 seconds of committed writes in memory, and comparing a new transaction’s reads against this set of commits.
+
+![fdb image](/posts/intro-fdb/images/architecture.png)
 
 ## Read and Write Path
 
-With FDB, you have **single hop read latencies** and **four hop write latencies**
+{{< youtube EMwhsGsxfPU>}}
+
+### Read Path:
+
+1. Retrieve a consistend read version for the transaction
+2. Do reads from a consistent MVCC snapshot at that read version on the storage node
 
 ### Write Path
 
-### Read Path
+1. client is sending a bundle to the `proxy` containing:
+    * read version for the transaction
+    * every readen key
+    * every mutation that you want to do
+2. The proxy will assign a `Commit version` to a batch of transactions.
+3. Proxy is sending to the resolver. This will check if the data that you want to mutate has been changed between your `read Version` and your `Commit version`. They are sharded by key-range.
+4. Transaction is made durable within the `Transaction Logs` and `fsync`. Before the data is even written to disk it is forwarded to the `storage servers` responsible for that mutation. Once the storage servers have made the mutation durable, they pop it from the log. This generally happens roughly 6 seconds after the mutation was originally committed to the log.
+5. `Storage servers` are lazily updating data on disk from the `Transaction logs`. They are keeping new write in-memory.
+5. `Transaction Logs` is responding OK to the Proxy and then to the client.
+
+Recovery processes are detailled around 25min.
 
 ## Storage
 
@@ -148,7 +181,7 @@ A lot of information are available in this talk:
 
 {{< youtube nlus1Z7TVTI>}}
 
-To sum-up:
+tl;dr:
 
 * `SSD` Storage Engine is based on SQLite B-Tree
 * `Redwood` will be a new storage engine based on Versioned B+Tree
@@ -161,10 +194,20 @@ Everything is wrapped into a transaction in FDB.
 
 # FDB One more things: Layers
 
+The paper is located [FoundationDB Record Layer:A Multi-Tenant Structured Datastore](https://arxiv.org/pdf/1901.04452.pdf)
+
 {{< youtube SvoUHHM9IKU>}}
+
+tl;dr:
+
+* 
+
 {{< youtube HLE8chgw6LI>}}
 
+tl;dr:
 
 # Kubernetes Operators
 
 {{< youtube A3U8M8pt3Ks>}}
+
+tl;dr
