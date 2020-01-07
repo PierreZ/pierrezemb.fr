@@ -1,22 +1,24 @@
 ---
-title: "Links and notes about FoundationDB"
-date: 2020-01-03T10:24:27+01:00
+title: "Notes about FoundationDB"
+description: "List of ressources gleaned about FoundationDB"
+images:
+  - /posts/notes-about-foundationdb/images/fdb-white.jpg
+date: 2020-01-07T10:24:27+01:00
 draft: true
 showpagemeta: true
+toc: true
 tags:
  - foundationdb
- - linksandnotes
+ - notesabout
 ---
 
-![fdb image](/posts/intro-fdb/images/fdb-logo.png)
+![fdb image](/posts/notes-about-foundationdb/images/fdb-logo.png)
 
-[linksandnotes](/tags/linksandnotes/) is a blogpost serie where we are discovering a new piece of technology. You will find a lot of **links, videos, podcasts to click on**. Today we will discover FoundationDB.
+[Notes About](/tags/notesabout/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover FoundationDB.
 
 ---
 
-# What is FoundationDB?
-
-## Overview
+## Overview of FoundationDB
 
 As stated in the [official documentation](https://apple.github.io/foundationdb/index.html):
 
@@ -37,9 +39,9 @@ FoundationDB started as a company in 2009, and then [has been acquired in 2015 b
 
 On April 19, 2018, Apple [open sourced the software, releasing it under the Apache 2.0 license](https://www.foundationdb.org/blog/foundationdb-is-open-source/).
 
-# Tooling before coding
+## Tooling before coding
 
-## Flow
+### Flow
 
 From the [Engineering page](https://apple.github.io/foundationdb/engineering.html):
 
@@ -62,7 +64,7 @@ Flow was developed before FDB, as stated in this [2013's post](https://news.ycom
 A very good overview of Flow is available [here](https://apple.github.io/foundationdb/flow.html) and some details [here](https://forums.foundationdb.org/t/why-was-flow-developed/1711/3).
 
 
-## Simulation-Driven development
+### Simulation-Driven development
 
 One of Flow’s most important job is enabling **Simulation**:
 
@@ -104,17 +106,18 @@ testTitle=SwizzledCycleTest
 
 The test is splitted into two parts:
 
-* The goal, for example doing a [Ring benchmark](https://github.com/michaelnisi/ring-benchmark) with thousands of transactions per sec and there should be only 0.01% of success.
-* What will be done to try to prevent the test to succeed. In this example it will **at the same time**:
+* **The goal**, for example doing transaction pointing to another with thousands of transactions per sec and there should be only 0.01% of success.
+* **What will be done to try to prevent the test to succeed**. In this example it will **at the same time**:
+
     * do random clogging. Which means that **network connections will be stopped** (preventing actors to send and receive packets). Swizzle flag means that a subset of network connections will be stopped and bring back in reverse order, 😳
     * will **poweroff/reboot machines** (attritions) pseudo-randomly while keeping a minimal of three machines, 🤯 
     * **change configuration**, which means a coordination changes through multi-paxos for the whole cluster. 😱
 
 Keep in mind that all these failures will appears **at the same time!** Do you think that your current **datastore has gone through the same test on a daily basis?** [I think not](https://github.com/etcd-io/etcd/pull/11308).
 
-Applications written using the FoundationDB simulator have hierarchy: `DataCenter -> Machine -> Process -> Interface`. Each of these can be killed/freezed/nuked. Even faulty admin commands fired by some DevOps are tested!
+Applications written using the FoundationDB simulator have hierarchy: `DataCenter -> Machine -> Process -> Interface`. **Each of these can be killed/freezed/nuked**. Even faulty admin commands fired by some DevOps are tested!
 
-## Recap
+### Recap
 
 An awesome recap is available on the [Software Engineering Daily podcast](https://softwareengineeringdaily.com/2019/07/01/foundationdb-with-ryan-worl/):
 
@@ -125,7 +128,7 @@ An awesome recap is available on the [Software Engineering Daily podcast](https:
 > So, all FoundationDB processes, and FoundationDB, it's basically all written in Flow except a very small amount of it from the SQLite B-tree. The reason why that was useful is that when you use Flow, you get all of these higher level abstraction that let what you do what feels to you like asynchronous stuff, but under the hood, it's all implemented using callbacks in C++, which you can make deterministic by running it in a single thread. So, there's a scheduler that just calls these callbacks one after another and it's very crazy looking C++ code, like you wouldn't want to read it, but it's because of Flow they were able to implement that deterministic simulation.
 
 
-# The Architecture
+## The Architecture
 
 According to the [fdbmonitor and fdbserver](https://apple.github.io/foundationdb/administration.html#fdbmonitor-and-fdbserver):
 
@@ -133,41 +136,39 @@ According to the [fdbmonitor and fdbserver](https://apple.github.io/foundationdb
 
 > To make configuring, starting, stopping, and restarting fdbserver processes easy, FoundationDB also comes with a singleton daemon process, `fdbmonitor`, which is started automatically on boot. `fdbmonitor` reads the `foundationdb.conf` file and starts the configured set of fdbserver processes. It is also responsible for starting backup-agent.
 
-## Microservices
+### Microservices
 
 A typical FDB cluster is composed of different actors which are describe [here](https://github.com/apple/foundationdb/blob/master/documentation/sphinx/source/kv-architecture.rst).
 
-
-tl;dr:
 
 The most important role in FDB is the `Coordinator`, it uses `Paxos` to manage membership on a quorum to do writes. The `Coordinator` is mostly only used to elect some peers and during recovery. You can view it as a Zookeeper-like stack.
 
 The Coordinator starts by electing a `Cluster Controller`. It provides administratives informations about the cluster(I have 4 storage processes). Every process needs to register to the `Cluster Controller` and then it will assign roles to them. It is the one that will heart-beat all the processes.
 
-Then a `Master` is elected. The `Master` process is reponsible for the `data distribution` algorithms. Fun fact, the mapping between keys and storage servers is stored within FDB, which is you can actually move data by running transactions like any other application. He is also the one providing `read versions` and `version number` internally.
+Then a `Master` is elected. The `Master` process is reponsible for the `data distribution` algorithms. Fun fact, the mapping between keys and storage servers is stored within FDB, which is you can actually move data by running transactions like any other application. He is also the one providing `read versions` and `version number` internally. He is also acting as the `RateKeeper`.
 
-`The Proxy` sits between storage nodes and clients. It has the mapping-cache to know where any key is located. It batchs transactions from different clients
+`The Proxies` are responsible for providing read versions, committing transactions, and tracking the storage servers responsible for each range of keys. 
 
 `The Transaction Resolvers` are responsible determining conflicts between transactions. A transaction conflicts if it reads a key that has been written between the transaction’s read version and commit version. The resolver does this by holding the last 5 seconds of committed writes in memory, and comparing a new transaction’s reads against this set of commits.
 
-![fdb image](/posts/intro-fdb/images/architecture.png)
+![fdb image](/posts/notes-about-foundationdb/images/architecture.png)
 
-## Read and Write Path
+### Read and Write Path
 
 {{< youtube EMwhsGsxfPU>}}
 
-### Read Path:
+#### Read Path
 
 1. Retrieve a consistend read version for the transaction
 2. Do reads from a consistent MVCC snapshot at that read version on the storage node
 
-### Write Path
+#### Write Path
 
 1. client is sending a bundle to the `proxy` containing:
     * read version for the transaction
     * every readen key
     * every mutation that you want to do
-2. The proxy will assign a `Commit version` to a batch of transactions.
+2. The proxy will assign a `Commit version` to a batch of transactions. `Commit version` is generated by the `Master`
 3. Proxy is sending to the resolver. This will check if the data that you want to mutate has been changed between your `read Version` and your `Commit version`. They are sharded by key-range.
 4. Transaction is made durable within the `Transaction Logs` and `fsync`. Before the data is even written to disk it is forwarded to the `storage servers` responsible for that mutation. Once the storage servers have made the mutation durable, they pop it from the log. This generally happens roughly 6 seconds after the mutation was originally committed to the log.
 5. `Storage servers` are lazily updating data on disk from the `Transaction logs`. They are keeping new write in-memory.
@@ -175,102 +176,98 @@ Then a `Master` is elected. The `Master` process is reponsible for the `data dis
 
 You can find more diagrams about transactions [here](https://forums.foundationdb.org/t/technical-overview-of-the-database/135/3).
 
-Recovery processes are detailled around 25min.
+> Recovery processes are detailled at around 25min.
 
-## Storage
+### Storage
 
 A lot of information are available in this talk:
 
 {{< youtube nlus1Z7TVTI>}}
 
-tl;dr:
 
 * `SSD` Storage Engine is based on SQLite B-Tree
 * `Redwood` will be a new storage engine based on Versioned B+Tree
 
-# Developer experience
+## Developer experience
 
 FoundationDB’s keys are ordered, making `tuples` a particularly useful tool for data modeling. FoundationDB provides a **tuple layer** (available in each language binding) that encodes tuples into keys. This layer lets you store data using a tuple like `(state, county)` as a key. Later, you can perform reads using a prefix like `(state,)`. The layer works by preserving the natural ordering of the tuples. 
 
 Everything is wrapped into a transaction in FDB.
 
-# FDB One more things: Layers
+## FDB One more things: Layers
 
-## Concept of layers
+### Concept of layers
 
 
 {{< youtube HLE8chgw6LI>}}
 
-tl;dr:
 
-|  ![fdb image](/posts/intro-fdb/images/extract-layer-1.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/extract-layer-1.png) |
 |:--:| 
 | FDB is resolving many distributed problems, but you still need things like **security, multi-tenancy, query optimizations, schema, indexing**.|
 
 ---
 
-|  ![fdb image](/posts/intro-fdb/images/extract-layer-2.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/extract-layer-2.png) |
 |:--:| 
 | Layers are designed to develop features **above FDB.** The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** |
 
 ---
 
-|  ![fdb image](/posts/intro-fdb/images/extract-layer-3.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/extract-layer-3.png) |
 |:--:| 
 | The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** |
 
 ---
 
-![fdb image](/posts/intro-fdb/images/extract-layer-3.png)
+![fdb image](/posts/notes-about-foundationdb/images/extract-layer-3.png)
 
-## Record Layer
+### Apple's Record Layer
 
 The paper is located [FoundationDB Record Layer:A Multi-Tenant Structured Datastore](https://arxiv.org/pdf/1901.04452.pdf)
 
 {{< youtube SvoUHHM9IKU>}}
 
-tl;dr:
 
-|  ![fdb image](/posts/intro-fdb/images/record-extract-1.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/record-extract-1.png) |
 |:--:| 
 | Record Layer was designed to solve CloudKit problem. |
 
 ---
-|  ![fdb image](/posts/intro-fdb/images/record-extract-2.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/record-extract-2.png) |
 |:--:| 
-|  ![fdb image](/posts/intro-fdb/images/record-extract-3.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/record-extract-3.png) |
 | Record allow multi-tenancy with schema above FDB |
 
 ---
 
-|  ![fdb image](/posts/intro-fdb/images/record-extract-4.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/record-extract-4.png) |
 |:--:| 
 | Record Layers is providing stateless compute |
 
 ---
 
 
-# Kubernetes Operators
+## Kubernetes Operators
 
 {{< youtube A3U8M8pt3Ks>}}
 
-tl;dr:
 
-|  ![fdb image](/posts/intro-fdb/images/operator-extract-1.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/operator-extract-1.png) |
 |:--:| 
-|  ![fdb image](/posts/intro-fdb/images/operator-extract-2.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/operator-extract-2.png) |
 | implementation design of the Operator | 
 
 ---
 
-|  ![fdb image](/posts/intro-fdb/images/operator-extract-3.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/operator-extract-3.png) |
 |:--:| 
-|  ![fdb image](/posts/intro-fdb/images/operator-extract-4.png) |
+|  ![fdb image](/posts/notes-about-foundationdb/images/operator-extract-4.png) |
 | Upgrade is done by **bumping all processes at once** 😱 |
 
 ---
 
 
-# Roadmap
+## Roadmap
 
 [FoundationDB Release 7.0 Planning](https://github.com/apple/foundationdb/wiki/FoundationDB-Release-7.0-Planning)
