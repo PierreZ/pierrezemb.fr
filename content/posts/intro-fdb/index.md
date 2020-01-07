@@ -144,7 +144,7 @@ The most important role in FDB is the `Coordinator`, it uses `Paxos` to manage m
 
 The Coordinator starts by electing a `Cluster Controller`. It provides administratives informations about the cluster(I have 4 storage processes). Every process needs to register to the `Cluster Controller` and then it will assign roles to them. It is the one that will heart-beat all the processes.
 
-The `Master` process is reponsible for the `data distribution` algorithms. The mapping between keys and storage servers is stored within FDB, which is enabling transaction to move data. He is also the one providing `read versions` and `version number`.
+Then a `Master` is elected. The `Master` process is reponsible for the `data distribution` algorithms. Fun fact, the mapping between keys and storage servers is stored within FDB, which is you can actually move data by running transactions like any other application. He is also the one providing `read versions` and `version number` internally.
 
 `The Proxy` sits between storage nodes and clients. It has the mapping-cache to know where any key is located. It batchs transactions from different clients
 
@@ -173,6 +173,8 @@ The `Master` process is reponsible for the `data distribution` algorithms. The m
 5. `Storage servers` are lazily updating data on disk from the `Transaction logs`. They are keeping new write in-memory.
 5. `Transaction Logs` is responding OK to the Proxy and then to the client.
 
+You can find more diagrams about transactions [here](https://forums.foundationdb.org/t/technical-overview-of-the-database/135/3).
+
 Recovery processes are detailled around 25min.
 
 ## Storage
@@ -194,20 +196,81 @@ Everything is wrapped into a transaction in FDB.
 
 # FDB One more things: Layers
 
+## Concept of layers
+
+
+{{< youtube HLE8chgw6LI>}}
+
+tl;dr:
+
+|  ![fdb image](/posts/intro-fdb/images/extract-layer-1.png) |
+|:--:| 
+| FDB is resolving many distributed problems, but you still need things like **security, multi-tenancy, query optimizations, schema, indexing**.|
+
+---
+
+|  ![fdb image](/posts/intro-fdb/images/extract-layer-2.png) |
+|:--:| 
+| Layers are designed to develop features **above FDB.** The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** |
+
+---
+
+|  ![fdb image](/posts/intro-fdb/images/extract-layer-3.png) |
+|:--:| 
+| The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** |
+
+---
+
+![fdb image](/posts/intro-fdb/images/extract-layer-3.png)
+
+## Record Layer
+
 The paper is located [FoundationDB Record Layer:A Multi-Tenant Structured Datastore](https://arxiv.org/pdf/1901.04452.pdf)
 
 {{< youtube SvoUHHM9IKU>}}
 
 tl;dr:
 
-* 
+|  ![fdb image](/posts/intro-fdb/images/record-extract-1.png) |
+|:--:| 
+| Record Layer was designed to solve CloudKit problem. |
 
-{{< youtube HLE8chgw6LI>}}
+---
+|  ![fdb image](/posts/intro-fdb/images/record-extract-2.png) |
+|:--:| 
+|  ![fdb image](/posts/intro-fdb/images/record-extract-3.png) |
+| Record allow multi-tenancy with schema above FDB |
 
-tl;dr:
+---
+
+|  ![fdb image](/posts/intro-fdb/images/record-extract-4.png) |
+|:--:| 
+| Record Layers is providing stateless compute |
+
+---
+
 
 # Kubernetes Operators
 
 {{< youtube A3U8M8pt3Ks>}}
 
-tl;dr
+tl;dr:
+
+|  ![fdb image](/posts/intro-fdb/images/operator-extract-1.png) |
+|:--:| 
+|  ![fdb image](/posts/intro-fdb/images/operator-extract-2.png) |
+| implementation design of the Operator | 
+
+---
+
+|  ![fdb image](/posts/intro-fdb/images/operator-extract-3.png) |
+|:--:| 
+|  ![fdb image](/posts/intro-fdb/images/operator-extract-4.png) |
+| Upgrade is done by **bumping all processes at once** 😱 |
+
+---
+
+
+# Roadmap
+
+[FoundationDB Release 7.0 Planning](https://github.com/apple/foundationdb/wiki/FoundationDB-Release-7.0-Planning)
