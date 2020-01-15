@@ -60,8 +60,8 @@ copyright = "This work is licensed under a Creative Commons Attribution-NonComme
     url  = "https://twitter.com/PierreZ"
 
   [[params.social]]
-    name = "email"
-    url  = "mailto:contact@pierrezemb/"
+    name = "keybase"
+    url  = "https://keybase.io/pierrez"
 
   [[params.social]]
     name = "github"
