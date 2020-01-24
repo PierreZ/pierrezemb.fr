@@ -12,7 +12,7 @@ tags:
  - notesabout
 ---
 
-![fdb image](/posts/notes-about-foundationdb/images/fdb-logo.png)
+![fdb image](/posts/notes-about-foundationdb/images/fdb-white.jpg)
 
 [Notes About](/tags/notesabout/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover FoundationDB.
 
@@ -229,26 +229,27 @@ Everything is wrapped into a transaction in FDB.
 
 {{< youtube HLE8chgw6LI>}}
 
-
-|  ![fdb image](/posts/notes-about-foundationdb/images/extract-layer-1.png) |
-|:--:| 
-| FDB is resolving many distributed problems, but you still need things like **security, multi-tenancy, query optimizations, schema, indexing**.|
+FDB is resolving many distributed problems, but you still need things like **security, multi-tenancy, query optimizations, schema, indexing**.
 
 ---
 
-|  ![fdb image](/posts/notes-about-foundationdb/images/extract-layer-2.png) |
-|:--:| 
-| Layers are designed to develop features **above FDB.** The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** |
+![fdb image](/posts/notes-about-foundationdb/images/extract-layer-1.png) 
 
 ---
 
-|  ![fdb image](/posts/notes-about-foundationdb/images/extract-layer-3.png) |
-|:--:| 
-| The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** |
+Layers are designed to develop features **above FDB.** The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** 
 
 ---
 
-![fdb image](/posts/notes-about-foundationdb/images/extract-layer-3.png)
+![fdb image](/posts/notes-about-foundationdb/images/extract-layer-2.png) 
+
+---
+
+The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** 
+
+---
+
+![fdb image](/posts/notes-about-foundationdb/images/extract-layer-3.png) 
 
 ### Apple's Record Layer
 
@@ -256,25 +257,41 @@ The paper is located [FoundationDB Record Layer:A Multi-Tenant Structured Datast
 
 {{< youtube SvoUHHM9IKU>}}
 
+Record Layer was designed to solve CloudKit problem.
 
-|  ![fdb image](/posts/notes-about-foundationdb/images/record-extract-1.png) |
-|:--:| 
-| Record Layer was designed to solve CloudKit problem. |
-
----
-|  ![fdb image](/posts/notes-about-foundationdb/images/record-extract-2.png) |
-|:--:| 
-|  ![fdb image](/posts/notes-about-foundationdb/images/record-extract-3.png) |
-| Record allow multi-tenancy with schema above FDB |
 
 ---
 
-|  ![fdb image](/posts/notes-about-foundationdb/images/record-extract-4.png) |
-|:--:| 
-| Record Layers is providing stateless compute |
+![fdb image](/posts/notes-about-foundationdb/images/record-extract-1.png)
 
 ---
 
+Record allow multi-tenancy with schema above FDB
+
+---
+
+![fdb image](/posts/notes-about-foundationdb/images/record-extract-2.png)
+
+
+![fdb image](/posts/notes-about-foundationdb/images/record-extract-3.png)
+
+---
+
+Record Layers is providing stateless compute
+
+---
+
+![fdb image](/posts/notes-about-foundationdb/images/record-extract-4.png)
+
+---
+
+And streaming queries!
+
+---
+
+![fdb image](/posts/notes-about-foundationdb/images/record-extract-5.png)
+
+---
 
 ## Kubernetes Operators
 
@@ -282,18 +299,25 @@ The paper is located [FoundationDB Record Layer:A Multi-Tenant Structured Datast
 
 {{< youtube A3U8M8pt3Ks>}}
 
+---
 
-|  ![fdb image](/posts/notes-about-foundationdb/images/operator-extract-1.png) |
-|:--:| 
-|  ![fdb image](/posts/notes-about-foundationdb/images/operator-extract-2.png) |
-| implementation design of the Operator | 
+![fdb image](/posts/notes-about-foundationdb/images/operator-extract-1.png)
 
 ---
 
-|  ![fdb image](/posts/notes-about-foundationdb/images/operator-extract-3.png) |
-|:--:| 
-|  ![fdb image](/posts/notes-about-foundationdb/images/operator-extract-4.png) |
-| Upgrade is done by **bumping all processes at once** 😱 |
+![fdb image](/posts/notes-about-foundationdb/images/operator-extract-2.png)
+
+---
+
+Upgrade is done by **bumping all processes at once** 😱
+
+---
+
+![fdb image](/posts/notes-about-foundationdb/images/operator-extract-3.png)
+
+---
+
+![fdb image](/posts/notes-about-foundationdb/images/operator-extract-4.png)
 
 ### Combining chaos-mesh and the operator
 
