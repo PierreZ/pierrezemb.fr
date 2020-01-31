@@ -3,7 +3,7 @@ title: "Notes about FoundationDB"
 description: "List of ressources gleaned about FoundationDB"
 images:
   - /posts/notes-about-foundationdb/images/fdb-white.jpg
-date: 2020-01-22T10:24:27+01:00
+date: 2020-01-30T10:24:27+01:00
 draft: false
 showpagemeta: true
 toc: true
