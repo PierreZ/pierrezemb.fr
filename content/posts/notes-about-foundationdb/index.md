@@ -194,7 +194,7 @@ Then a `Master` is elected. The `Master` process is reponsible for the `data dis
 3. Proxy is sending to the resolver. This will check if the data that you want to mutate has been changed between your `read Version` and your `Commit version`. They are sharded by key-range.
 4. Transaction is made durable within the `Transaction Logs` by `fsync`ing the data. Before the data is even written to disk it is forwarded to the `storage servers` responsible for that mutation. Internally, `Transactions Logs` are creating **a stream per `Storage Server`**. Once the `storage servers` have made the mutation durable, they pop it from the log. This generally happens roughly 6 seconds after the mutation was originally committed to the log. 
 5. `Storage servers` are lazily updating data on disk from the `Transaction logs`. They are keeping new write in-memory.
-6. `Transaction Logs` is responding OK to the Proxy and then to the client.
+6. `Transaction Logs` is responding OK to the Proxy and then the proxy is replying OK to the client.
 
 You can find more diagrams about transactions [here](https://forums.foundationdb.org/t/technical-overview-of-the-database/135/3).
 
