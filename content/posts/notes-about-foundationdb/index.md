@@ -36,6 +36,10 @@ From a database dialect, it provides:
 * [strict serializability](https://jepsen.io/consistency/models/strict-serializable)(operations appear to have occurred in some order),
 * [external consistency](https://cloud.google.com/spanner/docs/true-time-external-consistency)(For any two transactions, T1 and T2, if T2 starts to commit after T1 finishes committing, then the timestamp for T2 is greater than the timestamp for T1).
 
+**And this is THE tweet that triggered a lot of curiosity on my side:**
+
+{{<tweet 405017101804396546>}}
+
 ## The story
 
 FoundationDB started as a company in 2009, and then [has been acquired in 2015 by Apple](https://techcrunch.com/2015/03/24/apple-acquires-durable-database-company-foundationdb/). It [was a bad public publicity for the database as the download were removed.](https://news.ycombinator.com/item?id=9259986)
