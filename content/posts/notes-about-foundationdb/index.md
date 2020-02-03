@@ -233,6 +233,8 @@ FoundationDB’s keys are ordered, making `tuples` a particularly useful tool fo
 
 Everything is wrapped into a transaction in FDB.
 
+You can have a nice overview by reading the README of [tsdb-layer](https://github.com/richardartoul/tsdb-layer/blob/master/README.md), an experiment combining Time Series and FoundationDB: Millions of writes/s and 10x compression in under 2,000 lines of Go.
+
 ## FDB One more things: Layers
 
 ### Concept of layers
