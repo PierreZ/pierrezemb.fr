@@ -47,7 +47,7 @@ copyright = "This work is licensed under a Creative Commons Attribution-NonComme
   # Directory name of your blog content (default is `content/posts`)
   contentTypeName = "posts"
   # Default theme "light" or "dark"
-  defaultTheme = "dark"
+  defaultTheme = "light"
   themeColor = "#252627"
 
   [params.logo]

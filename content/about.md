@@ -1,12 +1,10 @@
 ---
-title: "About me"
+title: "$ whoami"
 date: 2018-12-15T18:34:45+01:00
 draft: false
 ---
 
 {{< image src="/img/myself.jpg" alt="Hello Friend" position="center" style="max-width: 300px;border-radius: 200px;" >}}
-
-# $ whoami
 
 I am an **Tech Lead** at **[OVHcloud](https://www.ovhcloud.com)**. I love working with **distributed systems**, specifically around **data storage**.
 
@@ -21,6 +19,15 @@ I enjoy being part of open-source communities, through **[talks](/talks)**, **[b
 * Apple
     * [FoundationDB](https://github.com/apple/foundationdb/commits/master?author=PierreZ) and their [Kubernetes Operator](https://github.com/FoundationDB/fdb-kubernetes-operator/commits/master?author=PierreZ),
 * and [others](https://github.com/PierreZ/).
+
+I am also maintaining/playing with some projects such as:
+
+* [goStatic](https://github.com/PierreZ/goStatic), A really small static web server for Docker with over 5M of downloads on the DockerHub,
+* [awesome-cs-papers-and-implementations](https://github.com/PierreZ/awesome-cs-papers-and-implementations), An awesome list about the most iconic CS papers
+* [addupstream](https://github.com/PierreZ/addupstream), A small cli to automatically add upstream remotes to a git project,
+* [fdb-k8s-chaos](https://github.com/PierreZ/fdb-k8s-chaos), An experiment to trigger some chaos into FoundationDB on Kubernetes,
+* [fdb-etcd](https://github.com/PierreZ/fdb-etcd), An experiment to provide ETCD layer on top of Record-Layer and FoundationDB.
+
 
 On my free time, I am giving a hand to local events, such as the local GDG/JUG **[FinistDevs](https://finistdevs.org/)**, **[Devoxx4Kids](https://twitter.com/devoxx4kidsbes)** and **[DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh/)**, a technical conference. I am also a **teaching assistant** in my former Engineer School.
 
@@ -47,3 +54,5 @@ I was **on-call duty** on more than 700 servers, including:
 * Various Apache technologies, such as Kafka, Zookeeper and Flink
 
 I gave training and support for both external and internal client of Metrics, including WarpScript.
+
+During that time, I contributed to Apache Flink and HBase.
