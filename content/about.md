@@ -17,7 +17,7 @@ I enjoy being part of open-source communities, through **[talks](/talks)**, **[b
 * Apache
     * [HBase](https://github.com/apache/hbase/commits/master?author=PierreZ),
     * [Flink](https://github.com/apache/flink/commits/master?author=PierreZ),
-    * [Pulsar](https://github.com/apache/pulsar/commits/master?author=PierreZ),
+    * [Pulsar](https://github.com/apache/pulsar/commits/master?author=PierreZ) and some related plugins like [streamnative/kop (Kafka On Pulsar)](https://github.com/streamnative/kop/commits/master?author=PierreZ),
 * Apple
     * [FoundationDB](https://github.com/apple/foundationdb/commits/master?author=PierreZ) and their [Kubernetes Operator](https://github.com/FoundationDB/fdb-kubernetes-operator/commits/master?author=PierreZ),
 * and [others](https://github.com/PierreZ/).
