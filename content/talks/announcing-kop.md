@@ -29,6 +29,8 @@ In this webinar, Sijie Guo, from StreamNative, and Pierre Zemb, from OVHCloud, w
 
 # Ressources
 
+{{< youtube gL6hzRtij8M >}}
+
 * [slides](https://docs.google.com/presentation/d/1693kYdZ1ki2ZlVqGP3wtf3LW4ifsFcA2Mmb2OcYRlqs/edit?usp=sharing)
 
 # Photos and tweets
