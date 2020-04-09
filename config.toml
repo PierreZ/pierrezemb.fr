@@ -95,6 +95,12 @@ copyright = "This work is licensed under a Creative Commons Attribution-NonComme
     url = "/talks/"
 
 [[menu.main]]
+    name = "Podcasts"
+    identifier = "podcasts"
+    weight = 301
+    url = "/podcasts/"
+
+[[menu.main]]
     name = "Résumé"
     identifier = "resume"
     weight = 310
