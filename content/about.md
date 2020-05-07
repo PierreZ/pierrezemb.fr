@@ -24,10 +24,8 @@ I am also maintaining/playing with some projects such as:
 
 * [goStatic](https://github.com/PierreZ/goStatic), A really small static web server for Docker with over 5M of downloads on the DockerHub,
 * [awesome-cs-papers-and-implementations](https://github.com/PierreZ/awesome-cs-papers-and-implementations), An awesome list about the most iconic CS papers
-* [addupstream](https://github.com/PierreZ/addupstream), A small cli to automatically add upstream remotes to a git project,
 * [fdb-k8s-chaos](https://github.com/PierreZ/fdb-k8s-chaos), An experiment to trigger some chaos into FoundationDB on Kubernetes,
 * [fdb-etcd](https://github.com/PierreZ/fdb-etcd), An experiment to provide ETCD layer on top of Record-Layer and FoundationDB.
-
 
 On my free time, I am giving a hand to local events, such as the local GDG/JUG **[FinistDevs](https://finistdevs.org/)**, **[Devoxx4Kids](https://twitter.com/devoxx4kidsbes)** and **[DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh/)**, a technical conference. I am also a **teaching assistant** in my former Engineer School.
 
