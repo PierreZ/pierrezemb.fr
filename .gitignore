@@ -15,3 +15,5 @@ themes/
 resources/
 
 .vscode
+
+.idea/

@@ -22,9 +22,7 @@ I enjoy being part of open-source communities, through **[talks](/talks)**, **[b
 
 I am also maintaining/playing with some projects such as:
 
-* [goStatic](https://github.com/PierreZ/goStatic), A really small static web server for Docker with over 5M of downloads on the DockerHub,
 * [awesome-cs-papers-and-implementations](https://github.com/PierreZ/awesome-cs-papers-and-implementations), An awesome list about the most iconic CS papers
-* [fdb-k8s-chaos](https://github.com/PierreZ/fdb-k8s-chaos), An experiment to trigger some chaos into FoundationDB on Kubernetes,
 * [fdb-etcd](https://github.com/PierreZ/fdb-etcd), An experiment to provide ETCD layer on top of Record-Layer and FoundationDB.
 
 On my free time, I am giving a hand to local events, such as the local GDG/JUG **[FinistDevs](https://finistdevs.org/)**, **[Devoxx4Kids](https://twitter.com/devoxx4kidsbes)** and **[DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh/)**, a technical conference. I am also a **teaching assistant** in my former Engineer School.
@@ -33,9 +31,11 @@ I cofounded in 2017 **[HelloExoWorld](https://helloexo.world/)**, a initiative t
 
 # Work
 
-#### 2019 to now: Tech Lead @OVHcloud
+#### 2019 to now: Technical Leader @OVHcloud
 
 I am working on the underlying infrastructure of `IO` oriented products, including [ioStream](https://labs.ovh.com/iostream), a geo-replicated, managed topic-as-a-service product built using [Apache Pulsar](https://pulsar.apache.org) currently in beta.
+
+During that time, I worked around adding [Kafka's protocol to Pulsar](/posts/announcing-kop/).
 
 #### 2016 to 2019: Infrastructure Engineer @OVH
 

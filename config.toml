@@ -28,10 +28,10 @@ copyright = "This work is licensed under a Creative Commons Attribution-NonComme
 
   # Metadata mostly used in document's head
   description = "Pierre Zemb's website"
-  keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb,pierrez,tech,lead"
+  keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb,pierrez,tech,lead,technical,leader"
   images = ["myself.jpg"]
 
-  homeSubtitle = "Tech Lead @ OVHcloud"
+  homeSubtitle = "Technical Leader @ OVHcloud"
 
   # Prefix of link to the git commit detail page. GitInfo must be enabled.
   # gitUrl = ""
