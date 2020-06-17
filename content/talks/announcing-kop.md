@@ -27,11 +27,17 @@ In this webinar, Sijie Guo, from StreamNative, and Pierre Zemb, from OVHCloud, w
 
 * [Kafka-on-Pulsar Webinar](https://zoom.com.cn/webinar/register/6515842602644/WN_l_i-3ekDSg6PwPFn7tqRvA)
 
+* [Pulsar-Summit](https://pulsar-summit.org/sessions/kafka-on-pulsar-bringing-native-kafka-protocol-support-to-pulsar)
+
 # Ressources
 
-{{< youtube gL6hzRtij8M >}}
+## Slides
 
-* [slides](https://docs.google.com/presentation/d/1693kYdZ1ki2ZlVqGP3wtf3LW4ifsFcA2Mmb2OcYRlqs/edit?usp=sharing)
+{{<gslides link="https://docs.google.com/presentation/d/1fCRufPGZymsCJscGw-K4OFsY8CWwd59K2y2Mtnjx8pg/edit?usp=sharing" embedded="https://docs.google.com/presentation/d/e/2PACX-1vQepwqk4XZtrorcG70vhdI_wn7kuCgh30yPJtfmc0DwvYQYE2wR-WamIYuA-IYxs5911IAi8bBIkb0i">}}
+
+## Videos
+
+{{< youtube gL6hzRtij8M >}}
 
 # Photos and tweets
 
