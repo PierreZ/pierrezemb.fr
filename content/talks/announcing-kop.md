@@ -37,6 +37,11 @@ In this webinar, Sijie Guo, from StreamNative, and Pierre Zemb, from OVHCloud, w
 
 ## Videos
 
+### June 2020
+{{< youtube QYXKFPvayjs>}}
+
+### March 2020
+
 {{< youtube gL6hzRtij8M >}}
 
 # Photos and tweets
