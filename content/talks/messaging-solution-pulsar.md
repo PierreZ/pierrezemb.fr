@@ -17,9 +17,14 @@ In this talk, you will have the insights of why we decided to use Apache Pulsar 
 
 # Ressources
 
+
 ## Slides
 
 {{<gslides link="https://docs.google.com/presentation/d/1CRqjJOd6B5lMAY9uK7hat7TrO0boGyM3vYrOk2rbYCM/edit?usp=sharing" embedded="https://docs.google.com/presentation/d/1CRqjJOd6B5lMAY9uK7hat7TrO0boGyM3vYrOk2rbYCM">}}
+
+## Videos
+
+{{< youtube ra9o9_vPeUE>}}
 
 # Photos and tweets
 
