@@ -105,3 +105,7 @@ googleAnalytics = "UA-41090605-1"
     identifier = "resume"
     weight = 310
     url = "/CV.pdf"
+
+
+[markup.goldmark.renderer]
+unsafe= true
