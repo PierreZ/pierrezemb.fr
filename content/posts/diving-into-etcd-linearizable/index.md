@@ -2,6 +2,8 @@
 title: "Diving into ETCD's linearizable reads"
 date: 2020-09-18T05:24:27+01:00
 draft: false 
+images:
+  - /posts/diving-into-etcd-linearizable/etcd.png
 showpagemeta: true
 toc: true
 tags:
