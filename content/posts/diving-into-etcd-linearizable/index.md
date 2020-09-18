@@ -1,7 +1,7 @@
 ---
 title: "Diving into ETCD's linearizable reads"
 date: 2020-09-18T05:24:27+01:00
-draft: true 
+draft: false 
 showpagemeta: true
 toc: true
 tags:
@@ -11,7 +11,7 @@ tags:
 
 ![etcd image](/posts/diving-into-etcd-linearizable/etcd.png)
 
-[Diving Into](/tags/diving-into/) is a blogpost serie where we are digging a specific part of of the project's basecode. In this episode, we will digg into the implementation behind ETCD's Linearizable reads.
+[Diving Into](/tags/diving-into/) is a blogpost serie where we are digging a specific part of the project's basecode. In this episode, we will digg into the implementation behind ETCD's Linearizable reads.
 
 ---
 
@@ -21,7 +21,7 @@ From [the official website](https://etcd.io/):
 
 > etcd is a strongly consistent, distributed key-value store that provides a reliable way to store data that needs to be accessed by a distributed system or cluster of machines. It gracefully handles leader elections during network partitions and can tolerate machine failure, even in the leader node.
 
-ETCD is well-known to be Kubernetes's datastore and a CNCF incubating project.
+ETCD is well-known to be Kubernetes's datastore, and a CNCF incubating project.
 
 ## Linea-what?
 
@@ -36,20 +36,22 @@ ETCD is using [Raft](https://raft.github.io/), a consensus algorithm at his core
 1. `node1` is `leader` and heartbeating properly to `node2` and `node3`,
 2. network partition is happening, and `node1` is isolated from the others.
 
-At this moment, all the actions are depending on timeouts and settings. In a (close) future, all nodes will go into **election mode** and node 2 and 3 will be able to create a quorum. This leads to this situation:
+At this moment, all the actions are depending on timeouts and settings. In a (close) future, all nodes will go into **election mode** and node 2 and 3 will be able to create a quorum. This can lead to this situation:
 
-* `node1` thinks he is a leader as heartbeat timeouts and retry are not yet reached, so he can serves reads 😱
+* `node1` thinks he is a leader as heartbeat timeouts and retry are not yet reached, so he can serve reads 😱
 * `node2` and `node3` have elected a new leader and are working again, accepting writes.
 
-This situation is violating Linearizable reads. How can we solve this? One way is to use `ReadIndex`!
+This situation is violating Linearizable reads, as reads going through `node1` will not see the last updates from the current leader.
+
+How can we solve this? One way is to use `ReadIndex`!
 
 ## ReadIndex
 
 The basic idea behind this is to confirm that the **leader is true leader or not** by sending a message to the followers. If a majority of responses are healthy, then the leader can safely serve the reads. Let's dive into the implementation!
 
-All code are from the current latest release [v3.4.13](https://github.com/etcd-io/etcd/releases/tag/v3.4.13).
+All codes are from the current latest release [v3.4.13](https://github.com/etcd-io/etcd/releases/tag/v3.4.13).
 
-[Let's take a Range operation](https://github.com/etcd-io/etcd/blob/master/etcdserver/v3_server.go#L114-L120):
+[Let's take a Range operation](https://github.com/etcd-io/etcd/blob/v3.4.13/etcdserver/v3_server.go#L114-L120):
 
 ```go
 	if !r.Serializable {
@@ -101,14 +103,7 @@ that will create a `MsgReadIndex` message that will be handled in [stepLeader](h
 		// If more than the local vote is needed, go through a full broadcast,
 		// otherwise optimize.
 		if !r.prs.IsSingleton() {
-			if r.raftLog.zeroTermOnErrCompacted(r.raftLog.term(r.raftLog.committed)) != r.Term {
-				// Reject read only request when this leader has not committed any log entry at its term.
-				return nil
-			}
-
-			// thinking: use an interally defined context instead of the user given context.
-			// We can express this in terms of the term and index instead of a user-supplied value.
-			// This would allow multiple reads to piggyback on the same message.
+		    // PZ: omitting some code here
 			switch r.readOnly.option {
 			case ReadOnlySafe:
 				r.readOnly.addRequest(r.raftLog.committed, m)
@@ -179,7 +174,7 @@ Now that the state has been updated, we need to unblock our [linearizableReadLoo
 			case rs = <-s.r.readStateC:
 ```
 
-Cool, another channel! Turns out, `readStateC` is updated in [one of the main goroutine](https://github.com/etcd-io/etcd/blob/master/etcdserver/raft.go#L162):
+Cool, another channel! Turns out, `readStateC` is updated in [one of the main goroutine](https://github.com/etcd-io/etcd/blob/v3.4.13/etcdserver/raft.go#L162):
 
 ```go
 // start prepares and starts raftNode in a new goroutine. It is no longer safe
@@ -217,11 +212,11 @@ Perfect, now `readStateC` is notified, and we can continue on [linearizableReadL
 		nr.notify(nil)
 ```
 
-The first part is a safety measure to makes sure that the applied index is lower that the index stored in `ReadState`. And then finally we are unlocking all pending reads 🤩
+The first part is a safety measure to makes sure the applied index is lower that the index stored in `ReadState`. And then finally we are unlocking all pending reads 🤩
 
 ## One more thing: Follower read
 
-We went through `stepLeader` a lot, be there is something interesting in [`stepFollower`](https://github.com/etcd-io/etcd/blob/26b89fd418d4be64034fab3fb05dd9b1723aa32b/raft/raft.go#L1320):
+We went through `stepLeader` a lot, be there is something interesting in [`stepFollower`](https://github.com/etcd-io/etcd/blob/v4.3.13/raft/raft.go#L1320):
 ```go
 	case pb.MsgReadIndex:
 		if r.lead == None {
@@ -233,9 +228,9 @@ We went through `stepLeader` a lot, be there is something interesting in [`stepF
 ```
 This means that a follower can send a `MsgReadIndex` message to perform the same kind of checks than a leader. This small features is in fact enabling **follower-reads** on ETCD 🤩 That is why you can see `Range` requests from a `follower`.
 
-## Some ops notes
+## operational tips
 
-* If you are running etcd <= 3.4, make sure that **logger=zap** is enabled. Like this, you will be able to see some tracing logs, and I trully hope you will not witness this one:
+* If you are running etcd <= 3.4, make sure **logger=zap** is set. Like this, you will be able to see some tracing logs, and I trully hope you will not witness this one:
 
 ```json
 {

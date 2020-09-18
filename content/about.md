@@ -31,17 +31,23 @@ I cofounded in 2017 **[HelloExoWorld](https://helloexo.world/)**, a initiative t
 
 # Work
 
-#### 2019 to now: Technical Leader @OVHcloud
+#### 2020 to now: Technical Leader @OVHcloud - Managed Kubernetes
 
-I am working on the underlying infrastructure of `IO` oriented products, including [ioStream](https://labs.ovh.com/iostream), a geo-replicated, managed topic-as-a-service product built using [Apache Pulsar](https://pulsar.apache.org) currently in beta.
+I am  working on the [managed Kubernetes product](https://www.ovhcloud.com/en-gb/public-cloud/kubernetes/) and mostly on ETCD's scalability.
+
+#### 2019 to 2020: Technical Leader @OVHcloud - ioStream
+
+I was working on the underlying infrastructure of `IO` oriented products, including [ioStream](https://labs.ovh.com/iostream), a geo-replicated, managed topic-as-a-service product built using [Apache Pulsar](https://pulsar.apache.org).
 
 During that time, I worked around adding [Kafka's protocol to Pulsar](/posts/announcing-kop/).
+
+We launched a beta mid-2019, and the project has been shutdown mid-2020.
 
 #### 2016 to 2019: Infrastructure Engineer @OVH
 
 I worked on **[Metrics Data Platform](https://www.ovh.com/fr/data-platforms/metrics/)**. We are using **[Warp10](http://www.warp10.io/)** with friendly Apache softwares such as **Hbase, Hadoop, Zookeeper, Kafka and Flink** to handle all OVH's metrics-based monitoring, which represent around **432 billions of measurements per day**.
 
-I have taken part of most of Metrics development, from internal management to Ingress/Egress translation part. I also worked on the implementation and deployement of a distributed and scalable alerting system using Apache Flink.
+I have taken part of most of Metrics development, from internal management to Ingress/Egress translation part. I also worked on the implementation and deployment of a distributed and scalable alerting system using Apache Flink.
 
 I was using `Flink`, `HBase`, `Hadoop,` `Kafka`, `Ansible`, `Go`, `Rust`, `Java`, `Linux`, `WarpScript` on a daily basis.
 
