@@ -92,10 +92,6 @@ We didn’t changed much, but we enable many things over here:
 
 # **What about serverless?**
 
-{{< tweet 717420657655418880 >}}
-Serverless is so 2016
-
-
 Serverless is the “new” buzz word. Ignited by Amazon with their product [AWS Lambda](https://aws.amazon.com/lambda/) and quickly followed by [Google](https://cloud.google.com/functions/docs), [Microsoft](https://azure.microsoft.com/en-us/services/functions/), [IBM](https://new-console.ng.bluemix.net/openwhisk/) and [Iron.io](https://www.iron.io/introducing-aws-lambda-support), the goal is to **offer to developers a new way of building apps**. Instead of writing apps, **you’ll just write a function that will respond to an event**. In fact, you’ll be paying only for the time it’s running. It’s a interesting point-of-view, because you’ll be **deploying an architecture built only using events**. I must admit that I didn’t try it yet, but I think i**t’s a great idea to force developers to split their apps and really think about events,** but you could just build the same thing with any cloud provider.
 
 # Additional links and talks about this topic
