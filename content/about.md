@@ -24,9 +24,10 @@ I enjoy being part of open-source communities, through **[talks](/talks)**, **[b
 
 I am also maintaining/playing with some projects such as:
 
+* [goStatic](https://github.com/PierreZ/goStatic), A really small static web server for Docker
 * [awesome-cs-papers-and-implementations](https://github.com/PierreZ/awesome-cs-papers-and-implementations), An awesome list about the most iconic CS papers
 * [fdb-etcd](https://github.com/PierreZ/fdb-etcd), An experiment to provide ETCD layer on top of Record-Layer and FoundationDB.
-* [Record-Store](https://pierrez.github.io/record-store/), A light, multi-model, user-defined place for your data. 
+* [Record-Store](https://pierrez.github.io/record-store/), A light, multi-model, user-defined place for your data.
 
 On my free time, I am giving a hand to local events, such as the local GDG/JUG **[FinistDevs](https://finistdevs.org/)**, **[Devoxx4Kids](https://twitter.com/devoxx4kidsbes)** and **[DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh/)**, a technical conference. I am also a **teaching assistant** in my former Engineer School.
 
