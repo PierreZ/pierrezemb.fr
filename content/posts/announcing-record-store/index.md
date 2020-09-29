@@ -18,7 +18,7 @@ TL;DR: I'm really happy to announce my latest open-source project called Record-
 
 `Record-Store` is a [layer](https://apple.github.io/foundationdb/layer-concept.html) running on top of [FoundationDB](https://foundationdb.org). It provides abstractions to create, load and deletes customer-defined data called `records`, which are hold into a `RecordSpace`. We would like to have this kind of flow for developers:
 
-1. Opening KeySpace, for example `prod/users`
+1. Opening RecordSpace, for example `prod/users`
 2. Create a protobuf definition which will be used as schema
 3. Upsert schema
 4. Push records
