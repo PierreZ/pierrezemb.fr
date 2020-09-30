@@ -3,6 +3,8 @@ title: "10 years of programming and counting 🚀"
 description: "A retrospective of the last 10 years"
 date: 2020-09-30T00:24:27+01:00
 draft: false
+images:
+  - /posts/ten-years-programming/first-talk.jpg
 showpagemeta: true
 toc: false 
 tags:
@@ -37,6 +39,8 @@ I also met amazing persons, that are now friends and/or mentors. I remember feel
 I also discovered more global tech conferences. I asked as a birthday 🎁 to go to Devoxx France and DotScale, in 2014. It was awesome 😎 
 
 By dint of watching talks, I wanted to give some. I started small, giving talks at my engineering school, then moved to the JUG itself. I learned **a lot** by making a lot of mistakes, but I’m pretty happy how things turned out, as I’m now speaking at tech conferences as part of my current work. 
+
+<img src="/posts/ten-years-programming/first-talk.jpg" alt="fig1" class="center">
 
 I also started to be involved in events and organizations such as:
 * The JUG/GDG
