@@ -19,7 +19,3 @@ draft: false
 
 ### February 2021
 {{< youtube Wi4WUAmRQmQ>}}
-
-# Photos and tweets
-
-{{<tweet 1362698852516696065>}}
