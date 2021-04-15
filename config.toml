@@ -66,6 +66,10 @@ copyright = "This work is licensed under a Creative Commons Attribution-NonComme
   [[params.social]]
     name = "github"
     url  = "https://github.com/PierreZ"
+  
+  [[params.social]]
+    name = "youtube"
+    url  = "https://www.youtube.com/c/PierreZemb"
 
   [[params.social]]
     name = "twitch"
