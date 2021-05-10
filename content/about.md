@@ -6,29 +6,40 @@ draft: false
 
 {{< image src="/img/myself.jpg" alt="Hello Friend" position="center" style="max-width: 300px;border-radius: 200px;" >}}
 
-I am an **Technical Leader** at **[OVHcloud](https://www.ovhcloud.com)**. I love working with **distributed systems**, specifically around **data storage**.
+I’m a senior Software Engineer building data infrastructure at Clever Cloud. I've built and operated a variety of stateful distributed systems throughout my career.
 
-I enjoy being part of open-source communities, through **[talks](/talks)**, **[blogposts](/posts)**, and **[contributions](https://github.com/PierreZ/)** to:
+I’m interested in distributed systems, data stores, understanding how things works under the hood. I enjoy being part of open-source communities, through [talks](/talks), [posts](/posts), and [contributions](https://github.com/PierreZ/) to:
 
-* SenX **[Warp10](https://github.com/senx/warp10-platform/commits?author=PierreZ)**,
-* Apache **[HBase](https://github.com/apache/hbase/commits/master?author=PierreZ)**, **[Flink](https://github.com/apache/flink/commits/master?author=PierreZ)**, **[Pulsar](https://github.com/apache/pulsar/commits/master?author=PierreZ)**
-* StreamNative **[KoP (Kafka On Pulsar)](https://github.com/streamnative/kop/commits/master?author=PierreZ)**,
-* PingCAP **[go-ycsb](https://github.com/pingcap/go-ycsb/commits/master?author=PierreZ),**
-* Apple **[FoundationDB](https://github.com/apple/foundationdb/commits/master?author=PierreZ)** and their **[Kubernetes Operator](https://github.com/FoundationDB/fdb-kubernetes-operator/commits/master?author=PierreZ)**,
-* CNCF **[ETCD](https://github.com/etcd-io/etcd/commits/master?author=PierreZ)**,
+* SenX [Warp10](https://github.com/senx/warp10-platform/commits?author=PierreZ),
+* Apache [HBase](https://github.com/apache/hbase/commits/master?author=PierreZ), [Flink](https://github.com/apache/flink/commits/master?author=PierreZ), [Pulsar](https://github.com/apache/pulsar/commits/master?author=PierreZ),
+* PingCAP [go-ycsb](https://github.com/pingcap/go-ycsb/commits/master?author=PierreZ),
+* Apple [FoundationDB](https://github.com/apple/foundationdb/commits/master?author=PierreZ) and their [Kubernetes Operator](https://github.com/FoundationDB/fdb-kubernetes-operator/commits/master?author=PierreZ),
+* StreamNative [KoP (Kafka On Pulsar)](https://github.com/streamnative/kop/commits/master?author=PierreZ), Kafka protocol handler for Pulsar,
+* CNCF [ETCD](https://github.com/etcd-io/etcd/commits/master?author=PierreZ),
 
-I am also maintaining/playing with some projects such as:
+I am also maintaining some projects such as:
 
-* **[goStatic](https://github.com/PierreZ/goStatic)**, A really small static web server for Docker
-* **[awesome-cs-papers-and-implementations](https://github.com/PierreZ/awesome-cs-papers-and-implementations)**, An awesome list about the most iconic CS papers
-* **[fdb-etcd](https://github.com/PierreZ/fdb-etcd)**, An experiment to provide ETCD layer on top of Record-Layer and FoundationDB.
-* **[Record-Store](https://pierrez.github.io/record-store/)**, A light, multi-model, user-defined place for your data.
+* [PierreZ/goStatic](https://github.com/PierreZ/goStatic), A really small static web server for Docker,
+* [PierreZ/fdb-etcd](https://github.com/PierreZ/fdb-etcd), An experiment to provide ETCD layer on top of Record-Layer and FoundationDB,
+* [PierreZ/Record-Store](https://pierrez.github.io/record-store/), A light, multi-model, user-defined place for your data.
 
-On my free time, I am giving a hand to local events, such as the local GDG/JUG **[FinistDevs](https://finistdevs.org/)**, **[Devoxx4Kids](https://twitter.com/devoxx4kidsbes)** and **[DevFest du Bout du Monde](https://devfest.duboutdumonde.bzh/)**, a technical conference. I am also a **teaching assistant** in my former Engineer School.
+On my free time, I am giving a hand to local events, such as the local GDG/JUG [FinistDevs](https://finistdevs.org/), [Devoxx4Kids](https://twitter.com/devoxx4kidsbes) and I am also a teaching assistant in my former Engineer School.
 
-I cofounded in 2017 **[HelloExoWorld](https://helloexo.world/)**, a initiative to search for exoplanets using Warp10, a time-series platform.
+I cofounded in 2017 [HelloExoWorld](https://helloexo.world/), an initiative to search for exoplanets using Warp10, a time-series platform.
 
 # Work
+#### 2021 to now: Senior Software Engineer @Clever Cloud
+
+TBD
+
+#### 2020 to 2021: Technical Leader @OVHcloud - Managed Kubernetes
+
+I was working on the [managed Kubernetes product](https://www.ovhcloud.com/en-gb/public-cloud/kubernetes/). I was involved in:
+
+* Improving ETCD’s scalability and OpenStack CSI,
+* Self-healing customers control-planes,
+* Go mentoring,
+* On-call duty.
 
 #### 2020 to now: Technical Leader @OVHcloud - Managed Kubernetes
 
