@@ -23,7 +23,8 @@ In this talk, you will have the insights of how we are operating our ETCD cluste
 
 ## Videos
 
-TBD 
+{{< youtube IrJyrGQ_R9c>}}
+
 
 # Photos and tweets
 
