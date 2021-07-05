@@ -41,10 +41,6 @@ I was working on the [managed Kubernetes product](https://www.ovhcloud.com/en-gb
 * Go mentoring,
 * On-call duty.
 
-#### 2020 to now: Technical Leader @OVHcloud - Managed Kubernetes
-
-I am  working on the [managed Kubernetes product](https://www.ovhcloud.com/en-gb/public-cloud/kubernetes/) and mostly on ETCD's scalability.
-
 #### 2019 to 2020: Technical Leader @OVHcloud - ioStream
 
 I was working on the underlying infrastructure of `IO` oriented products, including [ioStream](https://labs.ovh.com/iostream), a geo-replicated, managed topic-as-a-service product built using [Apache Pulsar](https://pulsar.apache.org).

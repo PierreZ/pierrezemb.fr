@@ -78,8 +78,8 @@ Which looks like a `Tuple`(a collection of values of different types) and this i
 Instead of crafting bytes by hand, we are `packing` a Tuple:
 
 ```rust
-// create a Tuple<String, i64> with ("tenant-1", 1)
-let tuple = (String::from("tenant-1"), 1);
+// create a Tuple<String, i64> with ("tenant-42", 1)
+let tuple = (String::from("tenant-42"), 1);
 
 // and compute a row-key from the Tuple
 let row_key = foundationdb::tuple::pack::<(String, i64)>(&tuple);
@@ -119,14 +119,14 @@ Having this kind of standard means that we can easily decompose/`unpack` it:
 let from_row_key = foundationdb::tuple::unpack::<(String, i64)>(&row_key)?;
 
 println!("user='{}', magic_number={}", from_row_key.0, from_row_key.1);
-// user='tenant-1', magic_number=42
+// user='tenant-42', magic_number=42
 ```
 
 Now that we saw `Tuples`, let's dig in the next abstraction: `subspaces`
 
 ### Subspace
 
-When you are working with key-values store, we are oftenly playing with what we call `keyspaces`, by dedicating a portion of the key to an usage, like this for example:
+When you are working with key-values store, we are often playing with what we call `keyspaces`, by dedicating a portion of the key to an usage, like this for example:
 
 ```text
 /users/tenant-1/...
