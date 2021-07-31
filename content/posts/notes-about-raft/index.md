@@ -5,9 +5,10 @@ images:
   - /posts/notes-about-raft/images/raft.png
 date: 2020-07-30T07:24:27+01:00
 draft: false
+
 showpagemeta: true
 toc: true
-tags:
+categories:
  - raft 
  - notesabout
 ---

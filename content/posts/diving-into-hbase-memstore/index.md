@@ -2,8 +2,9 @@
 title: "Diving into Hbase's MemStore"
 date: 2019-11-17T10:24:27+01:00
 draft: false
+
 showpagemeta: true
-tags:
+categories:
  - hbase
  - diving into
 ---

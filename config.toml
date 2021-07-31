@@ -1,119 +1,175 @@
-baseURL = "https://pierrezemb.fr"
-title   = "Pierre Zemb"
-
 DefaultContentLanguage = "en"
 
-theme = "hello-friend-ng"
+baseURL = "http://pierrezemb.fr"
+# [en, zh-cn, fr, ...] determines default content language
+defaultContentLanguage = "en"
+# language code
+languageCode = "en"
+title = "Pierre Zemb"
 
-PygmentsCodeFences = true
-PygmentsStyle = "monokai"
-
-rssLimit  = 10  # Maximum number of items in the RSS feed.
-copyright = "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." # This message is only used by the RSS template.
-
-# googleAnalytics = "UA-41090605-1"
-# disqusShortname = ""
-
-[author]
-  name = "Pierre Zemb"
-
-[blackfriday]
-  hrefTargetBlank = true
+# Change the default theme to be use when building the site with Hugo
+theme = "LoveIt"
 
 [params]
-  dateform        = "Jan 2, 2006"
-  dateformShort   = "Jan 2"
-  dateformNum     = "2006-01-02"
-  dateformNumTime = "2006-01-02 15:04 -0700"
+# LoveIt theme version
+version = "0.2.X"
 
-  # Metadata mostly used in document's head
-  description = "Pierre Zemb's website"
-  keywords = "infrastructure,engineer,portfolio,developer,software,pierre,zemb,pierrez,tech,lead,software,engineer"
-  images = ["myself.jpg"]
+enableGitInfo=true
+gitRepo = "https://github.com/PierreZ/pierrezemb.fr"
 
-  homeSubtitle = "Senior Software Engineer @ Clever Cloud"
 
-  # Prefix of link to the git commit detail page. GitInfo must be enabled.
-  # gitUrl = ""
+[author]
+name = "Pierre Zemb"
+link = "/"
 
-  # Integrate Javascript files or stylesheets by adding the url to the external assets or by
-  # linking local files with their path relative to the static folder, e.g. "css/styles.css"
-  customCSS = []
-  customJS  = []
+# website images for Open Graph and Twitter Cards
+images = ["myself.png"]
 
-  # Toggle this option need to rebuild SCSS, requires extended version of Hugo
-  justifyContent = false  # Set "text-align: justify" to .content.
+# Header config
+[params.header]
+    # desktop header mode ("fixed", "normal", "auto")
+    desktopMode = "fixed"
+    # mobile header mode ("fixed", "normal", "auto")
+    mobileMode = "auto"
+    # LoveIt NEW | 0.2.0 Header title config
+    [params.header.title]
+    # URL of the LOGO
+    logo = ""
+    # title name
+    name = "~/blog"
+    # you can add extra information before the name (HTML format is supported), such as icons
+    pre = ""
+    # you can add extra information after the name (HTML format is supported), such as icons
+    post = ""
+    # LoveIt NEW | 0.2.5 whether to use typeit animation for title name
+    typeit = false
 
-  # Directory name of your blog content (default is `content/posts`)
-  contentTypeName = "posts"
-  # Default theme "light" or "dark"
-  defaultTheme = "light"
-  themeColor = "#252627"
+# Footer config
+[params.footer]
+    enable = true
+    custom = ''
+    hugo = true
+    copyright = true
+    author = true
+    since = 2015
+    license = '<a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a>'
 
-  [params.logo]
-    logoText     = "$ cd ~/blog"
-    logoHomeLink = "/"
 
-  # Social icons
-  [[params.social]]
-    name = "twitter"
-    url  = "https://twitter.com/PierreZ"
+# Home page config
+[params.home]
+    # LoveIt NEW | 0.2.0 amount of RSS pages
+    rss = 10
+    # Home page profile
+    [params.home.profile]
+    enable = true
+    # Gravatar Email for preferred avatar in home page
+    gravatarEmail = "pierre.zemb.isen@gmail.com"
+    # URL of avatar shown in home page
+    avatarURL = "/images/avatar.png"
+    # LoveIt CHANGED | 0.2.7 title shown in home page (HTML format is supported)
+    title = "Pierre Zemb"
+    # subtitle shown in home page
+    subtitle = "Senior Software Engineer @ Clever Cloud"
+    # whether to use typeit animation for subtitle
+    typeit = true
+    # whether to show social links
+    social = true
+    # LoveIt NEW | 0.2.0 disclaimer (HTML format is supported)
+    disclaimer = ""
+    # Home page posts
+    [params.home.posts]
+    enable = false
 
-  [[params.social]]
-    name = "keybase"
-    url  = "https://keybase.io/pierrez"
 
-  [[params.social]]
-    name = "github"
-    url  = "https://github.com/PierreZ"
-  
-  [[params.social]]
-    name = "youtube"
-    url  = "https://www.youtube.com/c/PierreZemb"
 
-  [[params.social]]
-    name = "twitch"
-    url  = "https://www.twitch.tv/pierrezemb"
+[outputs]
+home = ["HTML", "RSS", "JSON"]
 
-[[params.social]]
-    name = "linkedin"
-    url  = "https://www.linkedin.com/in/%F0%9F%91%A8%F0%9F%8F%BB%E2%80%8D%F0%9F%92%BB-pierre-zemb-8004125b/"
+[params.search]
+enable = true
+# type of search engine ("lunr", "algolia")
+type = "lunr"
 
-[languages]
-  [languages.en]
-    weight    = 1
-    copyright = '<a href="http://creativecommons.org/licenses/by/3.0/">Some Rights Reserved</a>'
+[params.section]
+# special amount of posts in each section page
+paginate = 15
 
+[params.page.share]
+enable = true
+Twitter = true
+Facebook = true
+Linkedin = true
+HackerNews = true
+Reddit = true
+
+# Social config about the author
+[params.social]
+    Twitter = "PierreZ"
+    Github = "PierreZ"
+    Keybase = "pierrez"
+    Youtubechannel = "pierrezemb"
+    Twitch = "PierreZemb"
+    Linkedin = "%F0%9F%91%A8%F0%9F%8F%BB%E2%80%8D%F0%9F%92%BB-pierre-zemb-8004125b"
+
+[menu]
+    [[menu.main]]
+        identifier = "About"
+        # you can add extra information before the name (HTML format is supported), such as icons
+        pre = "🧑‍💻"
+        # you can add extra information after the name (HTML format is supported), such as icons
+        post = ""
+        name = "About"
+        url = "/about/"
+        # title will be shown when you hover on this menu link
+        title = ""
+        weight = 1
+    [[menu.main]]
+        identifier = "Blog"
+# you can add extra information before the name (HTML format is supported), such as icons
+        pre = "🖊️"
+        # you can add extra information after the name (HTML format is supported), such as icons
+        post = ""
+        name = "Blog"
+        url = "/posts/"
+        # title will be shown when you hover on this menu link
+        title = ""
+        weight = 2
+    [[menu.main]]
+        identifier = "podcast"
+        pre = "🎙️"
+        post = ""
+        name = "Podcasts"
+        url = "/podcasts/"
+        title = ""
+        weight = 3
+    [[menu.main]]
+        identifier = "Talks"
+        pre = "📹"
+        post = ""
+        name = "Talks"
+        url = "/talks/"
+        title = ""
+        weight = 4
 [[menu.main]]
-    name = "About"
-    identifier = "about"
-    weight = 200
-    url = "/about/"
-
+        identifier = "categories"
+        pre = "🏷️"
+        post = ""
+        name = "Categories"
+        url = "/categories/"
+        title = ""
+        weight = 5
 [[menu.main]]
-    name = "Blog"
-    identifier = "blog"
-    weight = 250
-    url = "/posts/"
+        identifier = "cv"
+        pre = "📄"
+        post = ""
+        name = "Resume"
+        url = "/cv.pdf"
+        title = ""
+        weight = 6
 
-[[menu.main]]
-    name = "Talks"
-    identifier = "talks"
-    weight = 300
-    url = "/talks/"
-
-[[menu.main]]
-    name = "Podcasts"
-    identifier = "podcasts"
-    weight = 301
-    url = "/podcasts/"
-
-[[menu.main]]
-    name = "Résumé"
-    identifier = "resume"
-    weight = 310
-    url = "/CV.pdf"
-
-
-[markup.goldmark.renderer]
-unsafe= true
+# Markup related configuration in Hugo
+[markup]
+# Syntax Highlighting (https://gohugo.io/content-management/syntax-highlighting)
+[markup.highlight]
+# false is a necessary configuration (https://github.com/dillonzq/LoveIt/issues/158)
+noClasses = false

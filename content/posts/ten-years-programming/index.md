@@ -3,11 +3,12 @@ title: "10 years of programming and counting 🚀"
 description: "A retrospective of the last 10 years"
 date: 2020-09-30T00:24:27+01:00
 draft: false
+
 images:
   - /posts/ten-years-programming/first-talk.jpg
 showpagemeta: true
 toc: false 
-tags:
+categories:
  - personal
 ---
 

@@ -5,10 +5,11 @@ images:
   - /posts/notes-about-foundationdb/images/fdb-white.jpg
 date: 2020-01-30T10:24:27+01:00
 draft: false
+
 showpagemeta: true
 toc: true
-tags:
- - foundationdb
+categories:
+ - FoundationDB
  - notesabout
 ---
 

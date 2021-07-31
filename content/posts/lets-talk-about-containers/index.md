@@ -5,7 +5,7 @@ date: 2016-01-04T18:52:19.698Z
 lastmod: 2019-01-10T21:56:50+01:00
 showpagemeta: true
 canonical: https://medium.com/@PierreZ/let-s-talk-about-containers-1f11ee68c470
-tags:
+categories:
  - operating 
  - containers
 

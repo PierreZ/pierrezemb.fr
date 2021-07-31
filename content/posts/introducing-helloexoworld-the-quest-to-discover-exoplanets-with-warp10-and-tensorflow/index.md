@@ -4,7 +4,7 @@ author: "Pierre Zemb"
 date: 2017-10-11T10:23:11.770Z
 lastmod: 2019-01-10T22:16:31+01:00
 showpagemeta: true
-tags:
+categories:
  - timeseries
  - helloexoworld
  - analytics

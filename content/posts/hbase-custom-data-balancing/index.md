@@ -5,9 +5,10 @@ images:
   - /posts/hbase-custom-data-balancing/images/hbase-ovh-1.jpeg
 date: 2020-02-14T10:24:27+01:00
 draft: false
+
 showpagemeta: true
 toc: true
-tags:
+categories:
  - hbase
  - contribution
 canonical: https://www.ovh.com/blog/contributing-to-apache-hbase-custom-data-balancing/

@@ -2,7 +2,8 @@
 title: "🇫🇷 BigData Hebdo 99 : Apache Pulsar & Kafka on Pulsar"
 date: 2020-05-06T01:22:36+01:00
 draft: false
-tags:
+
+categories:
  - pulsar
  - big-data-hebdo
 ---

@@ -2,8 +2,9 @@
 title: "🇫🇷 BigData Hebdo 93 : FoundationDB"
 date: 2020-02-17T01:22:36+01:00
 draft: false
+
 tags:
- - foundationdb
+ - FoundationDB
  - big-data-hebdo
 ---
 

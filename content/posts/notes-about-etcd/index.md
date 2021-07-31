@@ -4,10 +4,11 @@ description: "List of ressources gleaned about ETCD"
 images:
   - /posts/notes-about-etcd/images/etcd.png
 date: 2021-01-11T00:24:27+01:00
-draft: false 
+draft: false
+ 
 showpagemeta: true
 toc: true
-tags:
+categories:
  - etcd
  - notesabout
 ---

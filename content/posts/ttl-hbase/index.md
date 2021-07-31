@@ -2,7 +2,8 @@
 title: Playing with TTL in HBase
 date: 2019-05-27T22:07:11+02:00
 draft: false
-tags:
+
+categories:
  - distributed-systems
  - hbase
 ---

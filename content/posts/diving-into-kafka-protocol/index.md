@@ -2,8 +2,9 @@
 title: "Diving into Kafka's Protocol"
 date: 2019-12-08T15:00:00+01:00
 draft: false
+
 showpagemeta: true
-tags:
+categories:
  - kafka
  - diving into
 ---

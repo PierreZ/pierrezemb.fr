@@ -2,9 +2,8 @@
 title: "$ whoami"
 date: 2018-12-15T18:34:45+01:00
 draft: false
----
 
-{{< image src="/img/myself.jpg" alt="Hello Friend" position="center" style="max-width: 300px;border-radius: 200px;" >}}
+---
 
 I’m a senior Software Engineer building data infrastructure at Clever Cloud. I've built and operated a variety of stateful distributed systems throughout my career.
 

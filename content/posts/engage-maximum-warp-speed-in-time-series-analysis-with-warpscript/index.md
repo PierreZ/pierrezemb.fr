@@ -4,7 +4,7 @@ author: "Pierre Zemb"
 date: 2017-10-08T20:43:05.198Z
 lastmod: 2019-01-10T21:57:19+01:00
 showpagemeta: true
-tags:
+categories:
  - timeseries 
  - warp10
  - analytics

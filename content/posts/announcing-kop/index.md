@@ -5,9 +5,10 @@ images:
   - /posts/announcing-kop/images/kop-1.png
 date: 2020-03-24T10:24:27+01:00
 draft: false
+
 showpagemeta: true
 toc: true
-tags:
+categories:
  - pulsar
  - contribution
 canonical: https://www.ovh.com/blog/announcing-kafka-on-pulsar-bring-native-kafka-protocol-support-to-apache-pulsar/

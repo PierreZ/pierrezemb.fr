@@ -4,11 +4,12 @@ description: "An overview of all the helpers to generate row keys with Foundatio
 images:
   - /posts/notes-about-foundationdb/images/fdb-white.jpg
 date: 2021-02-21T00:24:27+01:00
-draft: false 
+draft: false
+ 
 showpagemeta: true
 toc: true
-tags:
- - foundationdb 
+categories:
+ - FoundationDB 
 ---
 
 ![fdb image](/posts/notes-about-foundationdb/images/fdb-white.jpg)

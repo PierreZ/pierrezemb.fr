@@ -2,7 +2,8 @@
 title: "🇫🇷 Message à caractère informatique 46 : Faire Le Tri Dans Ses Relations"
 date: 2021-06-04T01:22:36+01:00
 draft: false
-tags:
+
+categories:
  - sql
  - maci
 ---
