@@ -115,7 +115,7 @@ Reddit = true
     [[menu.main]]
         identifier = "About"
         # you can add extra information before the name (HTML format is supported), such as icons
-        pre = "🧑‍💻"
+        pre = ""
         # you can add extra information after the name (HTML format is supported), such as icons
         post = ""
         name = "About"
@@ -126,7 +126,7 @@ Reddit = true
     [[menu.main]]
         identifier = "Blog"
 # you can add extra information before the name (HTML format is supported), such as icons
-        pre = "🖊️"
+        pre = ""
         # you can add extra information after the name (HTML format is supported), such as icons
         post = ""
         name = "Blog"
@@ -136,7 +136,7 @@ Reddit = true
         weight = 2
     [[menu.main]]
         identifier = "podcast"
-        pre = "🎙️"
+        pre = "️"
         post = ""
         name = "Podcasts"
         url = "/podcasts/"
@@ -144,7 +144,7 @@ Reddit = true
         weight = 3
     [[menu.main]]
         identifier = "Talks"
-        pre = "📹"
+        pre = ""
         post = ""
         name = "Talks"
         url = "/talks/"
@@ -152,7 +152,7 @@ Reddit = true
         weight = 4
 [[menu.main]]
         identifier = "categories"
-        pre = "🏷️"
+        pre = "️"
         post = ""
         name = "Categories"
         url = "/categories/"
@@ -160,7 +160,7 @@ Reddit = true
         weight = 5
 [[menu.main]]
         identifier = "cv"
-        pre = "📄"
+        pre = ""
         post = ""
         name = "Resume"
         url = "/cv.pdf"

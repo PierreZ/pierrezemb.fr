@@ -1,8 +1,7 @@
 ---
-title: "$ whoami"
+title: "Hello 👋"
 date: 2018-12-15T18:34:45+01:00
 draft: false
-
 ---
 
 I’m a senior Software Engineer building data infrastructure at Clever Cloud. I've built and operated a variety of stateful distributed systems throughout my career.
