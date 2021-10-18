@@ -75,6 +75,8 @@ Putting a distributed systems inside Kubernetes is currently a unpleasant experi
 
 ## How GFS evolved within Google
 
+### Technical overview
+
 As GFS's paper was published in 2003, we can ask ourselves if GFS has evolved. And it did! The sad part is that there is only a few informations about this project codenamed `Colossus`. There is no papers, and not a lot informations available, here's what can be found online:
 
 * From [Storage Architecture and Challenges(2010)](https://cloud.google.com/files/storage_architecture_and_challenges.pdf):
@@ -108,6 +110,12 @@ The funny part is that they now need a Colossus for Colossus. The only things sa
 * From a [Hacker News comment](https://news.ycombinator.com/item?id=20135927):
     * Colossus and D are two separate things.
 
+* From [Colossus under the hood: a peek into Google’s scalable storage system](https://cloud.google.com/blog/products/storage-data-transfer/a-peek-behind-colossus-googles-file-system):
+
+    * Colossus's Control Plane is a scalable metadata service, which consists of many Curators. Clients talk directly to curators for control operations, such as file creation, and can scale horizontally.
+    * background storage managers called Custodians, there are handling tasks like disk space balancing and RAID reconstruction.
+    * Applications needs to specifies I/O, availability, and durability requirements
+
 What is that "D"?
 
 * From [ The Production Environment at Google, from the Viewpoint of an SRE](https://landing.google.com/sre/sre-book/chapters/production-environment/):
@@ -117,6 +125,18 @@ What is that "D"?
 * From [The Production Environment at Google](https://medium.com/@jerub/the-production-environment-at-google-8a1aaece3767):
     * D is more of a block server than a file server
     * It provides nothing apart from checksums.
+
+
+### Deployments
+<!-- I think the team that's pushing the forefront of something k8s-like for persistency/durability is... the Colossus/D team at Google, who have been running storage servers managed by Borg for almost a decade now :) Problem is, it's not k8s. But could tell us what that roadmap is.  -->
+
+How everything is deployed? Using Borg!
+
+{{<tweet 1197044446279479297>}}
+
+### Migration
+
+The migration process is described in the now free [Case Studies in Infrastructure Change Management](https://static.googleusercontent.com/media/sre.google/en//static/pdf/case-studies-infrastructure-change-management.pdf) book.
 
 ## Is there an open-source effort to create a Colossus-like DFS?
 
