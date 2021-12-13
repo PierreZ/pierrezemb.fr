@@ -15,6 +15,7 @@ theme = "LoveIt"
 version = "0.2.X"
 
 enableGitInfo=true
+enableEmoji=true
 gitRepo = "https://github.com/PierreZ/pierrezemb.fr"
 
 
