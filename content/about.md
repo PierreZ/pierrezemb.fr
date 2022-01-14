@@ -20,10 +20,11 @@ I am also maintaining some projects such as:
 * [PierreZ/goStatic](https://github.com/PierreZ/goStatic), A really small static web server for Docker,
 * [PierreZ/fdb-etcd](https://github.com/PierreZ/fdb-etcd), An experiment to provide ETCD layer on top of Record-Layer and FoundationDB,
 * [PierreZ/Record-Store](https://pierrez.github.io/record-store/), A light, multi-model, user-defined place for your data.
+* [FoundationDB-rs](https://github.com/foundationdb-rs/foundationdb-rs), The rust binding for FoundationDB.
 
 On my free time, I am giving a hand to local events, such as the local GDG/JUG [FinistDevs](https://finistdevs.org/), [Devoxx4Kids](https://twitter.com/devoxx4kidsbes) and I am also a teaching assistant in my former Engineer School.
 
-I cofounded in 2017 [HelloExoWorld](https://helloexo.world/), an initiative to search for exoplanets using Warp10, a time-series platform.
+I co-founded in 2017 [HelloExoWorld](https://helloexo.world/), an initiative to search for exoplanets using Warp10, a time-series platform.
 
 # Work
 #### 2021 to now: Senior Software Engineer @Clever Cloud
