@@ -89,6 +89,19 @@ I really like the pitch of the book:
 
 [The Art of PostgreSQL](https://theartofpostgresql.com/) is all about showing the power of both SQL and PostgreSQL. It explains the how's and why's of using Postgres's many feature, and how you, as a developers, can take advantages of it. A brilliant book that should be read by every developer.
 
+> This book is for developers, covering advanced SQL techniques for data processing. Learn how to get exactly the result set you need in your application’s code!
+> 
+> Learn advanced SQL with practical examples and datasets that help you get the most of the book! Every query solves a practical use case and is given in context.
+> 
+> The book covers (de-)normalisation with simple practical examples to dive into this seemingly complex topic, including Caching and Indexing Strategy.
+> 
+> Writing efficient SQL is easier than it looks, and begins with database modeling and writing clear code. The book teaches you how to write fast queries!
+
+### Readings in Database Systems 📘 
+
+Another free book, [Readings in Database Systems](http://www.redbook.io/) is a great read if you are looking for an opinionated and short review on subject like architecture, engines, analytics and so on.
+
+> Readings in Database Systems (commonly known as the "Red Book") has offered readers an opinionated take on both classic and cutting-edge research in the field of data management since 1988. Here, we present the Fifth Edition of the Red Book — the first in over ten years.
 
 ## Watching 📺
 
