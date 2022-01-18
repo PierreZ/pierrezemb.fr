@@ -105,6 +105,7 @@ Reddit = true
 
 # Social config about the author
 [params.social]
+    RSS = true
     Twitter = "PierreZ"
     Github = "PierreZ"
     Keybase = "pierrez"
