@@ -3,6 +3,7 @@ title: "Best resources to learn about data and distributed systems"
 description: "Learning distributed systems is tough. You need to go through a lot of academic papers, concepts, code review, before being able to have a global pictures. Thankfully, there is a lot of resources out there that can help you. Here's the best resources I used to learn distributed systems"
 draft: false
 date: 2022-01-17T01:37:27+01:00
+lastmod: 2022-01-31T01:37:27+01:00
 showpagemeta: true
 images:
 - /posts/distsys-resources/books.jpeg
@@ -19,9 +20,19 @@ Learning distributed systems is tough. You need to go through a lot of academic 
 > 
 > -Lamport, 1987
 
+## Updates ⚡️
+
+* **2022-01-31**:
+  * [Aphyr distsys classnotes](#aphyr-distsys-class-notes)
+  * [Dan Creswell’s reading List](#dan-creswells-reading-list)
+  * [The Internals of PostgreSQL](#the-internals-of-postgresql)
+  * [Distributed systems](#distributed-systems)
+  * [Understanding Distributed Systems](#understanding-distributed-systems)
+  * [Patterns of Distributed Systems](#patterns-of-distributed-systems)
+
 ## Reading 📚
 
-### Designing Data-Intensive Applications 📘
+### Designing Data-Intensive Applications
 
 Let's start by one of my favorite book, [Designing Data-Intensive Applications](https://dataintensive.net/), written by [Martin Kleppmann](https://martin.kleppmann.com/). This is by far the most practical book you will ever find about distributed systems. It covers:
 
@@ -37,7 +48,7 @@ Let's start by one of my favorite book, [Designing Data-Intensive Applications](
 > 
 > This book will help you navigate the diverse and fast-changing landscape of technologies for storing and processing data. We compare a broad variety of tools and approaches, so that you can see the strengths and weaknesses of each, and decide what’s best for your application.
 
-### Database Internals 📘
+### Database Internals
 
 [Database Internals](https://www.databass.dev/), written by [Alex Petrov](https://twitter.com/ifesdjeen), is a fantastic book for anyone wondering how a database works. I recommend reading it after `Designing Data-Intensive Applications`, as the author dives in more details compared to Martin's book.
 
@@ -47,7 +58,28 @@ Let's start by one of my favorite book, [Designing Data-Intensive Applications](
 > 
 > The book consists of two parts: Storage Engines and Distributed Systems since that’s where most of the differences between the vast majority of databases is coming from.
 
-### Jepsen blog ✍️
+### Distributed Systems
+
+[Maarten van Steen](https://www.distributed-systems.net/index.php/me/) wrote a book called [Distributed Systems 3rd edition](https://www.distributed-systems.net/). It is a nice book which you can get a digital copy of this book for free.
+
+> Distributed systems are like 3D brain teasers: easy to disassemble; hard to put together.
+
+
+### Understanding Distributed Systems
+
+If you are not a backend engineer but still curious about distributed systems, I highly recommend [Understanding Distributed Systems](https://understandingdistributed.systems/). [Roberto Vitillo](https://robertovitillo.com/) is doing an insane job to vulgarize the subject.
+
+> Want to learn how to build scalable and fault-tolerant cloud applications?
+> 
+> This book will teach you the core principles of distributed systems so that you don’t have to spend countless hours trying to understand how everything fits together.
+
+### The Internals of PostgreSQL
+
+PostgreSQL is getting a lot of love and traction these years, and [Hironobu Suzuki](https://www.interdb.jp/) wrote a terrific book the about the [The Internals of PostgreSQL](https://www.interdb.jp/pg/index.html).
+
+>  PostgreSQL is a well-designed open-source multi-purpose relational database system which is widely used throughout the world. It is one huge system with the integrated subsystems, each of which has a particular complex feature and works with each other cooperatively. Although understanding of the internal mechanism is crucial for both administration and integration using PostgreSQL, its hugeness and complexity prevent it. The main purposes of this document are to explain how each subsystem works, and to provide the whole picture of PostgreSQL.
+
+### Jepsen blog
 
 We are often using databases as a source of truth, but they are also pieces of software with bugs in it. Kyle Kingsbury is the most famous database-breaker with [Jepsen](http://jepsen.io/):
 
@@ -55,17 +87,19 @@ We are often using databases as a source of truth, but they are also pieces of s
 
 You will find analysis on many databases, such as CockroachDB, etcd, Kafka, MongoDB, and so on.
 
-Here's a great bonus: Kyle is also teaching distributed systems, and his notes are [available](https://github.com/aphyr/distsys-class#an-introduction-to-distributed-systems).
+### Aphyr distsys class notes
 
-### Distributed systems for fun and profit 📘
+Following Jepsen, here's a great bonus: Kyle is also teaching distributed systems, and his notes are [available](https://github.com/aphyr/distsys-class#an-introduction-to-distributed-systems).
 
-While being the only free book on this list, [Distributed systems for fun and profit](http://book.mixu.net/distsys/) is an awesome book. The author, [Mikito Takada](http://mixu.net/) has done a terrific work to vulgarize distributed systems.
+### Distributed systems for fun and profit
+
+Despite being free, [Distributed systems for fun and profit](http://book.mixu.net/distsys/) is an awesome book. The author, [Mikito Takada](http://mixu.net/) has done a terrific work to vulgarize distributed systems.
 
 > I wanted a text that would bring together the ideas behind many of the more recent distributed systems - systems such as Amazon's Dynamo, Google's BigTable and MapReduce, Apache's Hadoop and so on.
 
 > In this text I've tried to provide a more accessible introduction to distributed systems. To me, that means two things: introducing the key concepts that you will need in order to have a good time reading more serious texts, and providing a narrative that covers things in enough detail that you get a gist of what's going on without getting stuck on details.
 
-### Translucent Databases 📘
+### Translucent Databases
 
 I really like the pitch of the book:
 
@@ -85,7 +119,7 @@ I really like the pitch of the book:
 
 [Translucent Databases](http://wayner.org/node/46) is a short book, focus on how to store sensitive data. You will find several dozen examples of interesting case studies on how to efficiently and privately store sensitive data. A must-have.
 
-### The Art of PostgreSQL 📘
+### The Art of PostgreSQL
 
 [The Art of PostgreSQL](https://theartofpostgresql.com/) is all about showing the power of both SQL and PostgreSQL. It explains the how's and why's of using Postgres's many feature, and how you, as a developers, can take advantages of it. A brilliant book that should be read by every developer.
 
@@ -97,7 +131,7 @@ I really like the pitch of the book:
 > 
 > Writing efficient SQL is easier than it looks, and begins with database modeling and writing clear code. The book teaches you how to write fast queries!
 
-### Readings in Database Systems 📘 
+### Readings in Database Systems
 
 Another free book, [Readings in Database Systems](http://www.redbook.io/) is a great read if you are looking for an opinionated and short review on subject like architecture, engines, analytics and so on.
 
@@ -105,7 +139,7 @@ Another free book, [Readings in Database Systems](http://www.redbook.io/) is a g
 
 ## Watching 📺
 
-### CMU Database Group 🧑‍🏫
+### CMU Database Group
 
 The Database Group at Carnegie Mellon University have been publishing a lot of contents, including:
 * [Intro to Database Systems lecture](https://www.youtube.com/playlist?list=PLSE8ODhjZXjZaHA6QcxDfJ0SIWBzQFKEG)
@@ -120,13 +154,13 @@ I also recommend their Quarantine database talks playlists:
 * [Vaccination Database Tech Talks First Dose](https://www.youtube.com/playlist?list=PLSE8ODhjZXjbeqnfuvp30VrI7VXiFuOXS)
 * [Vaccination Database Tech Talks Second Dose](https://www.youtube.com/playlist?list=PLSE8ODhjZXjbDOFN4U4-Uv95-N8sgzs5D)
 
-### Distributed Systems lecture series 🧑‍🏫
+### Distributed Systems lecture series
 
 [Martin Kleppmann](https://martin.kleppmann.com/)(`Designing Data Intensive applications`'s author) published an [8-lecture series on distributed systems](https://www.youtube.com/playlist?list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB):
 
 > This video is part of an 8-lecture series on distributed systems, given as part of the undergraduate computer science course at the University of Cambridge.
 
-### Academic conferences 📹 
+### Academic conferences
 
 Keeping track of the academic world is not easy, but thankfully, we can keep track of several academic conferences which are data-related, including:
 
@@ -135,14 +169,14 @@ Keeping track of the academic world is not easy, but thankfully, we can keep tra
 * [VLDB](https://vldb.org)
 * [PaPoC](https://papoc-workshop.github.io/2022/)
 
-### Industrial conference 📹
+### Industrial conference
 
 There is not much database-focused conferences, but you will be interested to see talks from:
 
 * [HydraConf](https://hydraconf.com/)
 * [HYTRADBOI](https://www.hytradboi.com/)
 
-### DistSys Reading Group sessions 📹
+### DistSys Reading Group sessions
 
 If you are looking for explanations about a distributed systems paper, you may be interested in the [DistSys Reading Group](http://charap.co/category/reading-group/):
 
@@ -152,7 +186,7 @@ Every session can be found on their [YouTube channel](https://www.youtube.com/ch
 
 ## Coding 🧑‍💻
 
-### Maelstrom ⚡
+### Maelstrom
 
 Ever wonder to develop your own toy distributed systems? Fear no more, you can use [Maelstrom](https://github.com/jepsen-io/maelstrom) for that!
 
@@ -160,10 +194,26 @@ Ever wonder to develop your own toy distributed systems? Fear no more, you can u
 
 > Maelstrom provides a range of tests for different kinds of distributed systems, built on top of a simple JSON protocol via STDIN and STDOUT. Users write servers in any language. Maelstrom runs those servers, sends them requests, routes messages via a simulated network, and checks that clients observe expected behavior. You want to write Plumtree in Bash? Byzantine Paxos in Intercal? Maelstrom is for you.
 
-### PingCAP's Talent Plan ⚡
+### PingCAP's Talent Plan
 
 PingCAP is the company behind the tidb/tikv stack, a new distributed systems. They developed their own [open source training program](https://github.com/pingcap/talent-plan):
 
 > Talent Plan is an open source training program initiated by PingCAP. It aims to create or combine some open source learning materials for people interested in open source, distributed systems, Rust, Golang, and other infrastructure knowledge. As such, it provides a series of courses focused on open source collaboration, rust programming, distributed database and systems.
 
 I went through the Raft project in Rust and I learned a lot!
+
+### Patterns of Distributed Systems
+
+[Unmesh Joshi](https://twitter.com/unmeshjoshi) is writing an on-going serie called [Patterns of Distributed Systems](https://martinfowler.com/articles/patterns-of-distributed-systems/):
+
+> Distributed systems provide a particular challenge to program. They often require us to have multiple copies of data, which need to keep synchronized. Yet we cannot rely on processing nodes working reliably, and network delays can easily lead to inconsistencies. Despite this, many organizations rely on a range of core distributed software handling data storage, messaging, system management, and compute capability. These systems face common problems which they solve with similar solutions. This article recognizes and develops these solutions as patterns, with which we can build up an understanding of how to better understand, communicate and teach distributed system design.
+
+## Reading lists 👀
+
+### Dan Creswell's reading List
+
+If you want more contents, [Dan Creswell](https://github.com/dancres) has a nice [Distributed Systems Reading List ](https://dancres.github.io/Pages/) 🚀
+
+---
+
+**Thank you** for reading my post! Feel free to react to this article, you can find me on [Twitter](https://twitter.com/PierreZ).

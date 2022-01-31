@@ -1,6 +1,6 @@
 DefaultContentLanguage = "en"
 
-baseURL = "http://pierrezemb.fr"
+baseURL = "https://pierrezemb.fr"
 # [en, zh-cn, fr, ...] determines default content language
 defaultContentLanguage = "en"
 # language code
