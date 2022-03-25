@@ -9,7 +9,7 @@ I’m a senior Software Engineer building data infrastructure at Clever Cloud. I
 I’m interested in distributed systems, data stores, understanding how things works under the hood. I enjoy being part of open-source communities, through [talks](/talks), [posts](/posts), and [contributions](https://github.com/PierreZ/) to:
 
 * SenX [Warp10](https://github.com/senx/warp10-platform/commits?author=PierreZ),
-* Apache [HBase](https://github.com/apache/hbase/commits/master?author=PierreZ), [Flink](https://github.com/apache/flink/commits/master?author=PierreZ), [Pulsar](https://github.com/apache/pulsar/commits/master?author=PierreZ),
+* Apache [HBase](https://github.com/apache/hbase/commits/master?author=PierreZ), [Flink](https://github.com/apache/flink/commits/master?author=PierreZ), [Pulsar](https://github.com/apache/pulsar/commits/master?author=PierreZ), [arrow-datafusion](https://github.com/apache/arrow-datafusion/commits/master?author=PierreZ),
 * PingCAP [go-ycsb](https://github.com/pingcap/go-ycsb/commits/master?author=PierreZ),
 * Apple [FoundationDB](https://github.com/apple/foundationdb/commits/master?author=PierreZ) and their [Kubernetes Operator](https://github.com/FoundationDB/fdb-kubernetes-operator/commits/master?author=PierreZ),
 * StreamNative [KoP (Kafka On Pulsar)](https://github.com/streamnative/kop/commits/master?author=PierreZ), Kafka protocol handler for Pulsar,
@@ -29,7 +29,7 @@ I co-founded in 2017 [HelloExoWorld](https://helloexo.world/), an initiative to 
 # Work
 #### 2021 to now: Senior Software Engineer @Clever Cloud
 
-TBD
+I am working around data infrastructure, to offer new database-oriented products 🚀
 
 #### 2020 to 2021: Technical Leader @OVHcloud - Managed Kubernetes
 
