@@ -1,5 +1,5 @@
 ---
-title: "🇫🇷 Message à caractère informatique 59: SCALEWAY FAIT UNE RFC POUR CANCEL LA FUTURE DE GAIAX"
+title: "🇫🇷 Message à caractère informatique 59: Scaleway fait une rfc pour cancel la future de gaiax"
 date: 2021-12-01T01:22:36+01:00
 draft: false
 
