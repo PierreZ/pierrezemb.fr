@@ -10,6 +10,8 @@ Durant ce talk, vous découvrirez comment faciliter le debug et l'analyse de la 
 
 ## Resources
 
+{{<youtube Sb3uBtaKCaY>}}
+
 * [Slides](https://docs.google.com/presentation/d/1QQue1ejUixbw_qaeOzWkLSBGrM2RX4vmGhSjQTTED0k/edit?usp=sharing)
 
 ## Occurences
