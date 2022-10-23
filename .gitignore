@@ -17,3 +17,5 @@ resources/
 .vscode
 
 .idea/
+.direnv
+.hugo_build.lock
