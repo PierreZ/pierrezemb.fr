@@ -31,6 +31,7 @@ async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 ```
+
 or in the [tokio's documentation](https://docs.rs/tokio-macros/1.5.0/tokio_macros/attr.main.html):
 
 ```rust
@@ -49,7 +50,6 @@ These are called **attributes macros**, and they allow you to directly manipulat
 Attributes macros allows you to reshape your rust code. This is called meta-programming, where you are using Rust code to generate Rust code.
 
 ### proc-macro, syn and quote
-
 
 We are now ready to write our own macros. There is two crates that are going to ease our work:
 
@@ -140,7 +140,6 @@ error: could not compile `blogpost` due to previous error
 
 Well, you can't change how a test look like. Let's use the attribute macros to pass this limitation:
 
-
 ```rust
 #[cfg(test)]
 mod tests {
@@ -168,7 +167,6 @@ error: could not compile `blogpost` due to previous error
 Okay, let's create `random_seed` by following [the official documentation](https://doc.rust-lang.org/reference/procedural-macros.html#attribute-macros):
 
 > Attribute macros are defined by a public function with the proc_macro_attribute attribute that has a signature of `(TokenStream, TokenStream) -> TokenStream`
-
 
 ### Creating our first macro
 

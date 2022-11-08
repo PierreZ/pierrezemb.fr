@@ -67,10 +67,9 @@ Flow was developed before FDB, as stated in this [2013's post](https://news.ycom
 
 > We've had quite a bit of interest in Flow over the years and I've given several talks on it at meetups/conferences. We've always thought about open-sourcing it... It's not as elegant as some other actor-model languages like Scala or Erlang (see: C++) but it's nice and fast at run-time and really helps productivity vs. writing callbacks, etc.
 
-> (Fun fact: We've only ever found two bugs in Flow. After the first, we decided that we never wanted a bug again in our programming language. So, we built a program in Python that generates random Flow code and independently-executes it to validate Flow's behavior. This fuzz tester found one more bug, and we've never found another.) 
+> (Fun fact: We've only ever found two bugs in Flow. After the first, we decided that we never wanted a bug again in our programming language. So, we built a program in Python that generates random Flow code and independently-executes it to validate Flow's behavior. This fuzz tester found one more bug, and we've never found another.)
 
 A very good overview of Flow is available [here](https://apple.github.io/foundationdb/flow.html) and some details [here](https://forums.foundationdb.org/t/why-was-flow-developed/1711/3).
-
 
 ### Simulation-Driven development
 
@@ -123,9 +122,9 @@ The test is splitted into two parts:
 * **The goal**, for example doing transaction pointing to another with thousands of transactions per sec and there should be only 0.01% of success.
 * **What will be done to try to prevent the test to succeed**. In this example it will **at the same time**:
 
-    * do random clogging. Which means that **network connections will be stopped** (preventing actors to send and receive packets). Swizzle flag means that a subset of network connections will be stopped and bring back in reverse order, 😳
-    * will **poweroff/reboot machines** (attritions) pseudo-randomly while keeping a minimal of three machines, 🤯 
-    * **change configuration**, which means a coordination changes through multi-paxos for the whole cluster. 😱
+  * do random clogging. Which means that **network connections will be stopped** (preventing actors to send and receive packets). Swizzle flag means that a subset of network connections will be stopped and bring back in reverse order, 😳
+  * will **poweroff/reboot machines** (attritions) pseudo-randomly while keeping a minimal of three machines, 🤯
+  * **change configuration**, which means a coordination changes through multi-paxos for the whole cluster. 😱
 
 Keep in mind that all these failures will appears **at the same time!** Do you think that your current **datastore has gone through the same test on a daily basis?** [I think not](https://github.com/etcd-io/etcd/pull/11308).
 
@@ -139,12 +138,11 @@ Limitations are well described in the [official documentation](https://apple.git
 
 An awesome recap is available on the [Software Engineering Daily podcast](https://softwareengineeringdaily.com/2019/07/01/foundationdb-with-ryan-worl/):
 
-> FoundationDB is tested in a very rigorous way using what's called **a deterministic simulation**. The reason they needed a new programming language to do this, is that to get a deterministic simulation, you have to make something that is deterministic. It's kind of obvious, but it's hard to do. 
+> FoundationDB is tested in a very rigorous way using what's called **a deterministic simulation**. The reason they needed a new programming language to do this, is that to get a deterministic simulation, you have to make something that is deterministic. It's kind of obvious, but it's hard to do.
 
-> For example, if your process interacts with the network, or disks, or clocks, it's not deterministic. If you have multiple threads, not deterministic. So, they needed a way to write a concurrent program that could talk with networks and disks and that type of thing. They needed a way to write a concurrent program that does all of those things that you would think are non-deterministic in a deterministic way. 
+> For example, if your process interacts with the network, or disks, or clocks, it's not deterministic. If you have multiple threads, not deterministic. So, they needed a way to write a concurrent program that could talk with networks and disks and that type of thing. They needed a way to write a concurrent program that does all of those things that you would think are non-deterministic in a deterministic way.
 
 > So, all FoundationDB processes, and FoundationDB, it's basically all written in Flow except a very small amount of it from the SQLite B-tree. The reason why that was useful is that when you use Flow, you get all of these higher level abstraction that let what you do what feels to you like asynchronous stuff, but under the hood, it's all implemented using callbacks in C++, which you can make deterministic by running it in a single thread. So, there's a scheduler that just calls these callbacks one after another and it's very crazy looking C++ code, like you wouldn't want to read it, but it's because of Flow they were able to implement that deterministic simulation.
-
 
 ## The Architecture
 
@@ -163,14 +161,13 @@ The whole architecture is designed to automatically:
 
 A typical FDB cluster is composed of different actors which are describe [here](https://github.com/apple/foundationdb/blob/master/documentation/sphinx/source/kv-architecture.rst).
 
-
 The most important role in FDB is the `Coordinator`, it uses `Paxos` to manage membership on a quorum to do writes. The `Coordinator` is mostly only used to elect some peers and during recovery. You can view it as a Zookeeper-like stack.
 
 The Coordinator starts by electing a `Cluster Controller`. It provides administratives informations about the cluster(I have 4 storage processes). Every process needs to register to the `Cluster Controller` and then it will assign roles to them. It is the one that will heart-beat all the processes.
 
 Then a `Master` is elected. The `Master` process is reponsible for the `data distribution` algorithms. Fun fact, the mapping between keys and storage servers is stored within FDB, which is you can actually move data by running transactions like any other application. He is also the one providing `read versions` and `version number` internally. He is also acting as the `RateKeeper`.
 
-`The Proxies` are responsible for providing read versions, committing transactions, and tracking the storage servers responsible for each range of keys. 
+`The Proxies` are responsible for providing read versions, committing transactions, and tracking the storage servers responsible for each range of keys.
 
 `The Transaction Resolvers` are responsible determining conflicts between transactions. A transaction conflicts if it reads a key that has been written between the transaction’s read version and commit version. The resolver does this by holding the last 5 seconds of committed writes in memory, and comparing a new transaction’s reads against this set of commits.
 
@@ -193,13 +190,13 @@ Then a `Master` is elected. The `Master` process is reponsible for the `data dis
     * every mutation that you want to do
 2. The proxy will assign a `Commit version` to a batch of transactions. `Commit version` is generated by the `Master`
 3. Proxy is sending to the resolver. This will check if the data that you want to mutate has been changed between your `read Version` and your `Commit version`. They are sharded by key-range.
-4. Transaction is made durable within the `Transaction Logs` by `fsync`ing the data. Before the data is even written to disk it is forwarded to the `storage servers` responsible for that mutation. Internally, `Transactions Logs` are creating **a stream per `Storage Server`**. Once the `storage servers` have made the mutation durable, they pop it from the log. This generally happens roughly 6 seconds after the mutation was originally committed to the log. 
+4. Transaction is made durable within the `Transaction Logs` by `fsync`ing the data. Before the data is even written to disk it is forwarded to the `storage servers` responsible for that mutation. Internally, `Transactions Logs` are creating **a stream per `Storage Server`**. Once the `storage servers` have made the mutation durable, they pop it from the log. This generally happens roughly 6 seconds after the mutation was originally committed to the log.
 5. `Storage servers` are lazily updating data on disk from the `Transaction logs`. They are keeping new write in-memory.
 6. `Transaction Logs` is responding OK to the Proxy and then the proxy is replying OK to the client.
 
 You can find more diagrams about transactions [here](https://forums.foundationdb.org/t/technical-overview-of-the-database/135/3).
 
-### Recovery 
+### Recovery
 
 Recovery processes are detailled at around 25min.
 
@@ -230,7 +227,7 @@ A lot of information are available in this talk:
 
 ## Developer experience
 
-FoundationDB’s keys are ordered, making `tuples` a particularly useful tool for data modeling. FoundationDB provides a **tuple layer** (available in each language binding) that encodes tuples into keys. This layer lets you store data using a tuple like `(state, county)` as a key. Later, you can perform reads using a prefix like `(state,)`. The layer works by preserving the natural ordering of the tuples. 
+FoundationDB’s keys are ordered, making `tuples` a particularly useful tool for data modeling. FoundationDB provides a **tuple layer** (available in each language binding) that encodes tuples into keys. This layer lets you store data using a tuple like `(state, county)` as a key. Later, you can perform reads using a prefix like `(state,)`. The layer works by preserving the natural ordering of the tuples.
 
 Everything is wrapped into a transaction in FDB.
 
@@ -246,23 +243,23 @@ FDB is resolving many distributed problems, but you still need things like **sec
 
 ---
 
-![fdb image](/posts/notes-about-foundationdb/images/extract-layer-1.png) 
+![fdb image](/posts/notes-about-foundationdb/images/extract-layer-1.png)
 
 ---
 
-Layers are designed to develop features **above FDB.** The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** 
+Layers are designed to develop features **above FDB.** The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.**
 
 ---
 
-![fdb image](/posts/notes-about-foundationdb/images/extract-layer-2.png) 
+![fdb image](/posts/notes-about-foundationdb/images/extract-layer-2.png)
 
 ---
 
-The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.** 
+The record-layer provided by Apple is a good starting point to build things above it, as it provides **structured schema, indexes, and (async) query planner.**
 
 ---
 
-![fdb image](/posts/notes-about-foundationdb/images/extract-layer-3.png) 
+![fdb image](/posts/notes-about-foundationdb/images/extract-layer-3.png)
 
 ### Apple's Record Layer
 
@@ -271,7 +268,6 @@ The paper is located [FoundationDB Record Layer:A Multi-Tenant Structured Datast
 {{< youtube SvoUHHM9IKU>}}
 
 Record Layer was designed to solve CloudKit problem.
-
 
 ---
 
@@ -284,7 +280,6 @@ Record allow multi-tenancy with schema above FDB
 ---
 
 ![fdb image](/posts/notes-about-foundationdb/images/record-extract-2.png)
-
 
 ![fdb image](/posts/notes-about-foundationdb/images/record-extract-3.png)
 
@@ -347,6 +342,6 @@ The experiment is available [here](https://github.com/PierreZ/fdb-k8s-chaos/).
 
 [FoundationDB Release 7.0 Planning](https://github.com/apple/foundationdb/wiki/FoundationDB-Release-7.0-Planning)
 
---- 
+---
 
 **Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) if needed.

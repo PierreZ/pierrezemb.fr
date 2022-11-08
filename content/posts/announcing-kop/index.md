@@ -16,7 +16,6 @@ canonical: https://www.ovh.com/blog/announcing-kafka-on-pulsar-bring-native-kafk
 
 > This is a repost from [OVHcloud's official blogpost.](https://www.ovh.com/blog/announcing-kafka-on-pulsar-bring-native-kafka-protocol-support-to-apache-pulsar/ "Permalink to announcing KoP"), please read it there to support my company. Thanks [Horacio Gonzalez](https://twitter.com/LostInBrittany/) for the awesome drawings!
 
-
 This post has been published on both the StreamNative and OVHcloud blogs and was co-authored by [Sijie Guo](https://twitter.com/sijieg), [Jia Zhai](https://twitter.com/Jia_Zhai) and [Pierre Zemb](https://twitter.com/PierreZ). Thanks [Horacio Gonzalez](https://twitter.com/LostInBrittany) for the illustrations!
 
 ![hbase image](/posts/announcing-kop/images/kop-1.png)
@@ -36,7 +35,7 @@ Apache Pulsar is an event streaming platform designed from the ground up to be c
 
 Pulsar provides a unified messaging model for both queueing and streaming workloads. Pulsar implemented its own protobuf-based binary protocol to provide high performance and low latency. This choice of protobuf makes it convenient to implement Pulsar [clients](https://pulsar.apache.org/docs/en/client-libraries/) and the project already supports Java, Go, Python and C++ languages alongside [thirdparty clients](https://pulsar.apache.org/docs/en/client-libraries/#thirdparty-clients) provided by the community. However, existing applications written using other messaging protocols had to be rewritten to adopt Pulsar's new unified messaging protocol.
 
-To address this, the Pulsar community developed applications to facilitate the migration to Pulsar from other messaging systems. For example, Pulsar provides a [Kafka wrapper](http://(https://pulsar.apache.org/docs/en/adaptors-kafka) on Kafka Java API, which allows existing applications that already use Kafka Java client switching from Kafka to Pulsar [without code change](https://www.youtube.com/watch?v=Cy9ev9nAZpI). Pulsar also has a rich connector ecosystem, connecting Pulsar with other data systems. Yet, there was still a strong demand from those looking to switch from other Kafka applications to Pulsar.
+To address this, the Pulsar community developed applications to facilitate the migration to Pulsar from other messaging systems. For example, Pulsar provides a [Kafka wrapper](<http://(https://pulsar.apache.org/docs/en/adaptors-kafka>) on Kafka Java API, which allows existing applications that already use Kafka Java client switching from Kafka to Pulsar [without code change](https://www.youtube.com/watch?v=Cy9ev9nAZpI). Pulsar also has a rich connector ecosystem, connecting Pulsar with other data systems. Yet, there was still a strong demand from those looking to switch from other Kafka applications to Pulsar.
 
 ## StreamNative and OVHcloud's collaboration
 
@@ -75,13 +74,13 @@ The following figure illustrates how we add the Kafka protocol support within Pu
 
 ### Topics
 
-In Kafka, all the topics are stored in one flat namespace. But in Pulsar, topics are organized in hierarchical multi-tenant namespaces. We introduce a setting _kafkaNamespace_ in broker configuration to allow the administrator configuring to map Kafka topics to Pulsar topics.
+In Kafka, all the topics are stored in one flat namespace. But in Pulsar, topics are organized in hierarchical multi-tenant namespaces. We introduce a setting *kafkaNamespace* in broker configuration to allow the administrator configuring to map Kafka topics to Pulsar topics.
 
 In order to let Kafka users leverage the multi-tenancy feature of Apache Pulsar, a Kafka user can specify a Pulsar tenant and namespace as its SASL username when it uses SASL authentication mechanism to authenticate a Kafka client.
 
 ### Message ID and offset
 
-In Kafka, each message is assigned with an offset once it is successfully produced to a topic partition. In Pulsar, each message is assigned with a `MessageID`. The message id consists of 3 components, _ledger-id_, _entry-id_, and _batch-index_. We are using the same approach in Pulsar-Kafka wrapper to convert a Pulsar MessageID to an offset and vice versa.
+In Kafka, each message is assigned with an offset once it is successfully produced to a topic partition. In Pulsar, each message is assigned with a `MessageID`. The message id consists of 3 components, *ledger-id*, *entry-id*, and *batch-index*. We are using the same approach in Pulsar-Kafka wrapper to convert a Pulsar MessageID to an offset and vice versa.
 
 ### Messages
 
@@ -103,7 +102,7 @@ When the Kafka request handler receives a consumer request from a Kafka client, 
 
 The most challenging part is to implement the group coordinator and offsets management. Because Pulsar doesn't have a centralized group coordinator for assigning partitions to consumers of a consumer group and managing offsets for each consumer group. In Pulsar, the partition assignment is managed by broker on a per-partition basis, and the offset management is done by storing the acknowledgements in cursors by the owner broker of that partition.
 
-It is difficult to align the Pulsar model with the Kafka model. Hence, for the sake of providing full compatibility with Kafka clients, we implemented the Kafka group coordinator by storing the coordinator group changes and offsets in a system topic called _public/kafka/__offsets_ in Pulsar.
+It is difficult to align the Pulsar model with the Kafka model. Hence, for the sake of providing full compatibility with Kafka clients, we implemented the Kafka group coordinator by storing the coordinator group changes and offsets in a system topic called *public/kafka/**offsets* in Pulsar.
 
 This allows us to bridge the gap between Pulsar and Kafka and allows people to use existing Pulsar tools and policies to manage subscriptions and monitor Kafka consumers. We add a background thread in the implemented group coordinator to periodically sync offset updates from the system topic to Pulsar cursors. Hence a Kafka consumer group is effectively treated as a Pulsar subscription. All the existing Pulsar toolings can be used for managing Kafka consumer groups as well.
 
@@ -120,7 +119,6 @@ KoP is open sourced under Apache License V2 in [https://github.com/streamnative/
 We are looking forward to your issues, and PRs. You can also [join #kop channel in Pulsar Slack](https://apache-pulsar.herokuapp.com/) to discuss all things about Kafka-on-Pulsar.
 
 StreamNative and OVHcloud are also hosting a webinar about KoP on March 31. If you are interested in learning more details about KoP,[please sign up](https://zoom.us/webinar/register/6515842602644/WN_l_i-3ekDSg6PwPFn7tqRvA). Looking forward to meeting you online.
-
 
 ![hbase image](/posts/announcing-kop/images/kop-4.png)
 

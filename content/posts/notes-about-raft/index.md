@@ -113,7 +113,7 @@ Leader is elected through `election`: Each term (interval of time of arbitrary l
 
 > Terms act as a logical clock [14] in Raft.
 
->  Each server stores a current term number, which increases monotonically over time. Current terms are exchanged whenever servers communicate; if one server’s current term is smaller than the other’s, then it updates its current term to the larger value. If a candidate or leader discovers that its term is out of date, it immediately reverts to fol-lower state. If a server receives a request with a stale term number, it rejects the request.
+> Each server stores a current term number, which increases monotonically over time. Current terms are exchanged whenever servers communicate; if one server’s current term is smaller than the other’s, then it updates its current term to the larger value. If a candidate or leader discovers that its term is out of date, it immediately reverts to fol-lower state. If a server receives a request with a stale term number, it rejects the request.
 
 `RPC` is used for communications:
 
@@ -131,9 +131,10 @@ The key-point of the election are the fact that:
 * election timeouts are randomized.
 
 > To begin an election, a follower increments its current term and transitions to candidate state. It then votes for itself and issues RequestVote RPCs in parallel to each of the other servers in the cluster. A candidate continues in this state until one of three things happens:
+>
 > * (a) it wins the election,
 > * (b) another server establishes itself as leader,
-> * (c) a period of time goes by with no winner. 
+> * (c) a period of time goes by with no winner.
 
 > Raft uses randomized election timeouts to ensure that split votes are rare and that they are resolved quickly. To prevent split votes in the first place, election timeouts are chosen randomly from a fixed interval (e.g., 150–300ms).
 
@@ -163,7 +164,7 @@ This is really interesting to be leader-failure proof. And for follower's failur
 
 As Raft guarantees that all the committed entries are available on all followers, log entries only flow in one di-rection, from leaders to followers, and leaders never over-write existing entries in their logs.
 
-> Raft uses the voting process to prevent a candidate from winning an election unless its log contains all committed entries. A candidate must contact a majority of the cluster in order to be elected, which means that every committed entry must be present in at least one of those servers. 
+> Raft uses the voting process to prevent a candidate from winning an election unless its log contains all committed entries. A candidate must contact a majority of the cluster in order to be elected, which means that every committed entry must be present in at least one of those servers.
 
 > Raft determines which of two logs is more up-to-date by comparing the index and term of the last entries in the logs. If the logs have last entries with different terms, then the log with the later term is more up-to-date. If the log send with the same term, then whichever log is longer is more up-to-date.
 
@@ -182,6 +183,7 @@ This behavior avoids future leaders to attempt to finish replicating an entry wh
 This section presents how to do cluster configuration(the set of servers participating in the consensus algorithm). Raft implements a two-phase approach:
 
 > In Raft the cluster first switches to a transitional configuration we call joint consensus; once the joint consensus has been committed,the system then transitions to the new configuration. The joint consensus combines both the old and new configurations:
+>
 > * Log entries are replicated to all servers in both con-figurations,
 > * Any server from either configuration may serve asleader,
 > * Agreement (for elections and entry commitment) requires separate majorities from both the old and new configurations.
@@ -202,6 +204,6 @@ This is useful for slow follower or a new server joining the cluster.
 
 > Clients of Raft send all of their requests to the leader. When a client first starts up, it connects to a randomly-chosen server. If the client’s first choice is not the leader,that server will reject the client’s request and supply information about the most recent leader it has heard from.
 
---- 
+---
 
 **Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) if needed.

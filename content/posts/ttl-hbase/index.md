@@ -9,7 +9,7 @@ categories:
 ---
 
 <header class="row text-center header">
-   <img src="/posts/hbase-data-model/images/hbase.jpg" alt="HBase Image" class="text-center"> 
+   <img src="/posts/hbase-data-model/images/hbase.jpg" alt="HBase Image" class="text-center">
 </header>
 
 Among all features provided by HBase, there is one that is pretty handy to deal with your data's lifecyle: the fact that every cell version can have **Time to Live** or TTL. Let's dive into the feature!
@@ -71,7 +71,6 @@ It will be removed only when a **major-compaction** will occur. As we are playin
 You may have heard about <b><a target="_blank" href="https://blogs.apache.org/hbase/entry/accordion-hbase-breathes-with-in">Accordion</a></b>, the new feature in HBase 2. If you are playing with HBase 2, you can enable it by following <a target="_blank" href="https://hbase.apache.org/book.html#inmemory_compaction">this link</a> and run <b>compactions directly in the MemStores.</b>
 </div>
 
-
 ```bash
 hbase(main):014:0> flush 'test_table'
 Took 0.4456 seconds    
@@ -90,7 +89,7 @@ As always, the truth is held by the documentation:
 
 > A {row, column, version} tuple exactly specifies a cell in HBase. It’s possible to have an unbounded number of cells where the row and column are the same but the cell address differs only in its version dimension.
 
-> While rows and column keys are expressed as bytes, **the version is specified using a long integer**. Typically **this long contains time instances** such as those returned by java.util.Date.getTime() or **System.currentTimeMillis()**, 
+> While rows and column keys are expressed as bytes, **the version is specified using a long integer**. Typically **this long contains time instances** such as those returned by java.util.Date.getTime() or **System.currentTimeMillis()**,
 
 [HBase Book: Versions](https://hbase.apache.org/book.html#versions)
 
@@ -126,7 +125,7 @@ ROW                            COLUMN+CELL
 Took 0.0031 seconds
 ```
 
-Notice that we are using a timestamp at the end of the `put` method? This will **add the desired timestamp to the version**. Which means that **your application can control when your version will be removed, even with a TTL on your column-qualifier.** You just need to compute a timestamp like this: 
+Notice that we are using a timestamp at the end of the `put` method? This will **add the desired timestamp to the version**. Which means that **your application can control when your version will be removed, even with a TTL on your column-qualifier.** You just need to compute a timestamp like this:
 
 > `ts = now - ttlCF + desiredTTL`.
 

@@ -57,44 +57,45 @@ All codes are from the current latest release [v3.4.13](https://github.com/etcd-
 [Let's take a Range operation](https://github.com/etcd-io/etcd/blob/v3.4.13/etcdserver/v3_server.go#L114-L120):
 
 ```go
-	if !r.Serializable {
-		err = s.linearizableReadNotify(ctx)
-		trace.Step("agreement among raft nodes before linearized reading")
-		if err != nil {
-			return nil, err
-		}
-	}
+ if !r.Serializable {
+  err = s.linearizableReadNotify(ctx)
+  trace.Step("agreement among raft nodes before linearized reading")
+  if err != nil {
+   return nil, err
+  }
+ }
 ```
 
 ```go
 
 func (s *EtcdServer) linearizableReadNotify(ctx context.Context) error {
-	s.readMu.RLock()
-	nc := s.readNotifier
-	s.readMu.RUnlock()
+ s.readMu.RLock()
+ nc := s.readNotifier
+ s.readMu.RUnlock()
 
-	// signal linearizable loop for current notify if it hasn't been already
-	select {
-	case s.readwaitc <- struct{}{}:
-	default:
-	}
+ // signal linearizable loop for current notify if it hasn't been already
+ select {
+ case s.readwaitc <- struct{}{}:
+ default:
+ }
 
-	// wait for read state notification
-	select {
-	case <-nc.c:
-		return nc.err
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-s.done:
-		return ErrStopped
-	}
+ // wait for read state notification
+ select {
+ case <-nc.c:
+  return nc.err
+ case <-ctx.Done():
+  return ctx.Err()
+ case <-s.done:
+  return ErrStopped
+ }
 }
 ```
+
 So in [linearizableReadNotify](https://github.com/etcd-io/etcd/blob/v3.4.13/etcdserver/v3_server.go#L773-L793), we are waiting for a signal. `readwaitc` is used in another goroutine called [linearizableReadLoop](https://github.com/etcd-io/etcd/blob/v3.4.13/etcdserver/v3_server.go#L672-L771). This goroutines will call this:
 
 ```go
 func (n *node) ReadIndex(ctx context.Context, rctx []byte) error {
-	return n.step(ctx, pb.Message{Type: pb.MsgReadIndex, Entries: []pb.Entry{{Data: rctx}}})
+ return n.step(ctx, pb.Message{Type: pb.MsgReadIndex, Entries: []pb.Entry{{Data: rctx}}})
 }
 
 ```
@@ -102,57 +103,57 @@ func (n *node) ReadIndex(ctx context.Context, rctx []byte) error {
 that will create a `MsgReadIndex` message that will be handled in [stepLeader](https://github.com/etcd-io/etcd/blob/v3.4.13/raft/raft.go#L994), who will send the message to the followers, like this:
 
 ```go
-	case pb.MsgReadIndex:
-		// If more than the local vote is needed, go through a full broadcast,
-		// otherwise optimize.
-		if !r.prs.IsSingleton() {
-		    // PZ: omitting some code here
-			switch r.readOnly.option {
-			case ReadOnlySafe:
-				r.readOnly.addRequest(r.raftLog.committed, m)
-				// The local node automatically acks the request.
-				r.readOnly.recvAck(r.id, m.Entries[0].Data)
-				r.bcastHeartbeatWithCtx(m.Entries[0].Data)
-			case ReadOnlyLeaseBased:
-				ri := r.raftLog.committed
-				if m.From == None || m.From == r.id { // from local member
-					r.readStates = append(r.readStates, ReadState{Index: ri, RequestCtx: m.Entries[0].Data})
-				} else {
-					r.send(pb.Message{To: m.From, Type: pb.MsgReadIndexResp, Index: ri, Entries: m.Entries})
-				}
-			}
+ case pb.MsgReadIndex:
+  // If more than the local vote is needed, go through a full broadcast,
+  // otherwise optimize.
+  if !r.prs.IsSingleton() {
+      // PZ: omitting some code here
+   switch r.readOnly.option {
+   case ReadOnlySafe:
+    r.readOnly.addRequest(r.raftLog.committed, m)
+    // The local node automatically acks the request.
+    r.readOnly.recvAck(r.id, m.Entries[0].Data)
+    r.bcastHeartbeatWithCtx(m.Entries[0].Data)
+   case ReadOnlyLeaseBased:
+    ri := r.raftLog.committed
+    if m.From == None || m.From == r.id { // from local member
+     r.readStates = append(r.readStates, ReadState{Index: ri, RequestCtx: m.Entries[0].Data})
+    } else {
+     r.send(pb.Message{To: m.From, Type: pb.MsgReadIndexResp, Index: ri, Entries: m.Entries})
+    }
+   }
 ```
 
 So, the `leader` is sending a heartbeat in `ReadOnlySafe` mode. Turns out there is two modes:
 
 ```go
 const (
-	// ReadOnlySafe guarantees the linearizability of the read only request by
-	// communicating with the quorum. It is the default and suggested option.
-	ReadOnlySafe ReadOnlyOption = iota
-	// ReadOnlyLeaseBased ensures linearizability of the read only request by
-	// relying on the leader lease. It can be affected by clock drift.
-	// If the clock drift is unbounded, leader might keep the lease longer than it
-	// should (clock can move backward/pause without any bound). ReadIndex is not safe
-	// in that case.
-	ReadOnlyLeaseBased
+ // ReadOnlySafe guarantees the linearizability of the read only request by
+ // communicating with the quorum. It is the default and suggested option.
+ ReadOnlySafe ReadOnlyOption = iota
+ // ReadOnlyLeaseBased ensures linearizability of the read only request by
+ // relying on the leader lease. It can be affected by clock drift.
+ // If the clock drift is unbounded, leader might keep the lease longer than it
+ // should (clock can move backward/pause without any bound). ReadIndex is not safe
+ // in that case.
+ ReadOnlyLeaseBased
 )
 ```
 
 Responses from the followers will be handled here:
 
 ```go
-	case pb.MsgHeartbeatResp:
-		// PZ: omitting some code here
-		rss := r.readOnly.advance(m)
-		for _, rs := range rss {
-			req := rs.req
-			if req.From == None || req.From == r.id { // from local member
-				r.readStates = append(r.readStates, ReadState{Index: rs.index, RequestCtx: req.Entries[0].Data})
-			} else {
-				r.send(pb.Message{To: req.From, Type: pb.MsgReadIndexResp, Index: rs.index, Entries: req.Entries})
-			}
-		}
+ case pb.MsgHeartbeatResp:
+  // PZ: omitting some code here
+  rss := r.readOnly.advance(m)
+  for _, rs := range rss {
+   req := rs.req
+   if req.From == None || req.From == r.id { // from local member
+    r.readStates = append(r.readStates, ReadState{Index: rs.index, RequestCtx: req.Entries[0].Data})
+   } else {
+    r.send(pb.Message{To: req.From, Type: pb.MsgReadIndexResp, Index: rs.index, Entries: req.Entries})
+   }
+  }
 ```
 
 We are storing things into a `ReadState`:
@@ -164,17 +165,17 @@ We are storing things into a `ReadState`:
 // state is what it requests through RequestCtx, eg. given a unique id as
 // RequestCtx
 type ReadState struct {
-	Index      uint64
-	RequestCtx []byte
+ Index      uint64
+ RequestCtx []byte
 }
 ```
 
 Now that the state has been updated, we need to unblock our [linearizableReadLoop](https://github.com/etcd-io/etcd/blob/v3.4.13/etcdserver/v3_server.go#L672-L771):
 
 ```go
-		for !timeout && !done {
-			select {
-			case rs = <-s.r.readStateC:
+  for !timeout && !done {
+   select {
+   case rs = <-s.r.readStateC:
 ```
 
 Cool, another channel! Turns out, `readStateC` is updated in [one of the main goroutine](https://github.com/etcd-io/etcd/blob/v3.4.13/etcdserver/raft.go#L162):
@@ -183,36 +184,36 @@ Cool, another channel! Turns out, `readStateC` is updated in [one of the main go
 // start prepares and starts raftNode in a new goroutine. It is no longer safe
 // to modify the fields after it has been started.
 func (r *raftNode) start(rh *raftReadyHandler) {
-	internalTimeout := time.Second
+ internalTimeout := time.Second
 
-	go func() {
-		defer r.onStop()
-		islead := false
+ go func() {
+  defer r.onStop()
+  islead := false
 
-		for {
-			select {
-			case <-r.ticker.C:
-				r.tick()
-			case rd := <-r.Ready():
-				// PZ: omitting some code here
-				if len(rd.ReadStates) != 0 {
-					select {
-					case r.readStateC <- rd.ReadStates[len(rd.ReadStates)-1]:
-				}
+  for {
+   select {
+   case <-r.ticker.C:
+    r.tick()
+   case rd := <-r.Ready():
+    // PZ: omitting some code here
+    if len(rd.ReadStates) != 0 {
+     select {
+     case r.readStateC <- rd.ReadStates[len(rd.ReadStates)-1]:
+    }
 ```
 
 Perfect, now `readStateC` is notified, and we can continue on [linearizableReadLoop](https://github.com/etcd-io/etcd/blob/v3.4.13/etcdserver/v3_server.go#L672-L771):
 
 ```go
-		if ai := s.getAppliedIndex(); ai < rs.Index {
-			select {
-			case <-s.applyWait.Wait(rs.Index):
-			case <-s.stopping:
-				return
-			}
-		}
-		// unblock all l-reads requested at indices before rs.Index
-		nr.notify(nil)
+  if ai := s.getAppliedIndex(); ai < rs.Index {
+   select {
+   case <-s.applyWait.Wait(rs.Index):
+   case <-s.stopping:
+    return
+   }
+  }
+  // unblock all l-reads requested at indices before rs.Index
+  nr.notify(nil)
 ```
 
 The first part is a safety measure to makes sure the applied index is lower that the index stored in `ReadState`. And then finally we are unlocking all pending reads 🤩
@@ -220,15 +221,17 @@ The first part is a safety measure to makes sure the applied index is lower that
 ## One more thing: Follower read
 
 We went through `stepLeader` a lot, be there is something interesting in [`stepFollower`](https://github.com/etcd-io/etcd/blob/v4.3.13/raft/raft.go#L1320):
+
 ```go
-	case pb.MsgReadIndex:
-		if r.lead == None {
-			r.logger.Infof("%x no leader at term %d; dropping index reading msg", r.id, r.Term)
-			return nil
-		}
-		m.To = r.lead
-		r.send(m)
+ case pb.MsgReadIndex:
+  if r.lead == None {
+   r.logger.Infof("%x no leader at term %d; dropping index reading msg", r.id, r.Term)
+   return nil
+  }
+  m.To = r.lead
+  r.send(m)
 ```
+
 This means that a follower can send a `MsgReadIndex` message to perform the same kind of checks than a leader. This small features is in fact enabling **follower-reads** on ETCD 🤩 That is why you can see `Range` requests from a `follower`.
 
 ## operational tips
@@ -253,9 +256,8 @@ This means that a follower can send a `MsgReadIndex` message to perform the same
 
 * there is [a random performance issue on etcd 3.4](https://github.com/etcd-io/etcd/issues/11884)
 * there is some metrics than you can watch for ReadIndex issues:
-	* `etcd_server_read_indexes_failed_total`
-	* `etcd_server_slow_read_indexes_total`
-
+  * `etcd_server_read_indexes_failed_total`
+  * `etcd_server_slow_read_indexes_total`
 
 ---
 

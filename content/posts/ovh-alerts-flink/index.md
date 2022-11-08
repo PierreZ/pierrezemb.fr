@@ -13,10 +13,9 @@ This is a repost from [OVH's official blogpost.](https://www.ovh.com/fr/blog/han
 
 # Handling OVH's alerts with Apache Flink
 
-
 ![OVH & Apache Flink][1]
 
-OVH relies extensively on **metrics** to effectively monitor its entire stack. Whether they are **low-level** or **business** centric, they allow teams to gain **insight** into how our services are operating on a daily basis. The need to store **millions of datapoints per second** has produced the need to create a dedicated team to build a operate a product to handle that load: [**Metrics Data Platform][2].** By relying on [**Apache Hbase][3], [Apache Kafka][4]** and [**Warp 10**][5], we succeeded in creating a fully distributed platform that is handling all our metrics… and yours!
+OVH relies extensively on **metrics** to effectively monitor its entire stack. Whether they are **low-level** or **business** centric, they allow teams to gain **insight** into how our services are operating on a daily basis. The need to store **millions of datapoints per second** has produced the need to create a dedicated team to build a operate a product to handle that load: [**Metrics Data Platform][2].**By relying on [**Apache Hbase][3], [Apache Kafka][4]** and [**Warp 10**][5], we succeeded in creating a fully distributed platform that is handling all our metrics… and yours!
 
 After building the platform to deal with all those metrics, our next challenge was to build one of the most needed feature for Metrics: the **Alerting.**
 
@@ -29,8 +28,8 @@ OMNI is our code name for a **fully distributed**, **as-code**, **alerting** sys
 
 The query executor is pushing the query results into Kafka, ready to be handled! We now need to perform all the tasks that an alerting system does:
 
-* Handling alerts **deduplication** and **grouping**, to avoid [alert fatigue. ][6]
-* Handling **escalation** steps, **acknowledgement **or **snooze**.
+* Handling alerts **deduplication** and **grouping**, to avoid [alert fatigue.][6]
+* Handling **escalation** steps, **acknowledgement**or **snooze**.
 * **Notify** the end user, through differents **channels**: SMS, mail, Push notifications, …
 
 To handle that, we looked at open-source projects, such as [Prometheus AlertManager,][7] [LinkedIn Iris,][8] we discovered the _hidden_ truth:
@@ -59,7 +58,8 @@ If you are new to streaming architecture, I recommend reading [Dataflow Programm
 
 {{< image src="https://www.ovh.com/fr/blog/wp-content/uploads/2019/01/003.png?x70472" style="background: white" alt="Hello Friend" position="center" caption="beacon architecture">}}
 
-Everything is merged into a dataStream, **partitionned** ([keyed by ][14]in Flink API) by users. Here's an example:
+Everything is merged into a dataStream, **partitionned** ([keyed by][14]in Flink API) by users. Here's an example:
+
 ```java
     final DataStream> alertStream =
     
@@ -85,7 +85,7 @@ Each of this class is under 120 lines of codes because Flink is **handling all t
 
 ## Integration tests
 
-As the number of classes was growing, we needed to test our pipeline. Because it is only wired to Kafka, we wrapped consumer and producer to create what we call **scenari: **a series of integration tests running different scenarios.
+As the number of classes was growing, we needed to test our pipeline. Because it is only wired to Kafka, we wrapped consumer and producer to create what we call **scenari:**a series of integration tests running different scenarios.
 
 ## Queryable state
 
@@ -104,18 +104,17 @@ Thanks to this, we easily developed an **API** over the queryable state, that is
 
 We deployed the latest version of Flink (**1.7.1** at the time of writing) directly on bare metal servers with a dedicated Zookeeper's cluster using Ansible. Operating Flink has been a really nice surprise for us, with **clear documentation and configuration**, and an **impressive resilience**. We are capable of **rebooting** the whole Flink cluster, and the job is **restarting at his last saved state**, like nothing happened.
 
-We are using **RockDB** as a state backend, backed by OpenStack **Swift storage **provided by OVH Public Cloud.
+We are using **RockDB** as a state backend, backed by OpenStack **Swift storage**provided by OVH Public Cloud.
 
 For monitoring, we are relying on [Prometheus Exporter][22] with [Beamium][23] to gain **observability** over job's health.
 
-### In short, we love Apache Flink!
+### In short, we love Apache Flink
 
 If you are used to work with stream related software, you may have realized that we did not used any rocket science or tricks. We may be relying on basics streaming features offered by Apache Flink, but they allowed us to tackle many business and scalability problems with ease.
 
 ![Apache Flink][24]
 
 As such, we highly recommend that any developers should have a look to Apache Flink. I encourage you to go through [Apache Flink Training][25], written by Data Artisans. Furthermore, the community has put a lot of effort to easily deploy Apache Flink to Kubernetes, so you can easily try Flink using our Managed Kubernetes!
-
 
 [1]: https://www.ovh.com/fr/blog/wp-content/uploads/2019/01/001-1.png?x70472
 [2]: https://www.ovh.com/fr/data-platforms/metrics/
@@ -127,9 +126,7 @@ As such, we highly recommend that any developers should have a look to Apache Fl
 [8]: https://engineering.linkedin.com/blog/2017/06/open-sourcing-iris-and-oncall
 [9]: https://flink.apache.org/
 [10]: https://flink.apache.org/flink-architecture.html
-[11]: https://www.ovh.com/fr/blog/wp-content/uploads/2019/01/002.png?x70472
 [12]: https://ci.apache.org/projects/flink/flink-docs-release-1.7/concepts/programming-model.html
-[13]: https://www.ovh.com/fr/blog/wp-content/uploads/2019/01/003.png?x70472
 [14]: https://medium.com/r/?url=https%3A%2F%2Fci.apache.org%2Fprojects%2Fflink%2Fflink-docs-release-1.7%2Fdev%2Fstream%2Fstate%2Fstate.html%23keyed-state
 [15]: https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/operators/
 [16]: https://ci.apache.org/projects/flink/flink-docs-stable/dev/api_concepts.html#rich-functions
@@ -142,5 +139,3 @@ As such, we highly recommend that any developers should have a look to Apache Fl
 [23]: https://github.com/ovh/beamium
 [24]: https://www.ovh.com/fr/blog/wp-content/uploads/2019/01/0F28C7F7-9701-4C19-BAFB-E40439FA1C77.png?x70472
 [25]: https://medium.com/r/?url=https%3A%2F%2Ftraining.da-platform.com%2F
-
-  

@@ -19,10 +19,9 @@ As we will talk about both FoundationDB and ETCD, I recommend you go through the
 * [Notes about ETCD](/posts/notes-about-etcd/),
 * [Notes about FoundationDB](/posts/notes-about-foundationdb/).
 
-
 ## Why an ETCDshim?
 
-I should start with a small disclaimer: I worked a lot around ETCD in my previous work at OVHcloud, especially around [this issue](https://github.com/etcd-io/etcd/issues/11884). OVHcloud is using one ETCD for hundred of ApiServers and it was a pain for SRE team. I made a  [talk @KubeCon Europe 2021](https://pierrezemb.fr/talks/lessons-learned-from-operating-etcd/) about the difficulties of operating ETCD's cluster under heavy load, but a quick `tl;dr` is that an ETCDshim makes sense if you are deploying a lot of Kubernetes clusters. 
+I should start with a small disclaimer: I worked a lot around ETCD in my previous work at OVHcloud, especially around [this issue](https://github.com/etcd-io/etcd/issues/11884). OVHcloud is using one ETCD for hundred of ApiServers and it was a pain for SRE team. I made a  [talk @KubeCon Europe 2021](https://pierrezemb.fr/talks/lessons-learned-from-operating-etcd/) about the difficulties of operating ETCD's cluster under heavy load, but a quick `tl;dr` is that an ETCDshim makes sense if you are deploying a lot of Kubernetes clusters.
 
 I wrote the layer during the first french lockdown just before joining the K8S team to **learn** both FDB and ETCD at the same time.
 

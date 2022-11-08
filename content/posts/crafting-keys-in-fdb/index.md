@@ -49,10 +49,10 @@ Or maybe you will wrap things in a function [like this in Go](https://github.com
 ```go
 // EncodeRowKey encodes the table id and record handle into a kv.Key
 func EncodeRowKey(tableID int64, encodedHandle []byte) kv.Key {
-	buf := make([]byte, 0, prefixLen+len(encodedHandle))
-	buf = appendTableRecordPrefix(buf, tableID)
-	buf = append(buf, encodedHandle...)
-	return buf
+ buf := make([]byte, 0, prefixLen+len(encodedHandle))
+ buf = appendTableRecordPrefix(buf, tableID)
+ buf = append(buf, encodedHandle...)
+ return buf
 }
 ```
 
@@ -70,7 +70,7 @@ If we are replacing some characters, we are not really far from:
 // (Prefix, classId, labelsId, timestamp)
 ```
 
-Which looks like a `Tuple`(a collection of values of different types) and this is what FoundationDB is using as an abstraction to create keys 😍 
+Which looks like a `Tuple`(a collection of values of different types) and this is what FoundationDB is using as an abstraction to create keys 😍
 
 ## FDB's abstractions and helpers
 
@@ -200,7 +200,7 @@ Which make sens, if we take `("tenant-1", 42)` as a prefix, then the range for t
 
 Now that we know our way around `Tuples` and `Subspaces`, we can now talk about what I'm working on, which is the `Directory`. Let's have a look at the relevant [documentation](https://apple.github.io/foundationdb/developer-guide.html#directories):
 
-> FoundationDB provides directories (available in each language binding) as a tool for managing related subspaces. 
+> FoundationDB provides directories (available in each language binding) as a tool for managing related subspaces.
 
 > Directories are a recommended approach for administering applications. Each application should create or open at least one directory to manage its subspaces.
 
@@ -209,14 +209,14 @@ Okay, let's see the API(in Go, as I'm working on the Rust API):
 ```go
 subspace, err := directory.CreateOrOpen(db, []string{"application", "my-app", "tenant", "tenant-42"}, nil)
 if err != nil {
-	log.Fatal(err)
+ log.Fatal(err)
 }
 
 fmt.Printf("%+v\n", subspace.Bytes())
 // [21 18]
 ```
 
-We can see that we have a shorter subspace! The `directory` allows you to generate some integer that will be bind to a path, like here `"application", "my-app", "tenant", "tenant-42"`. 
+We can see that we have a shorter subspace! The `directory` allows you to generate some integer that will be bind to a path, like here `"application", "my-app", "tenant", "tenant-42"`.
 
 There are two advantages to this:
 
@@ -227,7 +227,7 @@ There are two advantages to this:
 // list all tenant in "application", "my-app":
 tenants, err := directory.List(db, []string{"application", "my-app", "tenant"})
 if err != nil {
-	log.Fatal(err)
+ log.Fatal(err)
 }
 fmt.Printf("%+v\n", tenants)
 // [tenant-42]
@@ -235,10 +235,10 @@ fmt.Printf("%+v\n", tenants)
 // renaming 'tenant-42' in 'tenant-142'
 // This will NOT move the data, only the metadata is modified
 directorySubspace, err = directory.Move(db, 
-	[]string{"application", "my-app", "tenant", "tenant-42"},  // old path
-	[]string{"application", "my-app", "tenant", "tenant-142"}) // new path
+ []string{"application", "my-app", "tenant", "tenant-42"},  // old path
+ []string{"application", "my-app", "tenant", "tenant-142"}) // new path
 if err != nil {
-	log.Fatal(err)
+ log.Fatal(err)
 }
 fmt.Printf("%+v\n", directorySubspace.Bytes())
 // still [21 18]

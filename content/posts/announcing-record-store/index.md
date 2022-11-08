@@ -35,8 +35,8 @@ It is currently an experiment, but it already has some strong features:
 * **Multi-tenant** A `tenant` can create as many `RecordSpace` as we want, and we can have many `tenants`.
 
 * **Standard API** We are exposing the record-store with standard technologies:
-    * [gRPC](https://grpc.io)
-    * *very experimental* [GraphQL](https://graphql.org)
+  * [gRPC](https://grpc.io)
+  * *very experimental* [GraphQL](https://graphql.org)
 
 * **Scalable** We are based on the same tech behind [CloudKit](https://www.foundationdb.org/files/record-layer-paper.pdf) called the [Record Layer](https://github.com/foundationdb/fdb-record-layer/),
 
@@ -56,10 +56,9 @@ Lately, I have been playing a lot with my [ETCD-Layer](https://github.com/Pierre
 
 The name of this project itself is a tribute to the Record Layer as we are exposing the layer within a gRPC interface.
 
-## Try it out!
+## Try it out
 
 Record-Store is open sourced under Apache License V2 in [https://github.com/PierreZ/record-store](https://github.com/PierreZ/record-store) and the documentation can be found [https://pierrez.github.io/record-store](https://pierrez.github.io/record-store).
-
 
 ---
 

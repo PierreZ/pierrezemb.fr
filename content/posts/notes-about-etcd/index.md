@@ -23,7 +23,6 @@ As stated in the [official documentation](https://etcd.io/):
 
 > etcd is a strongly consistent, distributed key-value store that provides a reliable way to store data that needs to be accessed by a distributed system or cluster of machines. It gracefully handles leader elections during network partitions and can tolerate machine failure, even in the leader node.
 
-
 ## History
 
 ETCD was initially developed by CoreOS:
@@ -32,8 +31,8 @@ ETCD was initially developed by CoreOS:
 
 * July 23, 2013 - announcement
 * December 27, 2013 - etcd 0.2.0 - new API, new modules and tons of improvements
-* February 07, 2014 - etcd 0.3.0 - Improved Cluster Discovery, API Enhancements and Windows Support 
-* January 28, 2015 - etcd 2.0 - First Major Stable Release 
+* February 07, 2014 - etcd 0.3.0 - Improved Cluster Discovery, API Enhancements and Windows Support
+* January 28, 2015 - etcd 2.0 - First Major Stable Release
 * June 30, 2016 - etcd3 - A New Version of etcd from CoreOS
 * June 09, 2017 - etcd 3.2 - etcd 3.2 now with massive watch scaling and easy locks
 * February 01, 2018 - etcd 3.3 - Announcing etcd 3.3, with improvements to stability, performance, and more
@@ -57,11 +56,15 @@ ETCD is:
 * Raft is a consensus algorithm for managing a replicated log.
 * consensus involves multiple servers agreeing on values.
 * two common consensus algorithm are Paxos and Raft
+
 > , Paxos is quite difficult to understand, inspite of numerous attempts to make it more approachable.Furthermore, its architecture requires complex changes to support practical systems. As a result, both system builders and students struggle with Paxos.
+
 * A common alternative to Paxos/Raft is a non-consensus (aka peer-to-peer) replication protocol.
+
 > Raft separates the key elements of consensus, such asleader election, log replication, and safety
 
 ETCD contains several raft optimizations:
+
 * Read Index,
 * Follower reads,
 * Transfer leader,
@@ -119,7 +122,7 @@ message TxnRequest {
   
 ### Versioned data
 
-Each Key/Value has a revision. When creating a new key, revision starts at 1, and then will be incremented each time the key is updated. 
+Each Key/Value has a revision. When creating a new key, revision starts at 1, and then will be incremented each time the key is updated.
 
 In order to avoid having a growing keySpace, one can issue the `Compact` gRPC service:
 
@@ -179,14 +182,12 @@ ETCD implements `ReadIndex` read(more info on [Diving into ETCD’s linearizable
 > * Bolt uses a B+tree internally and only a single file. Both approaches have trade-offs.
 > * If you require a high random write throughput (>10,000 w/sec) or you need to use spinning disks then LevelDB could be a good choice. If your application is read-heavy or does a lot of range scans then Bolt could be a good choice.
 > * Try to avoid long running read transactions. Bolt uses copy-on-write so old pages cannot be reclaimed while an old transaction is using them.
-> * Bolt uses a memory-mapped file so the underlying operating system handles the caching of the data. Typically, the OS will cache as much of the file as it can in memory and will release memory as needed to other processes. This means that Bolt can show very high memory usage when working with large databases. 
+> * Bolt uses a memory-mapped file so the underlying operating system handles the caching of the data. Typically, the OS will cache as much of the file as it can in memory and will release memory as needed to other processes. This means that Bolt can show very high memory usage when working with large databases.
 > * Etcd implements multi-version-concurrency-control (MVCC) on top of Boltdb
 
 [From an Github issue](https://github.com/etcd-io/etcd/issues/12169#issuecomment-673292122):
 
 > Note that the underlying `bbolt` mmap its file in memory. For better performance, usually it is a good idea to ensure the physical memory available to etcd is larger than its data size.
-
-
 
 ## ETCD in K8S
 
@@ -194,13 +195,12 @@ ETCD implements `ReadIndex` read(more info on [Diving into ETCD’s linearizable
 
 [The interface can be found here](https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apiserver/pkg/storage/interfaces.go#L159).
 
-* Create use TTL and Txn 
+* Create use TTL and Txn
 * Get use KV.Get
 * Delete use Get and then for with a Txn
 * GuaranteedUpdate uses Txn
 * List uses Get
 * Watch uses Watch with a channel
-
 
 ## Jepsen
 
@@ -214,21 +214,20 @@ The Jepsen team tested [etcd-3.4.3](https://jepsen.io/analyses/etcd-3.4.3), here
 
 > If you use etcd locks, consider whether those locks are used to ensure safety, or simply to improve performance by probabilistically limiting concurrency. It’s fine to use etcd locks for performance, but using them for safety might be risky.
 
-
 ## Operation notes
 
 ### Deployements tips
 
 [From the official documentation](https://etcd.io/docs/v3.4.0/faq/):
 
-> Since etcd writes data to disk, SSD is highly recommended. 
+> Since etcd writes data to disk, SSD is highly recommended.
 > To prevent performance degradation or unintentionally overloading the key-value store, etcd enforces a configurable storage size quota set to 2GB by default.
 > To avoid swapping or running out of memory, the machine should have at least as much RAM to cover the quota.
-> 8GB is a suggested maximum size for normal environments and etcd warns at startup if the configured value exceeds it. 
+> 8GB is a suggested maximum size for normal environments and etcd warns at startup if the configured value exceeds it.
 
 ### Defrag
 
-> After compacting the keyspace, the backend database may exhibit internal fragmentation. 
+> After compacting the keyspace, the backend database may exhibit internal fragmentation.
 > Defragmentation is issued on a per-member so that cluster-wide latency spikes may be avoided.
 
 Defrag is basically [dumping the bbolt tree on disk and reopening it](https://github.com/etcd-io/etcd/blob/2b79442d8e9fc54b1ac27e7e230ac0e4c132a054/mvcc/backend/backend.go#L349).
@@ -257,5 +256,3 @@ Be careful on Leader's change and lease, this can [create some issues](https://g
 * [How a production outage in Grafana Cloud's Hosted Prometheus service was caused by a bad etcd client setup](https://grafana.com/blog/2020/04/07/how-a-production-outage-in-grafana-clouds-hosted-prometheus-service-was-caused-by-a-bad-etcd-client-setup/)
 * [Random performance issue on etcd 3.4](https://github.com/etcd-io/etcd/issues/11884)
 * [Impact of etcd deployment on Kubernetes, Istio, and application performance](https://arxiv.org/pdf/2004.00372.pdf)
-
-

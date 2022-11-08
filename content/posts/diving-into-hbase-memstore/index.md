@@ -17,7 +17,7 @@ categories:
 
 `tl;dr:` Hbase is using the [ConcurrentSkipListMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentSkipListMap.html).
 
-# What is the MemStore?
+## What is the MemStore?
 
 > The `memtable` from the official [BigTable paper](https://research.google.com/archive/bigtable-osdi06.pdf) is the equivalent of the `MemStore` in Hbase.
 
@@ -25,11 +25,11 @@ As rows are **sorted lexicographically** in Hbase, when data comes in, you need 
 
 Let's dig into how the MemStore internally works in Hbase 1.X.
 
-#  Hbase 1
+## Hbase 1
 
 All extract of code for this section are taken from [rel/1.4.9](https://github.com/apache/hbase/tree/rel/1.4.9) tag.
 
-## in-memory storage
+### in-memory storage
 
 The [MemStore interface](https://github.com/apache/hbase/blob/rel/1.4.9/hbase-server/src/main/java/org/apache/hadoop/hbase/regionserver/MemStore.java#L35) is giving us insight on how it is working internally.
 
@@ -46,11 +46,11 @@ long add(final Cell cell);
 
 The implementation is hold by [DefaultMemStore](https://github.com/apache/hbase/blob/rel/1.4.9/hbase-server/src/main/java/org/apache/hadoop/hbase/regionserver/DefaultMemStore.java). `add` is wrapped by several functions, but in the end, we are arriving here:
 
-
 ```java
   private boolean addToCellSet(Cell e) {
     boolean b = this.activeSection.getCellSkipListSet().add(e);
 ```
+
 -- [addToCellSet on the DefaultMemStore](https://github.com/apache/hbase/blob/rel/1.4.9/hbase-server/src/main/java/org/apache/hadoop/hbase/regionserver/DefaultMemStore.java#L202-L213)
 
 [CellSkipListSet class](https://github.com/apache/hbase/blob/rel/1.4.9/hbase-server/src/main/java/org/apache/hadoop/hbase/regionserver/CellSkipListSet.java#L33-L48) is built on top of [ConcurrentSkipListMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentSkipListMap.html), which provide nice features:
@@ -58,24 +58,23 @@ The implementation is hold by [DefaultMemStore](https://github.com/apache/hbase/
 * concurrency
 * sorted elements
 
-## Flush on HDFS
+### Flush on HDFS
 
 As we seen above, the `MemStore` is supporting all the puts. When asked to flush, the current memstore is **moved to snapshot and is cleared**. Flushed file are called ([HFiles](https://github.com/apache/hbase/blob/rel/2.1.2/hbase-server/src/main/java/org/apache/hadoop/hbase/io/hfile/HFile.java)) and they are similar to `SSTables` introduced by the official [BigTable paper](https://research.google.com/archive/bigtable-osdi06.pdf). HFiles are flushed on the Hadoop Distributed File System called `HDFS`.
 
->  If you want deeper insight about SSTables, I recommend reading [Table Format from the awesome RocksDB wiki](https://github.com/facebook/rocksdb/wiki/Rocksdb-BlockBasedTable-Format)
+> If you want deeper insight about SSTables, I recommend reading [Table Format from the awesome RocksDB wiki](https://github.com/facebook/rocksdb/wiki/Rocksdb-BlockBasedTable-Format)
 
-## Compaction
+### Compaction
 
 Compaction are only run on HFiles. It means that **if hot data is continuously updated, we are overusing memory due to duplicate entries per row per MemStore**. Accordion tends to solve this problem through *in-memory compactions*. Let's have a look to Hbase 2.X!
 
+## Hbase 2
 
-#  Hbase 2
-
-## storing data
+### storing data
 
 **All extract of code starting from here are taken from [rel/2.1.2](https://github.com/apache/hbase/tree/rel/2.1.2) tag.**
 
-Does `MemStore` interface changed? 
+Does `MemStore` interface changed?
 
 ```java
   /**
@@ -86,13 +85,14 @@ Does `MemStore` interface changed?
    */
   void add(final Cell cell, MemStoreSizing memstoreSizing);
 ```
+
 -- [add function in MemStore interface](https://github.com/apache/hbase/blob/rel/2.1.2/hbase-server/src/main/java/org/apache/hadoop/hbase/regionserver/MemStore.java#L67-L73)
 
 The signature changed a bit, to include passing a object instead of returning a long. Moving on.
 
 The new structure implementing MemStore is called [AbstractMemStore](https://github.com/apache/hbase/blob/rel/2.1.2/hbase-server/src/main/java/org/apache/hadoop/hbase/regionserver/AbstractMemStore.java#L42). Again, we have some layers, where AbstractMemStore is writing to a `MutableSegment`, which itsef is wrapping `Segment`. If you dig far enough, you will find that data are stored into the [CellSet class](https://github.com/apache/hbase/blob/rel/2.1.2/hbase-server/src/main/java/org/apache/hadoop/hbase/regionserver/CellSet.java#L35-L51) which is also things built on top of **ConcurrentSkipListMap**!
 
-## in-memory Compactions
+### in-memory Compactions
 
 Hbase 2.0 introduces a big change to the original memstore called Accordion which is a codename for in-memory compactions. An awesome blogpost is available here: [Accordion: HBase Breathes with In-Memory Compaction](https://blogs.apache.org/hbase/entry/accordion-hbase-breathes-with-in) and the [document design](https://issues.apache.org/jira/secure/attachment/12709471/HBaseIn-MemoryMemstoreCompactionDesignDocument.pdf) is also available.
 

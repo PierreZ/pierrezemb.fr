@@ -21,10 +21,7 @@ In the last two years, there’s been a technology that became really hype. It w
 
 ### “Write once, run everywhere”
 
-
 ![image](/posts/lets-talk-about-containers/images/1.jpeg)
-
-
 
 When I first heard about containers, I was working as a part-time internship for a french bank as a developer in a Ops team. I was working around [Hadoop](https://hadoop.apache.org/) and monitoring systems, and I was wondering “How should I properly deploy my work?”. It was a java app, running into the official Java version provided by my company. **I couldn’t just give it to my colleagues** **and leave them do some vaudou stuff because they are the Ops team**. I remembered saying to myself ”fortunately, all the features that I need are in this official java version, I don’t need the latest JRE. I just need to bundle everything into a jar and done”. But what if it wasn’t? What if I had to explain to my colleagues that I need the new JRE for a really small app written by an intern? Or I needed another non-standard library during runtime?
 
@@ -36,15 +33,13 @@ I will always remember my chat with my colleagues about it. I was like this:
 
 ![image](/posts/lets-talk-about-containers/images/2.jpeg)
 
+## And they were more like
 
-
-## And they were more like:
 ![image](/posts/lets-talk-about-containers/images/3.jpeg)
-
 
 Ops knew about containers since the dawn of time, so why such hype now? I think that “write once, run everywhere” is the true slogan of Docker, because you can run docker containers in any environments that has Docker. **You want to try the latest datastore/SaaS app that you found on Hacker News or Reddit? There’s a Dockerfile for that**. And that is super cool. So everyone started to get interested in Docker, myself included. But the real benefit is that many huge companies like Google admits that containers are the way they are deploying apps. **They don’t care what type of applications they are deploying or where it’s running, it’s just running somewhere.** That’s all that matters. By unifying the packages, you can automatize and deliver whatever you want somewhere. Do you really care if it’s on a specific machine? No you don’t. That’s a powerful way to think infrastructure more like a bunch of compute or storage power, and not individual machines.
 
-### Let’s create a container!
+### Let’s create a container
 
 That’s not a secret: I love [Go](https://golang.org/). It’s in my opinion a very nice programming language [that you should really try](https://medium.com/@PierreZ/why-you-really-should-give-golang-a-try-6b577092d725). So let’s say that I’m creating a go app, and then ship it with Docker. So I’ll use the officiel Docker image right? **Then I end up with a 700MB container to ship a 10MB app**… I thought that containers were supposed to be small… Why? because it’s based on a full OS, with go compiler and so on. To run a single binary, there’s no need to have the whole Go compiler stack.
 
@@ -54,22 +49,20 @@ There is another huge impact on having a full distribution on a container: Secur
 
 ### So what should I put into my container?
 
-I looked a lot around the internet, I saw things like [docker-alpine](https://github.com/gliderlabs/docker-alpine) or [baseimage-docker] (https://github.com/phusion/baseimage-docker)which are cool, but in fact, the answer was on Docker’s website… Here’s the [official sentence] (https://www.docker.com/what-docker)that explains the difference between containers and virtual machines:
+I looked a lot around the internet, I saw things like [docker-alpine](https://github.com/gliderlabs/docker-alpine) or [baseimage-docker] (<https://github.com/phusion/baseimage-docker)which> are cool, but in fact, the answer was on Docker’s website… Here’s the [official sentence] (<https://www.docker.com/what-docker)that> explains the difference between containers and virtual machines:
 
 > “Containers include the application and all of its dependencies, but share the kernel with other containers.”
 
 This specific sentence triggers something in my head. When you execute a program on your UNIX system, the system creates a special environment for that program. This environment contains everything needed for the system to run the program as if no other program were running on the system. It’s exactly the same! **So a container should be abstract not as a Virtual machines, but as a UNIX process!**
 
-*   application + dependencies represent the image
-*   Runtime environment like token/password will be passed through env vars for example
+* application + dependencies represent the image
+* Runtime environment like token/password will be passed through env vars for example
 
 ### Static compilation
 
 ![image](/posts/lets-talk-about-containers/images/4.png)
 
 Meet Go
-
-
 
 Here’s an interesting fact: Go, the open-source programming language pushed by Google **supports statically apps**, what a coincidence! That means that this statically app will be directly talking to the kernel. **Our Docker image can be empty**, except for the binary and needed files like configuration. There’s a strange image on Docker that you might have seen, which is called “scratch”:
 
@@ -83,7 +76,7 @@ ADD hello /
 CMD [/hello]
 ```
 
-So now, I have finally (I think) the right abstraction for a container! **We have a container containing only our app**. Can we go even further? The most interesting thing that I learned from (quickly) reading [_Large-scale cluster management at Google with Borg_](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43438.pdf) is this:
+So now, I have finally (I think) the right abstraction for a container! **We have a container containing only our app**. Can we go even further? The most interesting thing that I learned from (quickly) reading [*Large-scale cluster management at Google with Borg*](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43438.pdf) is this:
 
 > Borg programs are statically linked to reduce dependencies on their runtime environment, and structured as packages of binaries and data files, whose installation is orchestrated by Borg.
 

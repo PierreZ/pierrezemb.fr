@@ -15,7 +15,6 @@ categories:
 
 ---
 
-
 ![image](/posts/eventdriven-architecture-101/images/1.png)
 
 Do your own cover on [http://dev.to/rly](http://dev.to/rly)
@@ -28,12 +27,11 @@ _I’m still a student, so my point of view could be far from reality, be gentle
 
 ![image](/posts/eventdriven-architecture-101/images/2.gif)
 
-
 I’m a huge fan of GNU/Linux. I just love my terminal. It’s been difficult at the beginning, but now, I consider myself fluent with it. My favorite feature ? **Pipes or |**. For those who don’t know, it’s the ability to pass the result of the command to another command. For example, to count how many files you have in a folder, you’ll find yourself doing something like this:
 
-*   **list files** in a folder
-*   From this list, **manipulate/filter** it. One line must correspond to one file, things like folder are omitted
-*   And then **count** the line!
+* **list files** in a folder
+* From this list, **manipulate/filter** it. One line must correspond to one file, things like folder are omitted
+* And then **count** the line!
 
 In the UNIX world, it should give you something like “**_ls -l | grep ^- | wc -l”._** it might feels like chinese. For me, it’s just feels logical. **3 operations mapped into 3 commands.** You declare a set a commands that, in the end, give you the result. It’s simple and also very fast (in fact, you can find funny articles like this one: [Command-line tools can be 235x faster than your Hadoop cluster](http://aadrake.com/command-line-tools-can-be-235x-faster-than-your-hadoop-cluster.html)). This is only possible thanks to the **UNIX philosophy**, greatly describe by Doug McIlroy, Elliot Pinson and Berk Tague in 1978:
 
@@ -45,9 +43,7 @@ Why should I care? It’s 2016, not 1978! Well…
 
 ![image](/posts/eventdriven-architecture-101/images/3.gif)
 
-
 Cloud changed everything in terms of software engineering. **We can now deploy applications without thinking about the underlying server**. How cool is that? Let’s take some steps back. Now that you can easily deploy a huge application, what can be accomplished? Well, if I can deploy one app with ease, **Why should I deploy only one huge app ?** why can’t I deploy multiples applications instead of one? **Let’s call theses applications micro services** because we are in 2016.
-
 
 ![image](/posts/eventdriven-architecture-101/images/4.png)
 
@@ -69,14 +65,11 @@ Let’s ask Google, what’s an event?
 
 Well, handling a new customer is a thing that happens (hopefully). For this, we’ll be using a **Queue messaging system or Broker**. It’s a **middleware** that will **receive events, and making them available for another application or groups of applications.**
 
-
 ![image](/posts/eventdriven-architecture-101/images/6.gif)
 
 Queue messaging architecture with 2 producers and 4 consumers
 
-
 So let’s rethink our architecture. Pay attention to the words: our Register page will **produce** an event that will contains all the information about our client. This event will be **queued**, waiting to be **consumed** by the associated micro services.
-
 
 ![image](/posts/eventdriven-architecture-101/images/7.png)
 
@@ -84,11 +77,11 @@ Simple event-driven architecture
 
 We didn’t changed much, but we enable many things over here:
 
-*   **Simplicity**. Remember, the first rule ! “Make each program do one thing well”. Like this, your **code base for each app will be simple** **as hell**, and you’ll be able to easily replace your software if needed.
-*   **Modularity**. You need to add another action to the event, for example CreateProfile ? Easy, **just plug another app on the same queue**. You need to test a new version of your program? Easy, **just plug it on the same queue**.
-*   **Scalability**. One of your micro services is taking too much time? **Just start a new instance of it**. Huge traffic? Add new instances. With this approach, you can start really small and become giant.
-*   **Big-data friendly.** This type of architecture is often used to handle a lot of data. With plateform like [Apache Flink](http://flink.apache.org), you can do some **stream processing directly**. [Look how easy it is](https://ci.apache.org/projects/flink/flink-docs-master/apis/streaming/index.html#example-program).
-*   **Polyglotism.** Most messaging system are offering libraries for many languages.**Like this, you can use whatever language you want** . But be aware, _With great power comes great responsibility_.
+* **Simplicity**. Remember, the first rule ! “Make each program do one thing well”. Like this, your **code base for each app will be simple** **as hell**, and you’ll be able to easily replace your software if needed.
+* **Modularity**. You need to add another action to the event, for example CreateProfile ? Easy, **just plug another app on the same queue**. You need to test a new version of your program? Easy, **just plug it on the same queue**.
+* **Scalability**. One of your micro services is taking too much time? **Just start a new instance of it**. Huge traffic? Add new instances. With this approach, you can start really small and become giant.
+* **Big-data friendly.** This type of architecture is often used to handle a lot of data. With plateform like [Apache Flink](http://flink.apache.org), you can do some **stream processing directly**. [Look how easy it is](https://ci.apache.org/projects/flink/flink-docs-master/apis/streaming/index.html#example-program).
+* **Polyglotism.** Most messaging system are offering libraries for many languages.**Like this, you can use whatever language you want** . But be aware, _With great power comes great responsibility_.
 
 # **What about serverless?**
 
@@ -96,10 +89,10 @@ Serverless is the “new” buzz word. Ignited by Amazon with their product [AWS
 
 # Additional links and talks about this topic
 
-*   [Apache Kafka, Samza, and the Unix Philosophy of Distributed Data](http://www.confluent.io/blog/apache-kafka-samza-and-the-unix-philosophy-of-distributed-data) by [Martin Kleppmann](https://medium.com/u/13be457aed12)
-*   [Apache Kafka for Beginners](http://blog.cloudera.com/blog/2014/09/apache-kafka-for-beginners/) by Cloudera Engineering Blog
-*   [Introduction to Apache Kafka](https://www.voxxed.com/blog/2016/04/introduction-apache-kafka/) by Guglielmo Iozza
-*   [Apache Flink Training] (http://dataartisans.github.io/flink-training/)by data-artisans
+* [Apache Kafka, Samza, and the Unix Philosophy of Distributed Data](http://www.confluent.io/blog/apache-kafka-samza-and-the-unix-philosophy-of-distributed-data) by [Martin Kleppmann](https://medium.com/u/13be457aed12)
+* [Apache Kafka for Beginners](http://blog.cloudera.com/blog/2014/09/apache-kafka-for-beginners/) by Cloudera Engineering Blog
+* [Introduction to Apache Kafka](https://www.voxxed.com/blog/2016/04/introduction-apache-kafka/) by Guglielmo Iozza
+* [Apache Flink Training] (<http://dataartisans.github.io/flink-training/)by> data-artisans
 * Meetup LeboncoinTech — AMQP 101 by [Quentin ADAM](https://medium.com/u/58ea5a89aaae) (French sorry)
 * vert.x 3 — be reactive on the JVM but not only in Java by Clement Escoffier/Paulo Lopes DEVOXX 2015
 

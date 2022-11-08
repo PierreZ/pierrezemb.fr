@@ -15,11 +15,11 @@ categories:
 
 ---
 
-# The protocol reference
+## The protocol reference
 
 For the last few months, I worked a lot around Kafka's protocols, first by creating a fully async Kafka to Pulsar Proxy in Rust, and now by contributing directly to [KoP (Kafka On Pulsar)](https://www.slideshare.net/streamnative/2-kafkaonpulsarjia). The full Kafka Protocol documentation is available [here](https://kafka.apache.org/protocol.html), but it does not offer a global view of what is happening for a classic Producer and Consumer exchange. Let's dive in!
 
-## Common handshake
+### Common handshake
 
 After a client established the TCP connection, there is a few common requests and responses that are almost always here.
 
@@ -28,7 +28,6 @@ The common handhake can be divided in three parts:
 * Being able to understand each other. For this, we are using **[API_VERSIONS](https://kafka.apache.org/protocol.html#The_Messages_ApiVersions)** to know which versions of which TCP frames can be uses,
 * Establish Auth using **SASL** if needed, thanks to **[SASL_HANDSHAKE](https://kafka.apache.org/protocol.html#The_Messages_SaslHandshake)** and **[SASL_AUTHENTICATE](https://kafka.apache.org/protocol.html#The_Messages_SaslAuthenticate)**,
 * Retrieve the topology of the cluster using **[METADATA](https://kafka.apache.org/protocol.html#The_Messages_Metadata)**.
-
 
 > All exchange are based between a Kafka 2.0 cluster and client.
 
@@ -67,7 +66,7 @@ Note left of KafkaClient: That is you, I don't <br/> need to handshake <br/> aga
 
 {{</mermaid>}}
 
-## Producing
+### Producing
 
 The **[PRODUCE](https://kafka.apache.org/protocol.html#The_Messages_Produce)** API is used to send message sets to the server. For efficiency it allows sending message sets intended for many topic partitions in a single request.
 
@@ -89,21 +88,21 @@ sequenceDiagram
 
 {{</mermaid>}}
 
-## Consuming
+### Consuming
 
 Consuming is more complicated than producing. You can learn more in [The Magical Group Coordination Protocol of Apache Kafka](https://www.youtube.com/watch?v=maJulQ4ABNY) By Gwen Shapira, Principal Data Architect @ Confluent and also in the [Kafka Client-side Assignment Proposal](https://cwiki.apache.org/confluence/display/KAFKA/Kafka+Client-side+Assignment+Proposal).
 
 Consuming can be divided in three parts:
 
 * coordinating the consumers to assign them partitions, using:
-    * **[FIND_COORDINATOR](https://kafka.apache.org/protocol.html#The_Messages_FindCoordinator)**,
-    * **[JOIN_GROUP](https://kafka.apache.org/protocol.html#The_Messages_JoinGroup)**,
-    * **[SYNC_GROUP](https://kafka.apache.org/protocol.html#The_Messages_SyncGroup)**,
+  * **[FIND_COORDINATOR](https://kafka.apache.org/protocol.html#The_Messages_FindCoordinator)**,
+  * **[JOIN_GROUP](https://kafka.apache.org/protocol.html#The_Messages_JoinGroup)**,
+  * **[SYNC_GROUP](https://kafka.apache.org/protocol.html#The_Messages_SyncGroup)**,
 * then fetch messages using:
-    * **[OFFSET_FETCH](https://kafka.apache.org/protocol.html#The_Messages_OffsetFetch)**,
-    * **[LIST_OFFSETS](https://kafka.apache.org/protocol.html#The_Messages_ListOffsets)**,
-    * **[FETCH](https://kafka.apache.org/protocol.html#The_Messages_Fetch)**,
-    * **[OFFSET_COMMIT](https://kafka.apache.org/protocol.html#The_Messages_OffsetCommit)**,
+  * **[OFFSET_FETCH](https://kafka.apache.org/protocol.html#The_Messages_OffsetFetch)**,
+  * **[LIST_OFFSETS](https://kafka.apache.org/protocol.html#The_Messages_ListOffsets)**,
+  * **[FETCH](https://kafka.apache.org/protocol.html#The_Messages_Fetch)**,
+  * **[OFFSET_COMMIT](https://kafka.apache.org/protocol.html#The_Messages_OffsetCommit)**,
 * Send lifeproof to the coordinator using **[HEARTBEAT](https://kafka.apache.org/protocol.html#The_Messages_Heartbeat)**.
 
 For the sake of the explanation, we have now another Broker1 which is holding the coordinator for topic 'my-topic'. In real-life, it would be the same.
@@ -181,6 +180,6 @@ sequenceDiagram
     end 
 {{</mermaid>}}
 
---- 
+---
 
 **Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) if needed.
