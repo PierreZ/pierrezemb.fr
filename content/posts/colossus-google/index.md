@@ -132,8 +132,6 @@ What is that "D"?
 
 How everything is deployed? Using Borg!
 
-{{<tweet 1197044446279479297>}}
-
 ### Migration
 
 The migration process is described in the now free [Case Studies in Infrastructure Change Management](https://static.googleusercontent.com/media/sre.google/en//static/pdf/case-studies-infrastructure-change-management.pdf) book.

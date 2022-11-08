@@ -29,4 +29,4 @@ In this talk, you will have the insights of why we decided to use Apache Pulsar 
 
 # Photos and tweets
 
-{{<tweet 1267735145924222982>}}
+{{<tweet user="PierreZ" id="1267735145924222982">}}

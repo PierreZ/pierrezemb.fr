@@ -23,5 +23,5 @@ Have you been wondered what is like to be working at the largest European Cloud 
 
 # Photos and tweets
 
-{{<tweet 1103981210286673920>}}
-{{<tweet 1103982161810599936>}}
+{{<tweet user="AurrelH95" id="1103981210286673920">}}
+{{<tweet user="ale_polidori" id="1103982161810599936">}}

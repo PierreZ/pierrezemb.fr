@@ -16,4 +16,4 @@ The slides are available **[here](https://docs.google.com/presentation/d/15wm8eu
 
 # Photos and Tweets
 
-{{<tweet 938700613029912576>}}
+{{<tweet user="miton1810" id="938700613029912576">}}

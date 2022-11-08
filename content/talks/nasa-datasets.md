@@ -31,10 +31,10 @@ The hands-on can be done **[online](https://helloexoworld.github.io/hew-hands-on
 
 # Photos and tweets
 
-{{<tweet 1012294934823612416>}}
-{{<tweet 986537924912144384>}}
-{{<tweet 979031356117340160>}}
-{{<tweet 996655740793376768 >}}
-{{<tweet  978999137839583233>}}
-{{<tweet  1007295738571902976>}}
-{{<tweet 976555740054900736>}}
+{{<tweet user="LostInBrittany" id="1012294934823612416">}}
+{{<tweet user="LostInBrittany" id="986537924912144384">}}
+{{<tweet user="HelloExoWorld" id="979031356117340160">}}
+{{<tweet user="kimsnj" id="996655740793376768" >}}
+{{<tweet user="BrenAbolivier" id="978999137839583233">}}
+{{<tweet user="ptibulle" id="1007295738571902976">}}
+{{<tweet user="LostInBrittany" id="976555740054900736">}}

@@ -27,9 +27,9 @@ You will hear about time series, about open source solutions pushed to the limit
 
 # Photos and tweets
 
-{{<tweet 1128967524152946688>}}
-{{<tweet 1128967131062767616>}}
-{{<tweet 1128960579346030594>}}
-{{<tweet 1128960166781771776>}}
-{{<tweet 1128956775124918272>}}
+{{<tweet user="CecileHbh" id="1128967524152946688">}}
+{{<tweet user="nirousseau" id="1128967131062767616">}}
+{{<tweet user="JobOpportunIT_" id="1128960579346030594">}}
+{{<tweet user="TiffanySouterre" id="1128960166781771776">}}
+{{<tweet user="RivieraDEV" id="1128956775124918272">}}
 

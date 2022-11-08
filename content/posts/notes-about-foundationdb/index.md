@@ -39,7 +39,7 @@ From a database dialect, it provides:
 
 **And this is THE tweet that triggered a lot of curiosity on my side:**
 
-{{<tweet 405017101804396546>}}
+{{<tweet user="obfuscurity" id="405017101804396546">}}
 
 ## The story
 

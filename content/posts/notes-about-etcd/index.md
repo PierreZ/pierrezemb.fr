@@ -190,7 +190,7 @@ ETCD implements `ReadIndex` read(more info on [Diving into ETCD’s linearizable
 
 ## ETCD in K8S
 
-{{<tweet 1118273986956120064 >}}
+{{<tweet user="bgrant0607" id="1118273986956120064" >}}
 
 [The interface can be found here](https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apiserver/pkg/storage/interfaces.go#L159).
 

@@ -30,7 +30,7 @@ This conference is a feedback that will present:
 
 # Photos and tweets
 
-{{<tweet 1118857461748858881 >}}
-{{<tweet 1118881288432312320 >}}
-{{<tweet 1118843759398195202 >}}
-{{<tweet 1118856425688719366 >}}
+{{<tweet user="fteychene" id="1118857461748858881">}}
+{{<tweet user="PierreZ" id="1118881288432312320">}}
+{{<tweet user="PierreZ" id="1118843759398195202">}}
+{{<tweet user="estelandry" id="1118856425688719366">}}

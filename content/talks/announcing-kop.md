@@ -47,4 +47,4 @@ In this webinar, Sijie Guo, from StreamNative, and Pierre Zemb, from OVHCloud, w
 
 # Photos and tweets
 
-{{<tweet 1244655625042374657>}}
+{{<tweet user="streamnativeio" id="1244655625042374657">}}

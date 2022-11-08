@@ -117,9 +117,7 @@ Then [**Kepler2Warp10**](https://github.com/PierreZ/kepler2warp10) is used to **
 
 To ease importation, an [**Ansible role**](https://github.com/PierreZ/kepler2warp10-ansible)  has been made, to spread the work across multiples small **virtual machines**.
 
-Principles of transaction-oriented database recovery
-
-{{< tweet 908784580450295808>}}
+{{< tweet user="pierrez" id="908784580450295808">}}
 
 *   **550k distincts stars**
 *   around **50k datapoints per star**

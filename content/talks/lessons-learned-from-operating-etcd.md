@@ -29,4 +29,4 @@ In this talk, you will have the insights of how we are operating our ETCD cluste
 
 # Photos and tweets
 
-{{<tweet 1389541817004134404>}}
+{{<tweet user="etcdio" id="1389541817004134404">}}
