@@ -113,6 +113,10 @@ Reddit = true
     Twitch = "PierreZemb"
     Linkedin = "%F0%9F%91%A8%F0%9F%8F%BB%E2%80%8D%F0%9F%92%BB-pierre-zemb-8004125b"
 
+[params.social.Mastodon]
+    id = "@PierreZ"
+    prefix = "https://fosstodon.org/"
+
 [menu]
     [[menu.main]]
         identifier = "About"
