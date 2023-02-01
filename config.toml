@@ -3,6 +3,7 @@ DefaultContentLanguage = "en"
 baseURL = "https://pierrezemb.fr"
 # [en, zh-cn, fr, ...] determines default content language
 defaultContentLanguage = "en"
+ignoreErrors = ["error-remote-getjson"]
 # language code
 languageCode = "en"
 title = "Pierre Zemb"
