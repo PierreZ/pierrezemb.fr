@@ -12,6 +12,7 @@ Durant ce talk, vous découvrirez les enjeux et les impacts de la simulation dan
 ## Resources
 
 * [Slides](https://docs.google.com/presentation/d/1XGh1xmHdlI50PvP3D6gp5o7afhiwCmI7swOdmx14R50/edit?usp=sharing)
+* [Replay](https://verytechtrip.ovhcloud.com/fr/media/oembed/c2ac2738d580f1fff4bc7066fcd96cdf/)
 
 ## Occurences
 
