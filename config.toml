@@ -19,13 +19,21 @@ enableGitInfo=true
 enableEmoji=true
 gitRepo = "https://github.com/PierreZ/pierrezemb.fr"
 
+title = "Pierre Zemb"
+description = "Pierre Zemb's personal blog"
+dateFormat = "2006-01-02"
+fingerprint = "sha256"
 
 [author]
 name = "Pierre Zemb"
 link = "/"
 
 # website images for Open Graph and Twitter Cards
-images = ["myself.png"]
+images = ["/img/myself.jpg"]
+
+[params.app]
+title = "Pierre Zemb"
+description = "Pierre Zemb's personal blog"
 
 # Header config
 [params.header]
@@ -40,11 +48,11 @@ images = ["myself.png"]
     # title name
     name = "~/blog"
     # you can add extra information before the name (HTML format is supported), such as icons
-    pre = ""
+    pre = "👨‍💻"
     # you can add extra information after the name (HTML format is supported), such as icons
     post = ""
     # LoveIt NEW | 0.2.5 whether to use typeit animation for title name
-    typeit = false
+    typeit = true
 
 # Footer config
 [params.footer]
@@ -67,21 +75,23 @@ images = ["myself.png"]
     # Gravatar Email for preferred avatar in home page
     gravatarEmail = "pierre.zemb.isen@gmail.com"
     # URL of avatar shown in home page
-    avatarURL = "/images/avatar.png"
+    avatarURL = "/img/myself.jpg"
     # LoveIt CHANGED | 0.2.7 title shown in home page (HTML format is supported)
     title = "Pierre Zemb"
     # subtitle shown in home page
-    subtitle = "Senior Software Engineer @ Clever Cloud"
+    subtitle = "Head of Data Infrastructure @ Clever Cloud"
     # whether to use typeit animation for subtitle
-    typeit = true
+    typeit = false
     # whether to show social links
     social = true
     # LoveIt NEW | 0.2.0 disclaimer (HTML format is supported)
     disclaimer = ""
     # Home page posts
     [params.home.posts]
-    enable = false
+    enable = true
 
+[params.meta]
+favicon = true
 
 
 [outputs]
