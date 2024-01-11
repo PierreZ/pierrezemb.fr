@@ -26,12 +26,19 @@ On my free time, I am giving a hand to local events, such as the local GDG/JUG [
 
 I co-founded in 2017 [HelloExoWorld](https://helloexo.world/), an initiative to search for exoplanets using Warp10, a time-series platform.
 
-# Work
-#### 2021 to now: Senior Software Engineer @Clever Cloud
+## Work
+### 2023 to now: Head of Data infrastructure @Clever Cloud
+
+* Managing all teams working around data
+* Technical leadership around serverless databases
+* Technical advisor around distributed systems and data-related systems
+* On-call duty
+
+### 2021 to 2023: Senior Software Engineer @Clever Cloud
 
 I am working around data infrastructure, to offer new database-oriented products 🚀
 
-#### 2020 to 2021: Technical Leader @OVHcloud - Managed Kubernetes
+### 2020 to 2021: Technical Leader @OVHcloud - Managed Kubernetes
 
 I was working on the [managed Kubernetes product](https://www.ovhcloud.com/en-gb/public-cloud/kubernetes/). I was involved in:
 
@@ -40,7 +47,7 @@ I was working on the [managed Kubernetes product](https://www.ovhcloud.com/en-gb
 * Go mentoring,
 * On-call duty.
 
-#### 2019 to 2020: Technical Leader @OVHcloud - ioStream
+### 2019 to 2020: Technical Leader @OVHcloud - ioStream
 
 I was working on the underlying infrastructure of `IO` oriented products, including [ioStream](https://labs.ovh.com/iostream), a geo-replicated, managed topic-as-a-service product built using [Apache Pulsar](https://pulsar.apache.org).
 
