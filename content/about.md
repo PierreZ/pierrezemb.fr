@@ -4,7 +4,8 @@ date: 2018-12-15T18:34:45+01:00
 draft: false
 ---
 
-I’m a senior Software Engineer building data infrastructure at Clever Cloud. I've built and operated a variety of stateful distributed systems throughout my career.
+I’m a Engineering Manager building data infrastructure at Clever Cloud. I've built and operated a variety of stateful distributed systems throughout my career.
+
 
 I’m interested in distributed systems, data stores, understanding how things works under the hood. I enjoy being part of open-source communities, through [talks](/talks), [posts](/posts), and [contributions](https://github.com/PierreZ/) to:
 
@@ -27,9 +28,9 @@ On my free time, I am giving a hand to local events, such as the local GDG/JUG [
 I co-founded in 2017 [HelloExoWorld](https://helloexo.world/), an initiative to search for exoplanets using Warp10, a time-series platform.
 
 ## Work
-### 2023 to now: Head of Data infrastructure @Clever Cloud
+### 2023 to now: Engineering Manager @Clever Cloud
 
-* Managing all teams working around data
+* Managing all data-related teams, from DBaaS to internal metrics
 * Technical leadership around serverless databases
 * Technical advisor around distributed systems and data-related systems
 * On-call duty
