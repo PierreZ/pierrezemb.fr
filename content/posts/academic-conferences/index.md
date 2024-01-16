@@ -3,24 +3,28 @@ title: "The unseen treasures of Infrastructure Engineering: Academic Papers"
 draft: true
 date: 2024-01-01T15:37:27+01:00
 showpagemeta: true
+images:
+  - /posts/academic-conferences/papers.png
 categories:
 - learning
 - distributed-systems
 ---
 
+{{< figure src="/posts/academic-conferences/papers.png">}}
+
 I really like using RSS feeds. My Feedly account has more than 190 feeds, all neatly organized by categories. They help me keep up with new ideas and interesting blog posts about engineering. But there's another source of information I've been using for a long time that not many people know about: **academic papers**.
 
 You can discover details about infrastructure that you might not find in regular blog posts. Academic papers, unlike typical blog content, often dive deeper into specific aspects of infrastructure. They provide more in-depth information, uncovering details that are not commonly discussed. So, if you're interested in gaining a more comprehensive understanding of infrastructure-related topics, exploring academic papers can be really worthwile.
 
-> Don't you think it is a little too "academic" and far from the industry? 🤔
+> Sounds a bit too academic, doesn't it? 🤔
 
 I don't think so!  It's true that academic research can sometimes seem distant from everyday industry needs, but following both academic and industry tracks is beneficial. R&D from academia often lead to new ideas and technologies that eventually find their way into practical use. Moreover, numerous academic conferences feature a **"industry track"** that is essential to monitor.
 
-> Isn't that too difficult to read? 🤔
+> Aren't they too complex to read? 🤔
 
-If you don't get everything right away, that's okay. Reading these smart papers might be a bit hard, but it's a useful skill. Who knows, maybe one day you'll even write one! 😉
+If you don't get everything right away, that's okay. Reading these smart papers might be a bit hard, but it's a skill that gets better with practice. And who knows, maybe you'll be inspired to write your own paper someday! 😉
 
-> Ok, let's give it a try!
+> I'm intrigued! Where should I start?
 
 Here's a short list of my go-to academic papers and conferences that you can follow for infrastructure engineering. Please note that many conferences exists on other subjects, like security and so.
 
