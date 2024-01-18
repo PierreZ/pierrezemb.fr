@@ -52,9 +52,17 @@ The **Symposium on Cloud Computing** or SoCC for short belongs to ACM. It has a 
 
 The **Symposium on Operating Systems Principles** is another noteworthy conference in the ACM family. It's a top-tier venue for discussing operating systems research. Stay tuned for updates on the latest breakthroughs and innovative ideas. One of my favorite SOSP award is [Using Lightweight Formal Methods to Validate a Key-Value Storage Node in Amazon S3](https://www.youtube.com/watch?v=YdxvOPenjWI).
 
-## VLDB
+## Others
+
+### VLDB
 
 Not belonging to USENIX or ACM, the Very Large Data Bases (VLDB) conference is a key event in the database community. It provides a platform for researchers and professionals to exchange ideas on managing and analyzing large-scale datasets. 2023's best industry paper is about how Confluent improved Kafka with [Kora](https://www.confluent.io/blog/cloud-native-kafka-kora-vldb-award/).
+
+### CIDR
+
+The Conference on Innovative Data Systems Research (CIDR) is a systems-oriented conference, complementary in its mission to the mainstream database conferences like SIGMOD and VLDB, emphasizing the systems architecture perspective.
+
+2024's edition is featuring [Scalable OLTP in the Cloud: What's the BIG DEAL?](https://www.cidrdb.org/cidr2024/papers/p63-helland.pdf), which seems interesting.
 
 ---
 
