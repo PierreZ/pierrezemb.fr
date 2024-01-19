@@ -56,11 +56,11 @@ The **Symposium on Operating Systems Principles** is another noteworthy conferen
 
 ### VLDB
 
-Not belonging to USENIX or ACM, the Very Large Data Bases (VLDB) conference is a key event in the database community. It provides a platform for researchers and professionals to exchange ideas on managing and analyzing large-scale datasets. 2023's best industry paper is about how Confluent improved Kafka with [Kora](https://www.confluent.io/blog/cloud-native-kafka-kora-vldb-award/).
+Not belonging to USENIX or ACM, the **Very Large Data Bases** (VLDB) conference is a key event in the database community. It provides a platform for researchers and professionals to exchange ideas on managing and analyzing large-scale datasets. 2023's best industry paper is about how Confluent improved Kafka with [Kora](https://www.confluent.io/blog/cloud-native-kafka-kora-vldb-award/).
 
 ### CIDR
 
-The Conference on Innovative Data Systems Research (CIDR) is a systems-oriented conference, complementary in its mission to the mainstream database conferences like SIGMOD and VLDB, emphasizing the systems architecture perspective.
+The **Conference on Innovative Data Systems Research** (CIDR) is a systems-oriented conference, complementary in its mission to the mainstream database conferences like SIGMOD and VLDB, emphasizing the systems architecture perspective.
 
 2024's edition is featuring [Scalable OLTP in the Cloud: What's the BIG DEAL?](https://www.cidrdb.org/cidr2024/papers/p63-helland.pdf), which seems interesting.
 
