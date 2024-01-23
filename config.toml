@@ -79,7 +79,7 @@ description = "Pierre Zemb's personal blog"
     # LoveIt CHANGED | 0.2.7 title shown in home page (HTML format is supported)
     title = "Pierre Zemb"
     # subtitle shown in home page
-    subtitle = "Engineering Manager @ Clever Cloud"
+    subtitle = "Engineering Manager @ Clever Cloud </br> Distributed and Database systems"
     # whether to use typeit animation for subtitle
     typeit = false
     # whether to show social links
