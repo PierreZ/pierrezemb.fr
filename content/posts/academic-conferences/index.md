@@ -1,5 +1,6 @@
 ---
 title: "The unseen treasures of Infrastructure Engineering: Academic Papers"
+description: "Are you using academic papers in your RSS fields? You should!"
 draft: false
 date: 2024-01-22T15:37:27+01:00
 showpagemeta: true
