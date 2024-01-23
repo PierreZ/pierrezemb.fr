@@ -1,8 +1,9 @@
 ---
 title: "The unseen treasures of Infrastructure Engineering: Academic Papers"
-draft: true
-date: 2024-01-01T15:37:27+01:00
+draft: false
+date: 2024-01-22T15:37:27+01:00
 showpagemeta: true
+toc: true
 images:
   - /posts/academic-conferences/papers.png
 categories:
