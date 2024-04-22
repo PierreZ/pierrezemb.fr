@@ -17,6 +17,3 @@ draft: false
 {{<gslides link="https://docs.google.com/presentation/d/1WnpLaAa7H4tQA6gL8gGu-uWdUUGN4S2IZfIQgaBKlcg/edit?usp=sharing" embedded="https://docs.google.com/presentation/d/e/2PACX-1vREbQiVTb-16bR30NWYWeRrgqadEgVrHg6iCYSPjFFQPPVGTrhrxFxGU84dpHD3P5jpMEFEuNKcs_cB">}}
 
 ## Videos
-
-### February 2021
-{{< youtube Wi4WUAmRQmQ>}}
