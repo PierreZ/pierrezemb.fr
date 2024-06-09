@@ -48,6 +48,10 @@ Similar to OSDI, the Usenix [Annual Technical Conference](https://www.usenix.org
 
 SIGMOD, or the [Special Interest Group on Management of Data](https://sigmod.org/), is an essential conference under the ACM umbrella, focusing on the management and organization of data.
 
+### DaMoN
+
+Held with ACM SIGMOD/PODS, you can also find the [Data Management on New Hardware ](https://damon-db.org/).
+
 ### SoCC
 
 The [Symposium on Cloud Computing](https://acmsocc.org/2023/) or SoCC for short belongs to ACM. It has a bit less content, as videos are not published, but you should keep it in your watchlist.
