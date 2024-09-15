@@ -1,18 +1,12 @@
----
-title: "The unseen treasures of Infrastructure Engineering: Academic Papers"
-description: "Are you not using academic papers in your favorite RSS app? You should!"
-draft: false
-date: 2024-01-22T15:37:27+01:00
-showpagemeta: true
-toc: true
-images:
-  - /posts/academic-conferences/papers.png
-categories:
-- learning
-- distributed-systems
----
++++
+title = "The unseen treasures of Infrastructure Engineering: Academic Papers"
+description = "Are you not using academic papers in your favorite RSS app? You should!"
+date = 2024-01-22T15:37:27+01:00
+[taxonomies]
+tags= ["learning", "academic"]
++++
 
-{{< figure src="/posts/academic-conferences/papers.png">}}
+![/images/papers.png](Academic paper created with AI)
 
 I really like using RSS feeds. My Feedly account has more than 190 feeds, all neatly organized by categories. They help me keep up with new ideas and interesting blog posts about engineering. But there's another source of information I've been using for a long time that not many people know about: **academic papers**.
 

@@ -7,7 +7,6 @@ description = "Pierre Zemb personal blog"
 theme = "zola-bearblog"
 
 taxonomies = [
-  { name = "categories", feed = true },
   { name = "tags", feed = true },
 ]
 
@@ -45,4 +44,4 @@ url = "@/posts/_index.md"
 [extra.table_of_contents]
 show = true
 max_level = 2
-visible_on_load = false
+visible_on_load = true
