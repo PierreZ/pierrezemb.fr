@@ -5,7 +5,7 @@
     nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     loveit = {
-      url = "github:PierreZ/LoveIt/custom";
+      url = "git+https://codeberg.org/alanpearce/zola-bearblog.git";
       flake = false;
     };
   };
@@ -17,10 +17,10 @@
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = [ pkgs.hugo ];
+          buildInputs = [ pkgs.zola ];
           shellHook = ''
             mkdir -p themes
-            ln -sf ${loveit} themes/LoveIt
+            ln -sfF ${loveit} themes/zola-bearblog
           '';
         };
       });

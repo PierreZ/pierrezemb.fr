@@ -21,18 +21,17 @@
     "loveit": {
       "flake": false,
       "locked": {
-        "lastModified": 1666554687,
-        "narHash": "sha256-L0havgHvTxwXJcMRLLvpayufbTZ7HXpU027GXFeIROo=",
-        "owner": "PierreZ",
-        "repo": "LoveIt",
-        "rev": "b22b7dd397c5b3bee0677f7626c9fefba57bd8bd",
-        "type": "github"
+        "lastModified": 1723969748,
+        "narHash": "sha256-frYA5nFx6cfOEDqAewVS+2/+GhvbwEVAeGuia/yL9dY=",
+        "ref": "refs/heads/main",
+        "rev": "4b7e01f914a26f3f45dba77b951dd34a62eb0a6b",
+        "revCount": 104,
+        "type": "git",
+        "url": "https://codeberg.org/alanpearce/zola-bearblog.git"
       },
       "original": {
-        "owner": "PierreZ",
-        "ref": "custom",
-        "repo": "LoveIt",
-        "type": "github"
+        "type": "git",
+        "url": "https://codeberg.org/alanpearce/zola-bearblog.git"
       }
     },
     "nixpkgs": {
