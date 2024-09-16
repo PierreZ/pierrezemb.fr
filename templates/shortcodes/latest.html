@@ -1,0 +1,11 @@
+{% set articles = get_section(path="blog/_index.md") %}
+
+<h2>Derniers articles</h2>
+<ul>
+{% for article in articles %}
+    <li>
+        <a href="{{ article.permalink }}">{{ article.title }}</a>
+        <p>{{ article.summary | safe }}</p>
+    </li>
+{% endfor %}
+</ul>

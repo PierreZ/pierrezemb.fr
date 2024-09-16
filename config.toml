@@ -41,6 +41,22 @@ url = "@/_index.md"
 name = "Blog"
 url = "@/posts/_index.md"
 
+[[extra.main_menu]]
+name = "Tags"
+url = "/tags"
+
+[[extra.main_menu]]
+name = "Talks"
+url = "@/talks.md"
+
+[[extra.main_menu]]
+name = "Podcasts"
+url = "@/podcasts.md"
+
+[[extra.main_menu]]
+name = "Contact"
+url = "@/contact.md"
+
 [extra.table_of_contents]
 show = true
 max_level = 2
