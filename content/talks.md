@@ -1,5 +1,6 @@
 +++
 title = "Talks"
+extra.hide_table_of_contents = true
 +++
 
 This page gives an overview over some talks I have done over the last years. Most of them are in french.
