@@ -29,7 +29,7 @@ The common handhake can be divided in three parts:
 
 > All the following diagrams are generated with [MermaidJS](https://mermaidjs.github.io/#/).
 
-{{<mermaid>}}
+{% mermaid() %}
 sequenceDiagram
 
     Note left of KafkaClient: I'm speaking Kafka <br/> 2.3,but can the <br/> broker understand <br/> me?
@@ -60,13 +60,13 @@ sequenceDiagram
 
 Note left of KafkaClient: That is you, I don't <br/> need to handshake <br/> again with <br/> another broker
 
-{{</mermaid>}}
+{% end %}
 
 ### Producing
 
 The **[PRODUCE](https://kafka.apache.org/protocol.html#The_Messages_Produce)** API is used to send message sets to the server. For efficiency it allows sending message sets intended for many topic partitions in a single request.
 
-{{<mermaid>}}
+{% mermaid() %}
 sequenceDiagram
 
     Note over KafkaClient,Broker0: ...handshaking, see above...
@@ -82,7 +82,7 @@ sequenceDiagram
         Note left of KafkaClient: Thanks
     end
 
-{{</mermaid>}}
+{% end %}
 
 ### Consuming
 
@@ -103,7 +103,7 @@ Consuming can be divided in three parts:
 
 For the sake of the explanation, we have now another Broker1 which is holding the coordinator for topic 'my-topic'. In real-life, it would be the same.
 
-{{<mermaid>}}
+{% mermaid() %}
 sequenceDiagram
 
     Note over KafkaClient,Broker0: ...handshaking, see above...
@@ -174,7 +174,7 @@ sequenceDiagram
             Broker1 ->>- KafkaClient: 
         end
     end 
-{{</mermaid>}}
+{% end %}
 
 ---
 
