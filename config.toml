@@ -4,6 +4,7 @@ base_url = "https://pierrezemb.fr"
 title = "Pierre Zemb's Blog"
 description = "Pierre Zemb personal blog"
 
+# https://codeberg.org/alanpearce/zola-bearblog
 theme = "zola-bearblog"
 
 taxonomies = [

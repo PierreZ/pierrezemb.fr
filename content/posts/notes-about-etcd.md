@@ -8,7 +8,7 @@ tags= ["notes-about", "etcd"]
 
 ![etcd image](/images/notes-about-etcd/images/etcd.png)
 
-[Notes About](/tags/notesabout/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover ETCD.
+[Notes About](/tags/notes-about/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover ETCD.
 
 ## Overview of ETCD
 

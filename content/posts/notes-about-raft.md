@@ -8,7 +8,7 @@ tags= ["consensus", "notes-about", "raft"]
 
 ![raft_image](/images/notes-about-raft/raft.png)
 
-[Notes About](/tags/notesabout/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover Raft's paper called 'In Search of an Understandable Consensus Algorithm'.
+[Notes About](/tags/notes-about/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover Raft's paper called 'In Search of an Understandable Consensus Algorithm'.
 
 ---
 

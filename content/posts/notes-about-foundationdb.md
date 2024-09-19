@@ -8,7 +8,7 @@ tags= ["notes-about", "foundationdb"]
 
 ![fdb image](/images/notes-about-foundationdb/fdb-white.jpg)
 
-[Notes About](/tags/notesabout/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover FoundationDB.
+[Notes About](/tags/notes-about/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover FoundationDB.
 
 ---
 
