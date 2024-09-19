@@ -68,7 +68,7 @@ One of Flow’s most important job is enabling **Simulation**:
 
 A good overview of the simulation can be found [here](https://apple.github.io/foundationdb/testing.html). You can also have a look at this awesome talk!
 
-{{< youtube 4fFDFbi3toc>}}
+{{ youtube(id="4fFDFbi3toc") }}
 
 Simulation has been made possible by combining:
 
@@ -164,7 +164,8 @@ Then a `Master` is elected. The `Master` process is reponsible for the `data dis
 
 ### Read and Write Path
 
-{{< youtube EMwhsGsxfPU>}}
+{{ youtube(id="EMwhsGsxfPU") }}
+
 
 #### Read Path
 
@@ -208,7 +209,8 @@ More details around 31min but the `tl;dr` is that when system is saturated, retr
 
 A lot of information are available in this talk:
 
-{{< youtube nlus1Z7TVTI>}}
+{{ youtube(id="nlus1Z7TVTI") }}
+
 
 * `memory` is optimized for small databases. Data is stored in memory and logged to disk. In this storage engine, all data must be resident in memory at all times, and all reads are satisfied from memory.
 * `SSD` Storage Engine is based on SQLite B-Tree
@@ -226,7 +228,7 @@ You can have a nice overview by reading the README of [tsdb-layer](https://githu
 
 ### Concept of layers
 
-{{< youtube HLE8chgw6LI>}}
+{{ youtube(id="HLE8chgw6LI") }}
 
 FDB is resolving many distributed problems, but you still need things like **security, multi-tenancy, query optimizations, schema, indexing**.
 
@@ -254,7 +256,7 @@ The record-layer provided by Apple is a good starting point to build things abov
 
 The paper is located [FoundationDB Record Layer:A Multi-Tenant Structured Datastore](https://arxiv.org/pdf/1901.04452.pdf)
 
-{{< youtube SvoUHHM9IKU>}}
+{{ youtube(id="SvoUHHM9IKU") }}
 
 Record Layer was designed to solve CloudKit problem.
 
@@ -294,7 +296,7 @@ And streaming queries!
 
 ### Overview of the operator
 
-{{< youtube A3U8M8pt3Ks>}}
+{{ youtube(id="A3U8M8pt3Ks") }}
 
 ---
 

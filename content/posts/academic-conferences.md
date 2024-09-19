@@ -6,7 +6,7 @@ date = 2024-01-22T15:37:27+01:00
 tags= ["learning", "academic"]
 +++
 
-![/images/papers.png](Academic paper created with AI)
+![Academic paper created with AI](/images/papers.png)
 
 I really like using RSS feeds. My Feedly account has more than 190 feeds, all neatly organized by categories. They help me keep up with new ideas and interesting blog posts about engineering. But there's another source of information I've been using for a long time that not many people know about: **academic papers**.
 
