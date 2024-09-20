@@ -1,6 +1,7 @@
 +++
 title = "Introducing HelloExoWorld: The quest to discover exoplanets with Warp10 and Tensorflow"
 date = "2017-10-11T10:23:11.770Z"
+[extra]
 canonical = "https://medium.com/@PierreZ/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript-c97a9f4a0016"
 [taxonomies]
 tags= ["nasa", "timeseries", "warp10"]

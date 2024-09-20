@@ -12,7 +12,7 @@ echo "Deleting old publication"
 rm -rf public
 git clone git@github.com:PierreZ/portfolio --branch master public --depth 1
 rm -rf public/*
-hugo
+zola build --force
 cd public 
 
 echo "pushing..."

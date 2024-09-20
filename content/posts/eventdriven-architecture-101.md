@@ -1,6 +1,7 @@
 +++
 title = "Event-driven architecture 101"
 date = "2016-05-13T17:19:23.788Z"
+[extra]
 canonical = "https://medium.com/@PierreZ/event-driven-architecture-101-d8e13cc4c656"
 [taxonomies]
 tags= ["event", "architecture"]

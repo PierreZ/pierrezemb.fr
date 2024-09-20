@@ -1,6 +1,7 @@
 +++
 title = "Engage maximum warp speed in time series analysis with WarpScript"
 date = "2017-10-08T20:43:05.198Z"
+[extra]
 canonical= "https://medium.com/@PierreZ/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript-c97a9f4a0016"
 [taxonomies]
 tags= ["warp10", "warpscript"]

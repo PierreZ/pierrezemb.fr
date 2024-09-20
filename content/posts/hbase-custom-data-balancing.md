@@ -2,6 +2,7 @@
 title = "Contributing to Apache HBase: custom data balancing"
 description = "In today’s blogpost, we’re going to take a look at our upstream contribution to Apache HBase’s stochastic load balancer, based on our experience of running HBase clusters to support OVHcloud’s monitoring."
 date = "2020-02-14T10:24:27+01:00"
+[extra]
 canonical = "https://www.ovh.com/blog/contributing-to-apache-hbase-custom-data-balancing/"
 [taxonomies]
 tags= ["hbase", "contribution", "balancing"]

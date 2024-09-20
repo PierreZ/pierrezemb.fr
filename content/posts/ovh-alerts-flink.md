@@ -1,6 +1,7 @@
 +++
 title = "Handling OVH's alerts with Apache Flink"
 date = "2019-02-03T15:37:27+01:00"
+[extra]
 canonical = "https://www.ovh.com/fr/blog/handling-ovhs-alerts-with-apache-flink/"
 [taxonomies]
 tags= ["stream", "flink"]

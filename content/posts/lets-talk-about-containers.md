@@ -1,6 +1,7 @@
 +++
 title = "Let’s talk about containers"
 date = "2016-01-04T18:52:19.698Z"
+[extra]
 canonical = "https://medium.com/@PierreZ/let-s-talk-about-containers-1f11ee68c470"
 [taxonomies]
 tags= ["docker", "container"]
