@@ -10,10 +10,14 @@ set -e;
 
 echo "Deleting old publication"
 rm -rf public
-git clone git@github.com:PierreZ/portfolio --branch master public --depth 1
-rm -rf public/*
-zola build --force
-cd public 
+zola build
+
+# retrieve .git folder from portfolio
+git clone git@github.com:PierreZ/portfolio --branch master portfolio --depth 1
+mv portfolio/.git public/.git
+rm -rf portfolio
+
+cd public
 
 echo "pushing..."
 git add --all && git commit -m "(./publish.sh) updating master" && git push origin master && cd ..
