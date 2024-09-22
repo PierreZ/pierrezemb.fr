@@ -1,0 +1,16 @@
+<meta name="title" content="{% if page.title %}{{ page.title }}{% else %}{{ config.title }}{% endif %}">
+<meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ config.description }}{% endif %}">
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@pierrez" />
+<meta name="twitter:creator" content="@pierrez" />
+
+<meta property="og:site_name" content="{{ config.title }}">
+<meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ config.title }}{% endif %}">
+<meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ config.description }}{% endif %}"> 
+
+{% if page.extra.canonical %}
+<link rel="canonical" href="{{ page.extra.canonical }}" />
+{% endif %}
+
+<meta property="og:url" content="{% if page.title %}{{ page.permalink | safe }}{% else %}{{ config.base_url | safe }}{% endif %}">
