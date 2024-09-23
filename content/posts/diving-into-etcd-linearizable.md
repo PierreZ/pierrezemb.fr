@@ -3,7 +3,7 @@ title = "Diving into ETCD's linearizable reads"
 date = "2020-09-18T05:24:27+01:00"
 draft = false
 [taxonomies]
-tags = ["colossus", "gfs", "hadoop"]
+tags = ["diving-into", "etcd", "raft"]
 +++
 
 ![etcd image](/images/diving-into-etcd-linearizable/etcd.png)
