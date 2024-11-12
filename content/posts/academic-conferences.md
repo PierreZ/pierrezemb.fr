@@ -32,9 +32,13 @@ Here's a short list of my go-to academic papers and conferences that you can fol
 
 As part of the USENIX Association, the [Operating Systems Design and Implementation](https://www.usenix.org/conferences) is an annual computer science conference that you shouldn't miss. You can catch most of the sessions online along with some useful slides.
 
+### NSDI
+
+In a similar fashion, the [Networked Systems Design and Implementation](https://www.usenix.org/conferences) focuses on the design principles, implementation, and practical evaluation of networked and distributed systems.
+
 ### Usenix ATC
 
-Similar to OSDI, the Usenix [Annual Technical Conference](https://www.usenix.org/conferences) is another classic to follow.  has been awarded Best Paper in 2023, and it's a gem!
+The Usenix [Annual Technical Conference](https://www.usenix.org/conferences) is another classic to follow.
 
 ## The ACM family
 
