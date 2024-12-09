@@ -7,6 +7,11 @@ This page gives an overview over some podcasts I have done over the last years. 
 
 If you’d like to have me in a podcast episode, please get in touch.
 
+## 2024
+
+* [MACI 122](https://www.youtube.com/watch?v=GFKf9lZUG8M)
+* [MACI 121](https://www.youtube.com/watch?v=AfsLEz8oAb4)
+
 ## 2022
 
 * [MACI 64](https://www.youtube.com/watch?v=x2vvn0D-54k)
