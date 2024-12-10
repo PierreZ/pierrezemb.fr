@@ -12,7 +12,12 @@ taxonomies = [
 ]
 
 generate_feeds = true
-feed_filenames = "atom.xml"
+feed_filenames = [
+  "atom.xml",
+  "rss.xml"
+]
+
+author = "Pierre Zemb"
 
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true

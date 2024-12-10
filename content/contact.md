@@ -1,5 +1,6 @@
 +++
 title = "Contact Me"
+generate_feeds = false
 +++
 
 Email: _contact at pierrezemb.fr_

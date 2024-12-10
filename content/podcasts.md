@@ -1,6 +1,7 @@
 +++
 title = "Podcasts"
 extra.hide_table_of_contents = true
+generate_feeds = false
 +++
 
 This page gives an overview over some podcasts I have done over the last years. All of them are in french.
