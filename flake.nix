@@ -17,7 +17,7 @@
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = [ pkgs.zola ];
+          buildInputs = [ pkgs.git pkgs.zola ];
           shellHook = ''
             mkdir -p themes
             ln -sfF ${loveit} themes/zola-bearblog
