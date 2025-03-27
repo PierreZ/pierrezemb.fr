@@ -61,4 +61,4 @@ Long.MAX_VALUE - 9223372036854775806 = 1
 
 ---
 
-**Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) or [Bluesky](https://bsky.app/profile/pierrez) if needed.
+**Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) or [Bluesky](https://bsky.app/profile/pierrezemb.fr) if needed.
