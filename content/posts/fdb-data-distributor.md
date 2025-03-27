@@ -60,6 +60,8 @@ init( PRIORITY_SPLIT_SHARD, 950 );
 
 A full list of defined priorities can be found in the [Knobs file](https://github.com/apple/foundationdb/blob/release-7.3/fdbclient/ServerKnobs.cpp#L155-L173), providing useful insights into how tasks are scheduled.
 
+EDIT: Yes, `SPLIT_SHARD` has an higher priority! See [https://bsky.app/profile/alexmillerdb.bsky.social/post/3ljsqqvfslc24](https://bsky.app/profile/alexmillerdb.bsky.social/post/3ljsqqvfslc24).
+
 ### `ServerTeamInfo` Event
 
 Understanding the state of server teams is essential since the Data Distributor schedules data movements based on real-time metrics. The `fdbcli` command `triggerddteaminfolog` triggers informative logs by invoking [printSnapshotTeamsInfo](https://github.com/apple/foundationdb/blob/release-7.3/fdbserver/DDTeamCollection.actor.cpp#L3425).
