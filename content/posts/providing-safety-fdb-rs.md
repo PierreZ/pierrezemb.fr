@@ -4,7 +4,7 @@ description= "Strategies and techniques for enhancing safety in the FoundationDB
 date= 2025-02-11T00:00:00+01:00
 
 [taxonomies]
-tags= ["foundationdb", "rust", "simulation"]
+tags= ["foundationdb", "rust", "testing", "database", "distributed"]
 +++
 
 As we approach 5 million downloads of the [FoundationDB Rust crate](https://crates.io/crates/foundationdb) (4,998,185 at the time of writing), I wanted to share some insights into how I ensure the safety of the crate. Being the primary maintainer of a database driver comes with responsibility, but I sleep well at night knowing that we have robust safety measures in place.

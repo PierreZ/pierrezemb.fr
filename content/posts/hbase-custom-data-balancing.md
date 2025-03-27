@@ -5,7 +5,7 @@ date = "2020-02-14T10:24:27+01:00"
 [extra]
 canonical = "https://www.ovh.com/blog/contributing-to-apache-hbase-custom-data-balancing/"
 [taxonomies]
-tags= ["hbase", "contribution", "balancing"]
+tags= ["database", "distributed", "hbase", "performance", "opensource"]
 +++
 
 > This is a repost from [OVHcloud's official blogpost.](https://www.ovh.com/blog/contributing-to-apache-hbase-custom-data-balancing/ "Permalink to Contributing to Apache HBase: custom data balancing"), please read it there to support my company. Thanks [Horacio Gonzalez](https://twitter.com/LostInBrittany/) for the awesome drawings!

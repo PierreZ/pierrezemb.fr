@@ -2,7 +2,7 @@
 title = "What are ACID transactions?"
 date = 2019-02-03
 [taxonomies]
-tags= ["sql", "transaction"]
+tags= ["database", "transactions", "sql", "storage"]
 +++
 
 # Transaction?
@@ -76,4 +76,3 @@ Wait what? What is MVCC? Well, turns out that after the SQL standards came anoth
 ---
 
 **Thank you** for reading my post! Feel free to react to this article, I am also available on [Twitter](https://twitter.com/PierreZ) if needed.
-

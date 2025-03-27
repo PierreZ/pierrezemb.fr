@@ -4,7 +4,7 @@ date = "2019-02-03T15:37:27+01:00"
 [extra]
 canonical = "https://www.ovh.com/fr/blog/handling-ovhs-alerts-with-apache-flink/"
 [taxonomies]
-tags= ["stream", "flink"]
+tags= ["streaming", "flink", "monitoring", "distributed"]
 +++
 
 This is a repost from [OVH's official blogpost.](https://www.ovh.com/fr/blog/handling-ovhs-alerts-with-apache-flink/ "Permalink to Handling OVH's alerts with Apache Flink"). Thanks [Horacio Gonzalez](https://twitter.com/LostInBrittany/) for the awesome drawings!

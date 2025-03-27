@@ -4,7 +4,7 @@ description = "Discover attribute macros in Rust"
 date = "2025-02-21T00:24:27+01:00"
 draft = true 
 [taxonomies]
-tags= ["macros", "rust"]
+tags= ["rust", "programming", "metaprogramming"]
 +++
 
 If you wrote a bit of Rust, you may have stumbled upon some strange attributes attached to some functions, like in the [Rust book](https://doc.rust-lang.org/book/ch11-01-writing-tests.html#the-anatomy-of-a-test-function):

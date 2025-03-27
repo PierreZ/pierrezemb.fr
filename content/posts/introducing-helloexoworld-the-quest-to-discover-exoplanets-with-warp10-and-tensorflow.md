@@ -4,7 +4,7 @@ date = "2017-10-11T10:23:11.770Z"
 [extra]
 canonical = "https://medium.com/@PierreZ/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript-c97a9f4a0016"
 [taxonomies]
-tags= ["nasa", "timeseries", "warp10"]
+tags= ["space", "timeseries", "analytics", "machinelearning"]
 +++
 
 **update 2019:** this is a repost on my own blog. original article can be read on [medium](https://medium.com/helloexoworld/introducing-helloexoworld-the-quest-to-discover-exoplanets-with-warp10-and-tensorflow-e50f6e669915).

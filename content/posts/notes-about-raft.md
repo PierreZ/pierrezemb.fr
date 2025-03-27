@@ -3,12 +3,12 @@ title = "Notes about Raft's paper"
 description = "List of ressources gleaned about Raft"
 date = "2020-07-30T07:24:27+01:00"
 [taxonomies]
-tags= ["consensus", "notes-about", "raft"]
+tags= ["distributed", "consensus", "raft", "algorithms", "notes"]
 +++
 
 ![raft_image](/images/notes-about-raft/raft.png)
 
-[Notes About](/tags/notes-about/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover Raft's paper called 'In Search of an Understandable Consensus Algorithm'.
+[Notes About](/tags/notes/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover Raft's paper called 'In Search of an Understandable Consensus Algorithm'.
 
 ---
 

@@ -3,7 +3,7 @@ title = "Debugging FoundationDB's Data Distributor"
 description = "A deep dive into the internals of FoundationDB's Data Distributor and how it manages shard placement and team priorities."
 date = 2025-03-07T00:00:00+01:00
 [taxonomies]
-tags = ["foundationdb", "debugging", "distributed-systems"]
+tags = ["foundationdb", "debugging", "distributed", "database", "storage"]
 +++
 
 FoundationDB is a powerful, distributed database designed to handle massive workloads with high consistency guarantees. At its core, the **Data Distributor** plays a critical role in determining how shards are distributed across the cluster to maintain load balance and resilience.

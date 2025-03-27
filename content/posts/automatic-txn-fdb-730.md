@@ -3,7 +3,7 @@ title= "True idempotent transactions with FoundationDB 7.3"
 description= "Learn how to avoid FDB's biggest caveats by using a new feature called automatic idempotency in FoundationDB"
 date= 2024-03-12T00:37:27+01:00
 [taxonomies]
-tags= ["transaction", "foundationdb"]
+tags= ["database", "distributed", "transactions", "foundationdb", "storage"]
 +++
 
 I have been working around [FoundationDB](https://foundationdb.org) for several years now, and the new upcoming version is fixing one of the most evil and painful caveats you can deal with when writing layers: `commit_unknown_result`.

@@ -3,7 +3,7 @@ title = "Announcing Record-Store, a new (experimental) place for your data"
 description = "Opensourcing Record-Store"
 date = "2020-09-23T10:24:27+01:00"
 [taxonomies]
-tags= ["layer", "foundationdb"]
+tags = ["database", "storage", "distributed", "opensource", "foundationdb"]
 +++
 
 TL;DR: I'm really happy to announce my latest open-source project called Record-Store 🚀 Please check it out on [https://pierrez.github.io/record-store](https://pierrez.github.io/record-store).

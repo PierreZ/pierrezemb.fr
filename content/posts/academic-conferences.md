@@ -3,7 +3,7 @@ title = "The unseen treasures of Infrastructure Engineering: Academic Papers"
 description = "Are you not using academic papers in your favorite RSS app? You should!"
 date = 2024-01-22T15:37:27+01:00
 [taxonomies]
-tags= ["learning", "academic"]
+tags= ["research", "learning", "engineering", "papers"]
 +++
 
 ![Academic paper created with AI](/images/papers.png)

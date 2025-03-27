@@ -3,12 +3,12 @@ title = "Notes about ETCD"
 description = "List of ressources gleaned about ETCD"
 date = "2021-01-11T00:24:27+01:00"
 [taxonomies]
-tags= ["notes-about", "etcd"]
+tags= ["distributed", "etcd", "storage", "consensus", "notes"]
 +++
 
 ![etcd image](/images/notes-about-etcd/images/etcd.png)
 
-[Notes About](/tags/notes-about/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover ETCD.
+[Notes About](/tags/notes/) is a blogpost serie  you will find a lot of **links, videos, quotes, podcasts to click on** about a specific topic. Today we will discover ETCD.
 
 ## Overview of ETCD
 
@@ -50,11 +50,11 @@ ETCD is:
 * consensus involves multiple servers agreeing on values.
 * two common consensus algorithm are Paxos and Raft
 
-> , Paxos is quite difficult to understand, inspite of numerous attempts to make it more approachable.Furthermore, its architecture requires complex changes to support practical systems. As a result, both system builders and students struggle with Paxos.
+> Paxos is quite difficult to understand, inspite of numerous attempts to make it more approachable. Furthermore, its architecture requires complex changes to support practical systems. As a result, both system builders and students struggle with Paxos.
 
 * A common alternative to Paxos/Raft is a non-consensus (aka peer-to-peer) replication protocol.
 
-> Raft separates the key elements of consensus, such asleader election, log replication, and safety
+> Raft separates the key elements of consensus, such as leader election, log replication, and safety
 
 ETCD contains several raft optimizations:
 

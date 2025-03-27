@@ -2,7 +2,7 @@
 title = "Hbase Data Model"
 date = "2019-01-27T20:24:27+01:00"
 [taxonomies]
-tags= ["hbase", "modeling"]
+tags= ["database", "distributed", "hbase", "storage", "design"]
 +++
 
 ## HBase?

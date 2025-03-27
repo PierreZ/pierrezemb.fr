@@ -3,7 +3,7 @@ title = "Crafting row keys in FoundationDB"
 description = "An overview of all the helpers to generate row keys with FoundationDB"
 date = "2021-02-21T00:24:27+01:00"
 [taxonomies]
-tags = ["foundationdb"]
+tags = ["database", "storage", "foundationdb", "distributed"]
 +++
 
 ![fdb image](/images/notes-about-foundationdb/fdb-white.jpg)

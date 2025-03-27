@@ -2,7 +2,7 @@
 title = "What can be gleaned about GFS successor codenamed Colossus?"
 date= "2019-08-04T15:07:11+02:00"
 [taxonomies]
-tags = ["colossus", "gfs", "hadoop"]
+tags = ["storage", "distributed", "google", "filesystem", "hadoop"]
 +++
 
 In the last few months, there has been numerous blogposts about the end of the Hadoop-era. It is true that:

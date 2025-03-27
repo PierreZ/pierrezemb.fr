@@ -3,7 +3,7 @@ title = "Best resources to learn about data and distributed systems"
 description = "Learning distributed systems is tough. You need to go through a lot of academic papers, concepts, code review, before being able to have a global pictures. Thankfully, there is a lot of resources out there that can help you. Here's the best resources I used to learn distributed systems"
 date = "2022-01-17T01:37:27+01:00"
 [taxonomies]
-tags = ["learning", "distributed-systems"]
+tags = ["learning", "distributed", "education", "database"]
 +++
 
 Learning distributed systems is tough. You need to go through a lot of academic papers, concepts, code review, before being able to have a global pictures. Thankfully, there is a lot of resources out there that can help you to get started.  Here's a list of resources I used to learn distributed systems. I will keep this blogpost up-to-date with books, conferences, and so on.

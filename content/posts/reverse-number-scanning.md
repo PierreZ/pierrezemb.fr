@@ -3,7 +3,7 @@ title = "Key design tip: reverse number scanning in ordered key-value stores"
 date = "2025-03-27T05:24:27+01:00"
 draft = false
 [taxonomies]
-tags = ["programming", "key-value", "optimization"]
+tags = ["database", "performance", "optimization", "storage", "distributed"]
 +++
 
 Ordered key-value stores like HBase, FoundationDB or RocksDB store keys in lexicographical order. When getting the latest version or most recent events, this ordering often requires scanning through all values in reverse order. While this works, it can become a performance bottleneck, especially in distributed systems. Let's explore a simple yet powerful optimization technique that I've been using recently 🚀

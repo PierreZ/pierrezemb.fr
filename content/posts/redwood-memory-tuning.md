@@ -3,7 +3,7 @@ title = "Redwood’s memory tuning in FoundationDB"
 description = "Learn how to tune FoundationDB for Redwood storage Engine"
 date = "2024-04-22T00:37:27+01:00"
 [taxonomies]
-tags= ["tuning", "foundationdb"]
+tags= ["foundationdb", "performance", "storage", "database", "tuning"]
 +++
 
 While FoundationDB allows you to obtain sub-milliseconds transactions’s latency without any knob-tuning, we had to bump a bit memory usage for Redwood under certain usage and workload. The following configuration has been tested on clusters from 7.1 to 7.3.

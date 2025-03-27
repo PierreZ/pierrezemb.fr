@@ -2,7 +2,7 @@
 title = "Playing with TTL in HBase"
 date = "2019-05-27T22:07:11+02:00"
 [taxonomies]
-tags= ["hbase", "ttl"]
+tags= ["database", "hbase", "storage", "expiration"]
 +++
 
 <header class="row text-center header">

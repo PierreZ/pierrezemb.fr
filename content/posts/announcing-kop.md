@@ -2,10 +2,10 @@
 title = "Announcing Kafka-on-Pulsar: bring native Kafka protocol support to Apache Pulsar"
 description = "We are excited to announce that StreamNative and OVHcloud are open-sourcing “Kafka on Pulsar” (KoP).  KoP brings the native Apache Kafka protocol support to Apache Pulsar by introducing a Kafka protocol handler on Pulsar brokers"
 date = 2020-03-24T10:24:27+01:00
+[taxonomies]
+tags = ["messaging", "distributed", "kafka", "pulsar", "opensource"]
 [extra]
 canonical = "https://www.ovh.com/blog/announcing-kafka-on-pulsar-bring-native-kafka-protocol-support-to-apache-pulsar/"
-[taxonomies]
-tags= ["kafka", "pulsar"]
 +++
 
 > This is a repost from [OVHcloud's official blogpost.](https://www.ovh.com/blog/announcing-kafka-on-pulsar-bring-native-kafka-protocol-support-to-apache-pulsar/ "Permalink to announcing KoP"), please read it there to support my company. Thanks [Horacio Gonzalez](https://twitter.com/LostInBrittany/) for the awesome drawings!
@@ -47,7 +47,7 @@ KoP was developed to provide a streamlined and comprehensive solution leveraging
 
 ## The distributed log
 
-Both Pulsar and Kafka share a very similar data model around **log** for both pub/sub messaging and event streaming. For example, both are built on top of a distributed log. A key difference between these two systems is how they implement the distributed log. Kafka implements the distributed log in a partition-basis architecture, where a distributed log (a partition in Kafka) is designated to store in a set of brokers, while Pulsar deploys a **segment**-based architecture to implement its distributed log by leveraging Apache BookKeeper as its scale-out segment storage layer. Pulsar's *segment* based architecture provides benefits such as rebalance-free, instant scalability, and infinite event stream storage. You can learn more about the key differences between Pulsar and Kafka in [this Splunk blog](https://www.splunk.com/en_us/blog/it/comparing-pulsar-and-kafka-how-a-segment-based-architecture-delivers-better-performance-scalability-and-resilience.html) and in [this blog from the Bookkeeper project](http://bookkeeper.apache.org/distributedlog/technical-review/2016/09/19/kafka-vs-distributedlog.html).
+Both Pulsar and Kafka share a very similar data model around **log** for both pub/sub messaging and event streaming. For example, both are built on top of a distributed log. Kafka implements the distributed log in a partition-basis architecture, where a distributed log (a partition in Kafka) is designated to store in a set of brokers, while Pulsar deploys a **segment**-based architecture to implement its distributed log by leveraging Apache BookKeeper as its scale-out segment storage layer. Pulsar's *segment* based architecture provides benefits such as rebalance-free, instant scalability, and infinite event stream storage. You can learn more about the key differences between Pulsar and Kafka in [this Splunk blog](https://www.splunk.com/en_us/blog/it/comparing-pulsar-and-kafka-how-a-segment-based-architecture-delivers-better-performance-scalability-and-resilience.html) and in [this blog from the Bookkeeper project](http://bookkeeper.apache.org/distributedlog/technical-review/2016/09/19/kafka-vs-distributedlog.html).
 
 Since both of the systems are built on a similar data model, a distributed log, it is very simple to implement a Kafka-compatible protocol handler by leveraging Pulsar's distributed log storage and its pluggable protocol handler framework (introduced in the 2.5.0 release).
 
