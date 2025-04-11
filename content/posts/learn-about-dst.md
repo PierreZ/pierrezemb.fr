@@ -64,7 +64,10 @@ If you only have limited time, here are the three must-watch videos that will gi
 - [Ben Collins: FoundationDB Testing: Past & Present](https://www.youtube.com/watch?v=IaB8jvjW0kk)
 - [Marc Brooker: AWS re:Invent 2024 - Try again: The tools and techniques behind resilient systems (ARC403)](https://www.youtube.com/watch?v=rvHd4Y76-fs)
 - [TigerBeetle: Episode 064: Two In One, New Request Protocol and VOPR Tutorial](https://www.youtube.com/watch?v=6y8Ga3oogLY)
+- [FOSDEM 2025: Squashing the Heisenbug with Deterministic Simulation Testing](https://fosdem.org/2025/schedule/event/fosdem-2025-4279-squashing-the-heisenbug-with-deterministic-simulation-testing/)
 
 ---
+
+Have I missed any important resources on Deterministic Simulation Testing? This field is rapidly evolving, and I'm always looking to expand this collection. If you know of any articles, talks, or tools related to DST that should be included here, please reach out! I'd love to hear about your experiences with deterministic testing as well.
 
 Please, feel free to react to this article, you can reach me on [Twitter](https://twitter.com/PierreZ), or have a look on my [website](https://pierrezemb.fr).
