@@ -10,6 +10,8 @@ If you’d like to have me as a speaker at your conference or meet-up, please ge
 ## 2025
 
 * FinistDevs: [From contributor to main maintainer of a Rust database driver](https://docs.google.com/presentation/d/13pCaWXNkITj5Sh4dKofILbxPg_Wb2BBedbbi2Mv4PoE/edit?usp=sharing)
+* Devoxx France: [What if we embraced simulation-driven development? 🤔](https://docs.google.com/presentation/d/1xm4yNGnV2Oi8Lk3ZHEvg4aDMNEFieSmW06CkItCigSc/edit?usp=sharing)
+* Devoxx France: [Prototyping Distributed Systems with Maelstrom](https://docs.google.com/presentation/d/1UbJ7drA_6hX7kLN2nV8IxOsAt1k8WOnfGrEfRlbIa7k/edit?usp=sharing)
 
 ## 2024
 
