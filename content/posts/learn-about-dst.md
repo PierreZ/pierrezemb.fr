@@ -2,6 +2,7 @@
 title = "So, You Want to Learn More About Deterministic Simulation Testing?"
 description = "A curated collection of resources about deterministic simulation testing for distributed systems."
 date = 2025-04-11T00:00:00+02:00
+draft = true
 [taxonomies]
 tags = ["distributed", "testing", "reliability", "simulation", "deterministic"]
 +++
