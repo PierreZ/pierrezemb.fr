@@ -1,7 +1,6 @@
 +++
-title = "Embracing Simulation-Driven Development for Resilient Systems"
+title = "What if we embraced simulation-driven development?"
 description = "How deterministic simulation testing can help us build more reliable distributed systems and bridge the gap between development and production environments."
-draft = true
 date = 2025-04-18T11:12:12+02:00
 [taxonomies]
 tags = ["distributed", "testing", "reliability", "simulation", "deterministic"]

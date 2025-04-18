@@ -12,6 +12,8 @@ One of the highlights for me was having the chance to talk with the Antithesis t
 
 ## What is Deterministic Simulation Testing?
 
+> **Note:** For a deeper dive into this concept and its practical applications, check out my article on [What if we embraced simulation-driven development?](/posts/simulation-driven-development/).
+
 The best description of DST I've found is described in [FoundationDB's testing page](https://apple.github.io/foundationdb/testing.html):
 
 > The major goal of Simulation is to make sure that we find and diagnose issues in simulation rather than the real world. Simulation runs tens of thousands of simulations every night, each one simulating large numbers of component failures. Based on the volume of tests that we run and the increased intensity of the failures in our scenarios, we estimate that we have run the equivalent of roughly one trillion CPU-hours of simulation on FoundationDB.
