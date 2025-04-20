@@ -46,6 +46,11 @@
         {% if page.summary %}
         <summary type="html">{{ page.summary }}</summary>
         {% else %}
+        {%- if page.taxonomies.tags %}
+        {%- for tag in page.taxonomies.tags %}
+        <category term="{{ tag | safe }}" schema="tag" label="{{ tag | safe }}"/>
+        {%- endfor %}
+        {%- endif %}
         <content type="html" xml:base="{{ page.permalink | escape_xml | safe }}">{{ page.content }}</content>
         {% endif %}
     </entry>

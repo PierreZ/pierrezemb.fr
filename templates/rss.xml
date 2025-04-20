@@ -34,6 +34,11 @@
           <link>{{ page.permalink | escape_xml | safe }}</link>
           <guid>{{ page.permalink | escape_xml | safe }}</guid>
           <description xml:base="{{ page.permalink | escape_xml | safe }}">{% if page.summary %}{{ page.summary }}{% else %}{{ page.content }}{% endif %}</description>
+          {%- if page.taxonomies.tags %}
+          {%- for tag in page.taxonomies.tags %}
+          <category domain="tag">{{ tag | safe }}</category>
+          {%- endfor %}
+          {%- endif %}
       </item>
       {%- endfor %}
     </channel>
