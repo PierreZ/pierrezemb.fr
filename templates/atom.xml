@@ -48,7 +48,7 @@
         {% else %}
         {%- if page.taxonomies.tags %}
         {%- for tag in page.taxonomies.tags %}
-        <category term="{{ tag | safe }}" schema="tag" label="{{ tag | safe }}"/>
+        <category term="{{ tag | safe }}" schema="https://pierrezemb.fr/tags/" label="{{ tag | safe }}"/>
         {%- endfor %}
         {%- endif %}
         <content type="html" xml:base="{{ page.permalink | escape_xml | safe }}">{{ page.content }}</content>
