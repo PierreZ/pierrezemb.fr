@@ -199,10 +199,9 @@ Not many companies are using DST, but we are starting to have a nice list:
 
 ### DST at Clever Cloud
 
-At Clever Cloud, we're implementing a multi-tenant, multi-model distributed database, **a feat made possible by deterministic simulation testing**, which is core to our first product, [Materia KV](https://www.clever-cloud.com/blog/features/2024/06/11/materia-kv-our-easy-to-use-serverless-key-value-database-is-available-to-all/). Our simulations include:
-
+At Clever Cloud, we're implementing a multi-tenant, multi-model distributed database heavily relying on FoundationDB. While we haven't developed our own deterministic simulation testing framework yet, we leverage **[FoundationDB](https://www.foundationdb.org/)'s built-in simulation by injecting custom workloads.** This approach is core to developing our first serverless product, [Materia KV](https://www.clever-cloud.com/blog/features/2024/06/11/materia-kv-our-easy-to-use-serverless-key-value-database-is-available-to-all/). The simulations FoundationDB provides include:
   - Random network partitions
-  - Machine reboots (up to 10 machines, keeping at least 3 running)
+  - Machine reboots
   - Concurrent chaos events, like shuffling the actual data disk between 2 nodes
 
 Our simulation-driven development workflow runs simulations:
