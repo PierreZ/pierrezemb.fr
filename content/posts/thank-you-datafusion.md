@@ -1,7 +1,7 @@
 +++
 title = "Thank You, DataFusion: Queries in Rust, Without the Pain"
-date = 2025-05-31
-draft = false
+date = 2025-06-04
+draft = true
 [taxonomies]
 tags = ["rust", "datafusion", "sql", "query-engine", "databases"]
 +++

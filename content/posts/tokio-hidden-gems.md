@@ -154,4 +154,4 @@ Tokio offers more than just speed; it's a powerful toolkit. Features like curren
 
 ---
 
-Feel free to reach out with any questions or to share your experiences with simulation testing. You can find me on [Bluesky](https://bsky.app/profile/pierrezemb.fr), [Twitter](https://twitter.com/PierreZ) or through my [website](https://pierrezemb.fr).
+Feel free to reach out with any questions or to share your thoughts. You can find me on [Bluesky](https://bsky.app/profile/pierrezemb.fr), [Twitter](https://twitter.com/PierreZ) or through my [website](https://pierrezemb.fr).
