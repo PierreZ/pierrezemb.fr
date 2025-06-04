@@ -5,9 +5,9 @@ date = 2025-06-04
 tags = ["rust", "datafusion", "sql", "query-engine", "databases"]
 +++
 
-## That “YATA!” Moment, Rebooted
+## That “YATTA!” Moment, Rebooted
 
-We just merged at work our first successful data retrieval using [DataFusion](https://github.com/apache/datafusion) — a real SQL query, over real data, flowing through a system we built. And I’ll be honest: I haven’t had a “YATA!” moment like this in years. This wasn't just a feature shipped; it felt like unlocking a new superpower for our entire system, a complex vision finally materializing.
+We just merged at work our first successful data retrieval using [DataFusion](https://github.com/apache/datafusion) — a real SQL query, over real data, flowing through a system we built. And I’ll be honest: I haven’t had a “YATTA!” moment like this in years. This wasn't just a feature shipped; it felt like unlocking a new superpower for our entire system, a complex vision finally materializing.
 
 Not a silent nod. Not “huh, that works.” A *real*, physical, joyful reaction. The kind that makes you want to run a lap around the office (or, in my remote-first case, the living room).
 
