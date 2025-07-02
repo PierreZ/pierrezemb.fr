@@ -87,7 +87,7 @@ The generated row-key will be readable from any bindings, as it's construction i
 println!("{:#04X?}", row_key);
 ```
 
-```log
+```txt
 // can be verified with https://www.utf8-chartable.de/unicode-utf8-table.pl
 [
     0x02,
@@ -123,7 +123,7 @@ Now that we saw `Tuples`, let's dig in the next abstraction: `subspaces`
 
 When you are working with key-values store, we are often playing with what we call `keyspaces`, by dedicating a portion of the key to an usage, like this for example:
 
-```text
+```txt
 /users/tenant-1/...
 /users/tenant-2/...
 /users/tenant-3/...
@@ -152,7 +152,7 @@ println!("start: {:#04X?}\n end: {:#04X?}", subspace.range().0, subspace.range()
 
 We can see observe this:
 
-```log
+```txt
 // can be verified with https://www.utf8-chartable.de/unicode-utf8-table.pl
 start: [
     0x02,

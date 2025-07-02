@@ -43,7 +43,7 @@ The BindingTester uses [a stack-based machine](https://github.com/apple/foundati
 
 It looks like this:
 
-```shell
+```bash
 ./bindings/bindingtester/bindingtester.py --num-ops 1000 --api-version 730 --test-name api --compare python rust
 
 Creating test at API version 730
@@ -98,7 +98,7 @@ pub trait RustWorkload {
 
 Which can be runned inside the simulation while injecting some faults:
 
-```shell
+```bash
 fdbserver -r simulation -f /root/atomic.toml -b on --trace-format json
 
 # Choosing a random seed

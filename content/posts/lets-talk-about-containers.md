@@ -66,7 +66,7 @@ Here’s an interesting fact: Go, the open-source programming language pushed by
 
 That means that our Dockerfile now looks like this:
 
-```docker
+```dockerfile
 FROM scratch  
 ADD hello /  
 CMD [/hello]
