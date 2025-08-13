@@ -28,11 +28,14 @@ After years of operating many Apache-oriented distributed systems, I can confide
 
 
 ## TL;DR
-If you only have limited time, here are the three must-watch videos that will give you the best introduction to deterministic simulation testing:
+If you only have limited time, here are the four must-watch videos that will give you the best introduction to deterministic simulation testing:
 
 - [Will Wilson: Testing Distributed Systems with Deterministic Simulation](https://www.youtube.com/watch?v=4fFDFbi3toc)
 - [Will Wilson: Autonomous Testing and the Future of Software Development](https://www.youtube.com/watch?v=fFSPwJFXVlw)
 - [Will Wilson: Testing a Single-Node, Single Threaded, Distributed System Written in 1985](https://www.youtube.com/watch?v=m3HwXlQPCEU)
+- [Will Wilson: Let's all write good software](https://www.youtube.com/watch?v=eZ1mmqlq-mY)
+
+(Yes, it seems Will Wilson has a monopoly on great introductory talks on the topic. Having had the chance to meet him, I can personally vouch that he is not a deterministic algorithm for generating insightful presentations, though the sheer quality of his talks might make you wonder.)
 
 A curated feed of recent articles and blog posts about DST can be found at [Planet DST](https://deterministic-simulation-testing.github.io/planet-dst/).
 
@@ -69,6 +72,7 @@ A curated feed of recent articles and blog posts about DST can be found at [Plan
 - [Marc Brooker: AWS re:Invent 2024 - Try again: The tools and techniques behind resilient systems (ARC403)](https://www.youtube.com/watch?v=rvHd4Y76-fs)
 - [TigerBeetle: Episode 064: Two In One, New Request Protocol and VOPR Tutorial](https://www.youtube.com/watch?v=6y8Ga3oogLY)
 - [FOSDEM 2025: Squashing the Heisenbug with Deterministic Simulation Testing](https://fosdem.org/2025/schedule/event/fosdem-2025-4279-squashing-the-heisenbug-with-deterministic-simulation-testing/)
+- [BugBash 2025: Lawrie Green - How to succeed in software testing without really trying](https://www.youtube.com/watch?v=024c8OwR4JM)
 
 ---
 
