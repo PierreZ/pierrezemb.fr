@@ -1,24 +1,48 @@
-# Portfolio
+# Pierre Zemb's Personal Website
 
-## Add a talk
+## Quick Start
 
-```sh
-hugo new talks/nasa-datasets.md
+```bash
+# Enter development environment
+nix develop
+
+# Start local development server
+zola serve
+
+# Build the site
+zola build
 ```
 
-## Develop
+## Writing Content
 
-
-```sh
-hugo server -D  
+### Create a new blog post
+```bash
+# Create a new post in content/posts/
+# File naming: descriptive-slug-name.md (lowercase, hyphens for spaces)
+touch content/posts/my-new-post.md
 ```
 
-## Build
-
-```sh
-hugo
+### Create a new talk
+```bash
+# Add talk content directly to content/talks.md
+# Talks are maintained in a single page
 ```
 
-## Export HTML page to markdown
+## Deployment
 
-I am using [https://dillinger.io/](https://dillinger.io/).
+```bash
+# Deploy to GitHub Pages (pushes to PierreZ/portfolio repository)
+./deploy.sh
+```
+
+## Technology Stack
+
+- **Static Site Generator**: [Zola](https://www.getzola.org/)
+- **Theme**: zola-bearblog (minimalist Bear Blog theme)
+- **Development Environment**: Nix Flakes
+- **Hosting**: GitHub Pages
+
+## Additional Resources
+
+- **Export HTML to Markdown**: [Dillinger.io](https://dillinger.io/)
+- **Development guidance**: See [CLAUDE.md](./CLAUDE.md) for detailed development and content guidelines
