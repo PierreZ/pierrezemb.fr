@@ -114,10 +114,13 @@ toc = false  # Optional: hide table of contents
 ### Language Conventions
 - **Primary Language**: English for all recent posts
 - **Technical Precision**: Use correct terminology while explaining clearly
+- **Simple vocabulary**: Avoid overly complex or formal words (e.g., prefer "made clear" over "crystallized", "thinking about" over "sensing")
+  - Exception: Keep established technical terms like "non-deterministic", "deterministic", "distributed systems", etc.
 - **Formatting**:
   - **Bold** for key concepts
   - `Inline code` for technical terms, commands, file names
   - > Blockquotes for external quotes and important callouts
+  - Use semicolon `;` instead of em dash `—` for separation
 
 ### Common Tags
 - Primary: `distributed-systems`, `foundationdb`, `rust`, `testing`
