@@ -120,7 +120,8 @@ toc = false  # Optional: hide table of contents
   - **Bold** for key concepts
   - `Inline code` for technical terms, commands, file names
   - > Blockquotes for external quotes and important callouts
-  - Use semicolon `;` instead of em dash `—` for separation
+  - **Never use em dashes (`—`)** - they feel too formal and academic
+  - Instead use: colons (`:`) for explanations, parentheses `()` for clarification, commas for natural flow, or simple periods to break up sentences
 
 ### Common Tags
 - Primary: `distributed-systems`, `foundationdb`, `rust`, `testing`
