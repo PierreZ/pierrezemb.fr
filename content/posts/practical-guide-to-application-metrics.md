@@ -1,8 +1,7 @@
 +++
 title = "A Practical Guide to Application Metrics: Where to Put Your Instrumentation"
 description = "A comprehensive guide on where and how to instrument metrics in your applications, covering everything from API endpoints to background jobs"
-date = 2025-09-22
-draft = true
+date = 2025-09-24
 [taxonomies]
 tags = ["observability", "metrics", "monitoring", "distributed-systems"]
 +++
