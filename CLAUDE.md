@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is Pierre Zemb's personal website/blog built with **Zola**, a fast static site generator written in Rust. The site focuses on distributed systems and technical content.
+This is Pierre Zemb's personal website/blog built with **Zola**, a fast static site generator written in Rust. The site focuses on software engineering as Pierre's main subject and passion, covering distributed systems, programming languages (especially Rust), databases, testing methodologies, and deep technical explorations.
 
 ## Technology Stack
 
@@ -61,90 +61,105 @@ zola check
 
 ## Writing Content
 
-### Creating Blog Posts
-```bash
-# Create new post file in content/posts/
-touch content/posts/descriptive-slug-name.md
-# File naming: lowercase with hyphens for spaces (e.g., diving-into-etcd.md)
-
-# For talks: Edit the existing content/talks.md file directly
-# For podcasts: Edit the existing content/podcasts.md file directly
-```
-
-### Post Frontmatter
+### Post Frontmatter Template
 ```toml
 +++
 title = "Post Title"
-description = "Post description"
-date = 2024-01-01
+description = "One-sentence description for social media"
+date = 2025-01-01
 [taxonomies]
-tags = ["tag1", "tag2"]
-[extra]
-toc = false  # Optional: hide table of contents
+tags = ["distributed-systems", "foundationdb", "rust", "testing"]
 +++
 ```
 
+### Common Tags
+Primary: `distributed-systems`, `foundationdb`, `rust`, `testing`, `observability`, `software-engineering`, `programming`, `async`, `database` • Meta: `personal`, `notes-about`, `diving-into` • Languages: `rust`, `java` • Tools: `tokio`, `kafka`, `etcd`, `hbase` • Concepts: `algorithms`, `consensus`, `simulation`, `deterministic`, `metaprogramming`
+
 ## Blogging Style Guide
 
-### Writing Tone
-- **Professional yet Personal**: Balance technical expertise with personal reflection
-- **Measured Enthusiasm**: Use occasional emojis sparingly (😎, 🚀, 🤯)
-- **Educational Focus**: Explain complex concepts accessibly, share lessons learned
-- **Humble and Approachable**: Acknowledge learning from others and making mistakes
+### Writing Voice
+- **Conversational but technically precise**: "Let me share...", "You might think...", direct questions to reader
+- **Personal experience first**: Start with production incidents, on-call stories, or specific problems you've encountered, but also include code discoveries, library explorations, and engineering insights
+- **Concrete over abstract**: Real numbers, actual tools, specific failure modes, code examples, and working implementations rather than theoretical concepts
+- **Strategic **bold** for emphasis**: Never italics or em dashes (too formal)
 
-### Post Structure
-- **Length**: Medium-form (2000-8000 words) for regular posts, longer for deep dives
-- **Opening**: Start with compelling story, problem statement, or personal anecdote
-- **Sections**: Use clear ## headers for main sections, ### for subsections
-- **Progressive Disclosure**: Build from basic concepts to advanced details
+### Article Structure Templates
 
-### Technical Content
-- **Code Examples**: Include functional, real-world code snippets with syntax highlighting
-- **Languages**: Primarily Rust, Java, Go, Python, shell scripts
-- **Visual Aids**: Use Mermaid diagrams, screenshots in `/static/images/[post-name]/`
-- **Cross-references**: Link to related posts, documentation, external resources
+**Incident-driven posts:**
+1. Open with specific production story or on-call incident
+2. Explain the technical context and what went wrong
+3. Deep dive into the underlying concepts
+4. Extract practical lessons and actionable takeaways
 
-### Core Topics
-- Distributed systems (FoundationDB, HBase, Kafka, etcd)
-- Rust programming and ecosystem
-- System reliability and simulation-driven development
-- DevOps and infrastructure (NixOS, Kubernetes)
-- Career reflections and professional growth
+**Exploration posts:**
+1. "While working on X, I discovered Y" or "I keep having the same conversation..."
+2. Present the problem with concrete examples
+3. Walk through your analysis or solution
+4. Connect to broader principles
 
-### Language Conventions
-- **Primary Language**: English for all recent posts
-- **Technical Precision**: Use correct terminology while explaining clearly
-- **Simple vocabulary**: Avoid overly complex or formal words (e.g., prefer "made clear" over "crystallized", "thinking about" over "sensing")
-  - Exception: Keep established technical terms like "non-deterministic", "deterministic", "distributed systems", etc.
-- **Formatting**:
-  - **Bold** for key concepts
-  - `Inline code` for technical terms, commands, file names
-  - > Blockquotes for external quotes and important callouts
-  - **Never use em dashes (`—`)** - they feel too formal and academic
-  - Instead use: colons (`:`) for explanations, parentheses `()` for clarification, commas for natural flow, or simple periods to break up sentences
+**Opinion/analysis posts:**
+1. Make a bold claim about industry practices
+2. Support with production evidence and real examples  
+3. Address counterarguments with nuance
+4. End with practical recommendations
 
-### Common Tags
-- Primary: `distributed-systems`, `foundationdb`, `rust`, `testing`
-- Meta: `personal`, `notes-about`, `diving-into`
-- Technology-specific: Database and language names
+**Technical exploration posts:**
+1. "While implementing X, I discovered the internals of Y" or "Let's explore how Z actually works"
+2. Walk through the technical details with code examples
+3. Explain the design decisions and trade-offs
+4. Connect to broader software engineering principles
 
-### Post Endings
-Include standard footer:
+**Software engineering practice posts:**
+1. Present a development challenge or methodology question
+2. Compare different approaches with concrete examples
+3. Share lessons learned from real implementations
+4. Provide actionable insights for other engineers
+
+### Technical Writing Rules
+- **Always include real context**: Code examples from actual systems, not toy examples - whether production deployments or personal projects
+- **Use tables for comparisons**: You excel at structured comparisons of frameworks, algorithms, and approaches
+- **Include specific numbers**: "70+ node cluster", "85% utilization", "3 AM debugging", "13k lines of code", "5 million downloads"
+- **Reference real systems**: FoundationDB, HBase, Kafka, etcd - systems you've operated, Rust crates you've built, open source projects you've contributed to
+- **Connect to practical reality**: How does this affect on-call? What breaks at scale? How does this improve developer experience? What are the performance implications?
+
+### Your Vocabulary (Use These)
+- "on-call shifts", "production incidents", "operational burden", "the trick is...", "the real value comes from..."
+- "Here's what I've learned", "Let me share a memorable incident", "After years of...", "In my experience..."
+- "But the problems run deeper", "The breakthrough wasn't...", "This isn't theoretical"
+- "While implementing...", "The elegance of...", "This pattern emerges...", "Let's explore the internals..."
+- "The abstraction breaks down when...", "The design trade-off here is...", "What I found surprising..."
+- "The community has been exploring...", "After diving into the source code...", "The performance characteristics..."
+
+### Anti-patterns (Avoid These)
+- Generic AI phrases: "delve into", "dive deep", "in the world of", "furthermore", "moreover", "it's worth noting"
+- Academic language: "crystallized", "sensing", em dashes, overly formal transitions
+- Explaining what you're about to explain: "In this post, I will..."
+- Code without operational context or real-world connection
+
+### Code Examples Style
+```rust
+// Brief, practical comments that explain WHY, not what
+sometimes_assert!(
+    server_bind_fails,
+    self.bind_result.is_err(),
+    "Server bind should sometimes fail during chaos testing"
+);
+```
+
+### Post Examples
+
+**Typical opening (incident-driven):**
+> "One of the most memorable incidents happened when a network partition completely disrupted a 70+ node Apache Hadoop cluster..."
+
+**Technical explanation style:**
+> "Connection pool exhaustion is a classic way to kill your entire application: if you support 100 connections and 95 are active, you're in danger."
+
+**Opinion style:**
+> "The difference between shipped and operated software is the difference between something you can run and forget, and something that demands ongoing, hands-on care."
+
+### Standard Footer
 ```markdown
 ---
 
 Feel free to reach out with any questions or to share your experiences with [topic]. You can find me on [Twitter](https://twitter.com/PierreZ), [Bluesky](https://bsky.app/profile/pierrezemb.fr) or through my [website](https://pierrezemb.fr).
 ```
-
-### Series Formats
-- **"Notes About"**: Comprehensive resource compilations
-- **"Diving Into"**: Deep technical explorations
-- **Experience Reports**: Retrospectives on tools and practices
-
-## Important Notes
-
-- The site uses Zola, not Hugo (README needs updating)
-- Theme is managed via Nix Flakes, not git submodules
-- Deployment pushes to a separate GitHub repository
-- No automated testing or linting configured
-- Images should be placed in `/static/images/[post-name]/` for organization
