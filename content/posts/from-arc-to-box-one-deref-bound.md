@@ -1,7 +1,7 @@
 +++
-title = "Don't Forget About Deref"
+title = "From Arc to Box: One Deref Bound to Rule Them All"
 description = "How Rust's Deref trait solved a complex API design problem in FoundationDB-rs without traits or enums"
-date = 2025-10-01
+date = 2025-10-02
 [taxonomies]
 tags = ["rust", "foundationdb", "programming", "metaprogramming"]
 +++
