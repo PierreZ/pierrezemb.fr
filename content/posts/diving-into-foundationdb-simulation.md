@@ -1,11 +1,13 @@
 +++
-title = "Deep Dive into FoundationDB's Simulation Framework"
+title = "Diving into FoundationDB's Simulation Framework"
 description = "How FoundationDB achieves legendary reliability through deterministic simulation, interface swapping, and one trillion CPU-hours of testing"
 date = 2025-10-15
 draft = true
 [taxonomies]
-tags = ["foundationdb", "testing", "simulation", "deterministic", "distributed-systems"]
+tags = ["foundationdb", "testing", "simulation", "deterministic", "distributed-systems", "diving-into"]
 +++
+
+[Diving Into](/tags/diving-into/) is a blogpost series where we are digging a specific part of the project's codebase. In this episode, we will dig into the implementation behind FoundationDB's simulation framework.
 
 After years of on-call shifts running FoundationDB at Clever Cloud, here's what I've learned: **I've never been woken up by FDB**. Every production incident traced back to our code, our infrastructure, our mistakes. Never FDB itself. That kind of reliability doesn't happen by accident.
 
@@ -22,9 +24,9 @@ I've written before about [FoundationDB](/posts/notes-about-foundationdb/), [sim
 
 ## The Trick: Interface Swapping
 
-The genius of FDB's simulation is surprisingly simple: **the same code runs in both production and simulation by swapping interface implementations**. The global `g_network` pointer holds an `INetwork` interface. In production, this points to `Net2`, which creates real TCP connections using Boost.ASIO. In simulation, it points to `Sim2` ([sim2.actor.cpp:1051](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbrpc/sim2.actor.cpp#L1051)), which creates `Sim2Conn` objects (fake connections that write to in-memory buffers).
+The genius of FDB's simulation is surprisingly simple: **the same code runs in both production and simulation by swapping interface implementations**. The global `g_network` pointer holds an `INetwork` interface. In production, this points to `Net2`, which creates real TCP connections using Boost.ASIO. In simulation, it points to `Sim2` ([sim2.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbrpc/sim2.actor.cpp)), which creates `Sim2Conn` objects (fake connections that write to in-memory buffers).
 
-When code needs to send data, it gets a `Reference<IConnection>` from the network layer. In production, that's a real socket. In simulation, it's `Sim2Conn` ([sim2.actor.cpp:334](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbrpc/sim2.actor.cpp#L334)) with a `std::deque<uint8_t>` buffer. Network latency? The simulator adds `delay()` calls with values from `deterministicRandom()`. Packet loss? Just throw `connection_failed()`. Network partition? `Sim2Conn` checks `g_clogging.disconnected()` and refuses delivery. **It's all just memory operations with delays**, running single-threaded and completely deterministic.
+When code needs to send data, it gets a `Reference<IConnection>` from the network layer. In production, that's a real socket. In simulation, it's `Sim2Conn` ([sim2.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbrpc/sim2.actor.cpp)) with a `std::deque<uint8_t>` buffer. Network latency? The simulator adds `delay()` calls with values from `deterministicRandom()`. Packet loss? Just throw `connection_failed()`. Network partition? `Sim2Conn` checks `g_clogging.disconnected()` and refuses delivery. **It's all just memory operations with delays**, running single-threaded and completely deterministic.
 
 What makes this truly deterministic is `deterministicRandom()`, a seeded PRNG that replaces all randomness. Every network latency value, every backoff delay (like the `Peer`'s exponential reconnection timing), every process crash timing goes through the same deterministic stream. Same seed, same execution path, every single time. When a test fails after 1 trillion simulated operations, you can reproduce the exact failure by running with the same seed.
 
@@ -37,16 +39,17 @@ FoundationDB solves this with `BUGGIFY`, spread throughout the codebase. Each `B
 Let's take timeout handling in data distribution as an example:
 
 ```cpp
-// DDShardTracker.actor.cpp
+// DDShardTracker.actor.cpp (fdbserver/DDShardTracker.actor.cpp:1508)
 choose {
-    when(wait(BUGGIFY ? Never() : fetchTopKShardMetrics_impl(self, req))) {}
+    when(wait(g_network->isSimulated() && BUGGIFY_WITH_PROB(0.01) ? Never()
+                                                          : fetchTopKShardMetrics_impl(self, req))) {}
     when(wait(delay(SERVER_KNOBS->DD_SHARD_METRICS_TIMEOUT))) {
         // Timeout path
     }
 }
 ```
 
-The `Never()` future never completes. Literally hangs forever. When BUGGIFY is enabled, the operation gets stuck, forcing the timeout branch to execute. Simple, elegant failure injection.
+The `Never()` future never completes. Literally hangs forever. This happens only in simulation (`g_network->isSimulated()`) and with 1% probability (`BUGGIFY_WITH_PROB(0.01)`). When it fires, the operation gets stuck, forcing the timeout branch to execute. Simple, elegant failure injection.
 
 But here's the trick: **the timeout value itself is also buggified**:
 
@@ -59,6 +62,21 @@ if( randomize && BUGGIFY ) DD_SHARD_METRICS_TIMEOUT = 0.1;  // Simulation: 0.1 s
 Production timeout: 60 seconds. BUGGIFY timeout: 0.1 seconds (600x shorter). The shrinking timeout window means legitimate operations are far more likely to hit timeout paths. Even without `Never()` forcing a hang, simulated network delays and slow operations will trigger timeouts constantly. When `Never()` does fire, you get guaranteed timeout execution. Every knob marked `if (randomize && BUGGIFY)` becomes a chaos variable. Timeouts shrink, cache sizes drop, I/O patterns randomize.
 
 This creates **combinatorial explosion**. FoundationDB has hundreds of randomized knobs. Each BUGGIFY-enabled test run picks a different configuration: maybe connection monitors are 4x slower, but file I/O is using 32KB blocks, and cache size is 1000 entries, and reconnection delays are doubled. The next run? Completely different knob values. Same code, thousands of different operating environments. After one trillion simulated operations across countless test runs, you've stress-tested your code under scenarios that would take decades to encounter in production.
+
+
+## The Developer Workflow: Simulation as CI/CD
+
+Here's the FoundationDB developer experience: **write code, run a few local simulation tests to catch obvious bugs, submit your merge request, then let the machines do the hard work**.
+
+Every pull request triggers **hundreds of thousands of simulation tests** running on hundreds of cores for hours before a human even begins code review. Different seeds explore different execution paths, different failure timings, different BUGGIFY configurations. Nightly testing runs tens of thousands more simulations, crawling through edge cases you'd never think to test manually.
+
+In the early days when FoundationDB was still a company, they took this philosophy to its logical extreme: **merge requests were automatically merged if simulation passed**. No human approval needed. The simulation was so trusted that passing tests meant the code was production-ready. (You can hear more about FoundationDB's early development culture on [The BugBash Podcast](https://www.youtube.com/watch?v=C1nZzQqcPZw&list=PLh4UhOpNuTJO1S8xkfa3QmQzJemsUhuL8&index=6)).
+
+This changes how you think about distributed systems development. Instead of spending hours debugging race conditions or trying to mentally model all possible failure scenarios, you focus on building features. The simulation finds the edge cases. It discovers the bugs you'd never anticipate. It stress-tests your code under conditions that would take years to encounter in production.
+
+The scale ramps up through the development cycle: thousands of seeds during merge request testing, tens of thousands in nightly runs, potentially millions during major release cycles. Each seed represents a completely different execution path through your code. By the time your change reaches production, it's survived more chaos than most distributed systems see in their entire lifetime.
+
+**The confidence this gives developers is extraordinary**: if your code survives hundreds of thousands of simulated disasters, production feels easy in comparison.
 
 
 ## Flow: Actors and Cooperative Multitasking
@@ -114,7 +132,7 @@ No actor ever blocks. They all cooperate, yielding control back to the event loo
 
 Now that we understand Flow actors and the event loop, let's see what runs on it. SimulatedCluster **builds an entire distributed cluster in memory**.
 
-`SimulatedCluster` starts by generating a random cluster configuration: 1-5 datacenters, 1-100+ machines per DC, different storage engines (memory, ssd, redwood-1), different replication modes (single, double, triple). Every test run gets a different topology.
+`SimulatedCluster` starts by generating a random cluster configuration: 1-5 datacenters, 1-10+ machines per DC, different storage engines (memory, ssd, redwood-1), different replication modes (single, double, triple). Every test run gets a different topology.
 
 The actor hierarchy looks like this: SimulatedCluster creates machine actors (`simulatedMachine`). Each machine actor creates process actors (`simulatedFDBDRebooter`). Each process actor runs **actual fdbserver code**. The machine actor sits in an infinite loop (shown earlier in the Flow section): wait for all processes to die, delay 10 simulated seconds, reboot.
 
@@ -218,7 +236,7 @@ Four concurrent workloads ran on the same simulated cluster for 30 seconds. **Wo
 
 **The chaos workloads** that tried to break it:
 
-* **RandomClogging** ([RandomClogging.actor.cpp:92](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/RandomClogging.actor.cpp#L92)): Calls `g_simulator->clogInterface(ip, duration)` to partition machines. Those **187 network partitions** we saw? This workload. Some lasted over 5 seconds.
+* **RandomClogging** ([RandomClogging.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/RandomClogging.actor.cpp)): Calls `g_simulator->clogInterface(ip, duration)` to partition machines. Those **187 network partitions** we saw? This workload. Some lasted over 5 seconds.
 * **Attrition** ([MachineAttrition.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/MachineAttrition.actor.cpp)): Calls `g_simulator->killMachine()` and `g_simulator->rebootMachine()`. The **4 process kills** (2 instant, 2 with deleted data)? This workload.
 * **Rollback** ([Rollback.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/Rollback.actor.cpp)): Forces proxy-to-TLog failures, triggering coordinator recovery. The **2 coordinator changes**? This workload.
 
@@ -228,11 +246,11 @@ Workloads are composable. The TOML format lets you stack them: `[configuration]`
 
 Remember that test we just ran? Let's break down how the `Cycle` workload actually works. It creates a directed graph where every node points to exactly one other node, forming a single cycle: `0→1→2→...→N→0`. Then it runs 2500 concurrent transactions per second, each one randomly swapping edges in the graph. Meanwhile, chaos workloads kill machines, partition the network, and force coordinator changes. **If SERIALIZABLE isolation works correctly, the cycle never breaks**. You always have exactly N nodes in one ring, never split cycles or dangling pointers.
 
-Every workload implements four phases ([workloads.actor.h:99](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/include/fdbserver/workloads/workloads.actor.h#L99)):
+Every workload implements four phases ([workloads.actor.h](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/include/fdbserver/workloads/workloads.actor.h)):
 
-**SETUP** ([Cycle.actor.cpp:89](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/Cycle.actor.cpp#L89)): Creates `nodeCount` nodes. Each key stores the index of the next node in the cycle. Key 0 → value 1, key 1 → value 2, ..., key N-1 → value 0.
+**SETUP** ([Cycle.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/Cycle.actor.cpp)): Creates `nodeCount` nodes. Each key stores the index of the next node in the cycle. Key 0 → value 1, key 1 → value 2, ..., key N-1 → value 0.
 
-**EXECUTION** ([Cycle.actor.cpp:164](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/Cycle.actor.cpp#L164)): Multiple concurrent `cycleClient` actors run this loop:
+**EXECUTION**: Multiple concurrent `cycleClient` actors run this loop:
 1. Pick random node `r`
 2. Read three hops: `r→r2→r3→r4`
 3. Swap the middle two edges: make `r→r3` and `r2→r4`
@@ -240,7 +258,7 @@ Every workload implements four phases ([workloads.actor.h:99](https://github.com
 
 This transaction reads 3 keys and writes 2. If isolation breaks, you could create cycles of the wrong length or lose nodes entirely.
 
-**CHECK** ([Cycle.actor.cpp:313](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/Cycle.actor.cpp#L313)): One client reads the entire graph in a single transaction. Starting from node 0, follow pointers: 0→next→next→next. Count the hops. After exactly `nodeCount` hops, you must be back at node 0. If you get there earlier (cycle too short) or can't get there (broken chain), the test fails. Also verifies transaction throughput met the expected rate.
+**CHECK**: One client reads the entire graph in a single transaction. Starting from node 0, follow pointers: 0→next→next→next. Count the hops. After exactly `nodeCount` hops, you must be back at node 0. If you get there earlier (cycle too short) or can't get there (broken chain), the test fails. Also verifies transaction throughput met the expected rate.
 
 **METRICS**: Reports transactions completed, retry counts, latency percentiles.
 
@@ -253,7 +271,7 @@ I generated that simulation output using [fdb-sim-visualizer](https://github.com
 
 ## Verifying Correctness: Building Reliable Workloads
 
-**But here's the hard part: proving correctness when everything is randomized.** The cluster survived. Transactions completed. The cycle invariant never broke... or did it? When you're running 2500 transactions per second with random edge swaps under 187 network partitions, how do you **prove** nothing went wrong? You can't just check if the database "looks okay." You need mathematical proof the invariants held.
+**But here's the hard part: proving correctness when everything is randomized.** The cluster survived. Transactions completed. The cycle invariant never broke... or did it? When you're running 2500 transactions per second with random edge swaps under 187 network partitions, how do you **prove** nothing went wrong? You can't just check if the database "looks okay." You need **proof** the invariants held.
 
 FoundationDB's approach: **track during EXECUTION, verify in CHECK.** Three patterns emerge across the codebase:
 
@@ -279,19 +297,19 @@ FoundationDB's approach: **track during EXECUTION, verify in CHECK.** Three patt
 
 Every workload gets `clientId` (0, 1, 2...) and `clientCount` (total clients). Three patterns:
 
-**Client 0 only** ([AtomicOps.actor.cpp:128](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/AtomicOps.actor.cpp#L128)):
+**Client 0 only** ([AtomicOps.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/AtomicOps.actor.cpp)):
 ```cpp
 if (clientId != 0) return true;  // Common for CHECK phases
 ```
 
-**Partition keyspace** ([WatchAndWait.actor.cpp:91](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/WatchAndWait.actor.cpp#L91)):
+**Partition keyspace** ([WatchAndWait.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/WatchAndWait.actor.cpp)):
 ```cpp
 uint64_t startNode = (nodeCount * clientId) / clientCount;
 uint64_t endNode = (nodeCount * (clientId + 1)) / clientCount;
 // Client 0: nodes 0-33, Client 1: nodes 34-66, Client 2: nodes 67-99
 ```
 
-**Round-robin** ([Watches.actor.cpp:63](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/Watches.actor.cpp#L63)):
+**Round-robin** ([Watches.actor.cpp](https://github.com/apple/foundationdb/blob/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/fdbserver/workloads/Watches.actor.cpp)):
 ```cpp
 if (i % clientCount == clientId)
 // Client 0: keys 0,3,6,9... Client 1: keys 1,4,7,10...
@@ -411,7 +429,6 @@ testTitle = 'NemesisTest'
 [configuration]
 minimumReplication = 3
 minimumRegions = 3
-buggify = false
 
 [[test]]
 testTitle = 'DiskFailureCycle'
@@ -432,9 +449,7 @@ testTitle = 'DiskFailureCycle'
 
 The simulation generates JSON trace logs in `./events/`. Parse them with [fdb-sim-visualizer](https://github.com/PierreZ/fdb-sim-visualizer).
 
-For more test examples, check FoundationDB's [tests/](https://github.com/apple/foundationdb/tree/main/tests) directory. Hundreds of workload combinations testing every corner of the system.
-
----
+For more test examples, check FoundationDB's [tests/](https://github.com/apple/foundationdb/tree/dfbb0ea72ce01ba87148ef67cf216200e8b249cd/tests) directory. Hundreds of workload combinations testing every corner of the system.
 
 ## Why I've Never Been Woken Up by FDB
 

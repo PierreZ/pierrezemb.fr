@@ -3,12 +3,12 @@ title = "Diving into ETCD's linearizable reads"
 date = "2020-09-18T05:24:27+01:00"
 draft = false
 [taxonomies]
-tags = ["distributed", "etcd", "raft", "consensus", "storage", "diving"]
+tags = ["distributed", "etcd", "raft", "consensus", "storage", "diving-into"]
 +++
 
 ![etcd image](/images/diving-into-etcd-linearizable/etcd.png)
 
-[Diving Into](/tags/diving/) is a blogpost serie where we are digging a specific part of the project's basecode. In this episode, we will digg into the implementation behind ETCD's Linearizable reads.
+[Diving Into](/tags/diving-into/) is a blogpost serie where we are digging a specific part of the project's basecode. In this episode, we will digg into the implementation behind ETCD's Linearizable reads.
 
 ---
 

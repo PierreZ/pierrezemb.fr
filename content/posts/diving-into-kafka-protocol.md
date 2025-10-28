@@ -2,12 +2,12 @@
 title = "Diving into Kafka's Protocol"
 date = "2019-12-08T15:00:00+01:00"
 [taxonomies]
-tags = ["messaging", "distributed", "kafka", "networking", "diving"]
+tags = ["messaging", "distributed", "kafka", "networking", "diving-into"]
 +++
 
 ![kafka image](/images/diving-into-kafka-protocol/apache-kafka.png)
 
-[Diving Into](/tags/diving/) is a blogpost serie where we are digging a specific part of of the project's basecode. In this episode, we will digg into Kafka's protocol.
+[Diving Into](/tags/diving-into/) is a blogpost serie where we are digging a specific part of of the project's basecode. In this episode, we will digg into Kafka's protocol.
 
 ---
 
