@@ -1,13 +1,13 @@
 +++
 title = "Diving into FoundationDB's Simulation Framework"
 description = "How FoundationDB achieves legendary reliability through deterministic simulation, interface swapping, and one trillion CPU-hours of testing"
-date = 2025-10-15
-draft = true
+date = 2025-10-30
+draft = false
 [taxonomies]
 tags = ["foundationdb", "testing", "simulation", "deterministic", "distributed-systems", "diving-into"]
 +++
 
-[Diving Into](/tags/diving-into/) is a blogpost series where we are digging a specific part of the project's codebase. In this episode, we will dig into the implementation behind FoundationDB's simulation framework.
+> [Diving Into](/tags/diving-into/) is a blogpost series where we are digging a specific part of the project's codebase. In this episode, we will dig into the implementation behind FoundationDB's simulation framework.
 
 After years of on-call shifts running FoundationDB at Clever Cloud, here's what I've learned: **I've never been woken up by FDB**. Every production incident traced back to our code, our infrastructure, our mistakes. Never FDB itself. That kind of reliability doesn't happen by accident.
 
@@ -110,8 +110,7 @@ flowchart TD
     RunActor --> CheckReady
     CheckReady -->|No, all waiting| CheckPending{Any pending<br/>futures?}
     CheckPending -->|Yes| AdvanceTime[Advance simulated clock<br/>to next event]
-    AdvanceTime --> WakeActors[Wake actors waiting<br/>for this time]
-    WakeActors --> CheckReady
+    AdvanceTime --> CheckReady
     CheckPending -->|No| Done([Simulation complete])
 {% end %}
 
@@ -134,7 +133,7 @@ Now that we understand Flow actors and the event loop, let's see what runs on it
 
 `SimulatedCluster` starts by generating a random cluster configuration: 1-5 datacenters, 1-10+ machines per DC, different storage engines (memory, ssd, redwood-1), different replication modes (single, double, triple). Every test run gets a different topology.
 
-The actor hierarchy looks like this: SimulatedCluster creates machine actors (`simulatedMachine`). Each machine actor creates process actors (`simulatedFDBDRebooter`). Each process actor runs **actual fdbserver code**. The machine actor sits in an infinite loop (shown earlier in the Flow section): wait for all processes to die, delay 10 simulated seconds, reboot.
+The actor hierarchy looks like this: SimulatedCluster creates machine actors (`simulatedMachine`). Each machine actor creates process actors (`simulatedFDBDRebooter`). Each process actor runs **actual fdbserver code**. The machine actor sits in an infinite loop: wait for all processes to die, delay 10 simulated seconds, reboot.
 
 **The same fdbserver code that runs in production runs here**. No mocks. No stubs. Real transaction logs writing to simulated disk. Real storage engines (RocksDB, Redwood). Real Paxos consensus. The only difference? `Sim2` network instead of `Net2`.
 
@@ -371,7 +370,23 @@ impl RustWorkload for MyWorkload {
 
 Your Rust code compiles to a shared library, FDB's `ExternalWorkload` loads it at runtime via FFI, and your Rust async functions run on the same Flow event loop as the C++ cluster. The FFI boundary is managed by the `foundationdb-simulation` crate, which handles marshaling between Flow's event loop and Rust futures. Same determinism, same reproducibility, same chaos injection. But you're writing `async fn` instead of `ACTOR Future<Void>`.
 
-We use this at Clever Cloud to test [Materia KV](https://www.clever-cloud.com/blog/features/2024/06/11/materia-kv-our-easy-to-use-serverless-key-value-database-is-available-to-all/), our multi-tenant database built on FDB. Here's a [complete example workload](https://github.com/foundationdb-rs/foundationdb-rs/blob/main/foundationdb-simulation/examples/atomic/lib.rs) that tests atomic operations in ~100 lines of Rust. Write application code in Rust, run it in the simulator with machine kills and network partitions, verify correctness. If it survives simulation, it survives production. Though simulation can't catch every production issue (operational mistakes, hardware quirks), it eliminates entire classes of distributed systems bugs.
+Here's a [complete example workload](https://github.com/foundationdb-rs/foundationdb-rs/blob/main/foundationdb-simulation/examples/atomic/lib.rs) testing atomic operations in ~100 lines of Rust.
+
+### Simulation at Clever Cloud: Building Materia
+
+At Clever Cloud, we use simulation to build [Materia](https://www.clever-cloud.com/blog/features/2024/06/11/materia-kv-our-easy-to-use-serverless-key-value-database-is-available-to-all/), our serverless database products. I'm the lead engineer behind Materia and the main maintainer of [foundationdb-rs](https://github.com/foundationdb-rs/foundationdb-rs).
+
+We built a Rust SDK on top of FDB, similar to Apple's [Record Layer](https://github.com/FoundationDB/fdb-record-layer). It provides structured records, secondary indexes, query planning, and multi-tenant isolation. The result: a distributed transactional database built on FoundationDB's guarantees.
+
+FoundationDB is a hidden technology: you don't use it directly, you build layers on top. But here's the trick: **patterns like index design, quota management, and schema management should be written once and consumed, not reimplemented in every product**. Our SDK abstracts these patterns. Need secondary indexes? The SDK handles keyspace layout, index updates, and query planning. Need multi-tenant isolation? The SDK provides it. Need quota enforcement or permission management? **We built a common control plane that works across all products** built on the SDK. Write the hard distributed systems logic once, simulate it until it's bulletproof, then reuse it everywhere.
+
+Every merge request runs simulation tests in CI. We test SDK scenarios (indexing, query planning) and full product workloads under chaos. Multi-tenant isolation, concurrent queries, network partitions, machine crashes. The bugs we catch vary by layer. SDK changes catch nasty bugs like duplicated indexes during `maybe_committed` transactions. Product changes catch simpler errors like accidentally blocking FDB's retry logic or breaking atomicity.
+
+But the real value isn't just bug detection. **Instead of writing hundreds of unit tests, we write workloads that fuzz our code under chaos.** One workload with randomized operations and deterministic chaos replaces dozens of hand-crafted test cases. When engineers write workloads for their features, they're forced to think: "What happens when this retries during a partition?" "How do I verify correctness when transactions can commit in any order?" **Designing for chaos** becomes natural. The act of writing simulation workloads improves the design itself.
+
+The confidence this gives a small team is extraordinary. When you can prove your code survives hundreds of network partitions and machine crashes before shipping, you sleep better at night. Our latest layer, an etcd-compatible API for managed Kubernetes, was built from the ground up with simulation in mind. We're even [contributing features back to FoundationDB](https://github.com/apple/foundationdb/issues/12343) to better support layers like ours.
+
+If it survives simulation, it survives production.
 
 ## Running Simulations Yourself
 
