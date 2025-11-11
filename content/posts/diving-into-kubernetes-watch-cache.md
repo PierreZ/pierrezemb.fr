@@ -1,7 +1,7 @@
 +++
 title = "Diving into Kubernetes' Watch Cache"
 description = "Understanding how Kubernetes apiserver caches etcd, the 3-second timeout, and K8s 1.34 consistent read feature"
-date = 2025-11-05
+date = 2025-11-12
 [taxonomies]
 tags = ["diving-into", "kubernetes", "distributed-systems", "etcd", "caching"]
 +++
@@ -18,15 +18,11 @@ While debugging an etcd-shim on FoundationDB, I kept hitting `"Timeout: Too larg
 
 ## Overview of the Watch Cache
 
-As stated in the [Kubernetes 1.34 blog post](https://kubernetes.io/blog/2024/08/15/consistent-read-from-cache-beta/):
+When I first looked at the watch cache implementation, I expected a single monolithic cache sitting between the apiserver and etcd. It took compiling my own apiserver with additional logging to realize the architecture is more interesting: **each resource type gets its own independent Cacher instance**. Pods have one. Services have another. Deployments get their own. Every resource group runs an isolated LIST+WATCH loop, maintaining its own in-memory cache.
 
-> This enhancement allows the API server to serve consistent read requests directly from the watch cache, significantly reducing the load on etcd and improving overall cluster performance.
+This design makes sense once you think about it: a namespace that hasn't changed in hours shouldn't block fresh pod data. Quiet resources stay quiet. Active resources churn independently. The per-resource isolation is what makes progress notifications critical: without them, every quiet resource would timeout waiting for revisions that will never arrive through normal events.
 
-The key architectural points:
-
-- A cache layer sits between the apiserver and [etcd](/posts/notes-about-etcd/)
-- The architecture is **per resource group** - each resource type (pods, services, deployments, etc.) has its own Cacher instance
-- Each Cacher runs independently with its own LIST+WATCH loop
+As the [Kubernetes 1.34 blog post](https://kubernetes.io/blog/2024/08/15/consistent-read-from-cache-beta/) explains, this enhancement allows the API server to serve consistent read requests directly from the watch cache, significantly reducing the load on etcd and improving overall cluster performance.
 
 ## Architecture
 
@@ -50,15 +46,15 @@ The main components:
 
 ### Initialization: The LIST Phase
 
-Here's how the cache gets fed. The Reflector pattern kicks off with a complete LIST operation. Each resource cache begins by fetching all existing objects through a paginated LIST (10,000 items per page). Once the LIST completes, `watchCache.Replace()` populates the in-memory cache with these objects. The critical moment happens when the `SetOnReplace()` callback fires, marking the cache as READY. Nothing works for that resource until this initialization completes.
+**Nothing works until the cache initializes**. When a Cacher starts, every read for that resource blocks until initialization completes. This matters because initialization isn't instant: it's a paginated LIST operation fetching 10,000 items per page. For a large cluster with thousands of pods, this takes time.
 
-The implementation can be seen in [cacher.go:468-478](https://github.com/kubernetes/kubernetes/blob/release-1.34/staging/src/k8s.io/apiserver/pkg/storage/cacher/cacher.go#L468-L478).
+Here's the sequence: The Reflector pattern kicks off with a complete LIST operation. Each resource cache fetches all existing objects through paginated requests. Once the LIST completes, `watchCache.Replace()` populates the in-memory cache with these objects. The **critical moment** happens when the `SetOnReplace()` callback fires ([cacher.go:468-478](https://github.com/kubernetes/kubernetes/blob/release-1.34/staging/src/k8s.io/apiserver/pkg/storage/cacher/cacher.go#L468-L478)), marking the cache as READY. Until that callback fires, every request for that resource waits.
 
 ### Continuous Sync: The WATCH Phase
 
-After initialization, the cache maintains synchronization through a Watch stream that starts at LIST revision + 1. This ensures no events are missed between the LIST and WATCH operations. Events flow from etcd through a buffered channel (capacity: 100 events) and are processed by the `dispatchEvents()` goroutine, which runs continuously and matches events to interested watchers.
+After initialization, the real trick begins: the cache maintains synchronization through a Watch stream that starts at LIST revision + 1. This **guarantees no events are missed** between the LIST and WATCH operations. The watch picks up exactly where the list left off. Events flow from etcd through a buffered channel (capacity: 100 events) and are processed by the `dispatchEvents()` goroutine, which runs continuously, matching events to interested watchers.
 
-See [Reflector documentation](https://github.com/kubernetes/kubernetes/blob/release-1.34/staging/src/k8s.io/client-go/tools/cache/reflector.go) for the complete pattern.
+The pattern is elegant but depends on continuous event flow. When events stop arriving, when resources go quiet, that's when progress notifications become essential. See [Reflector documentation](https://github.com/kubernetes/kubernetes/blob/release-1.34/staging/src/k8s.io/client-go/tools/cache/reflector.go) for the complete pattern.
 
 ## The Problem: "Timeout: Too large resource version"
 
