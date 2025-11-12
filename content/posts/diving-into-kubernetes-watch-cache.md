@@ -20,8 +20,6 @@ While debugging an etcd-shim on FoundationDB, I kept hitting `"Timeout: Too larg
 
 When I first looked at the watch cache implementation, I expected a single monolithic cache sitting between the apiserver and etcd. It took compiling my own apiserver with additional logging to realize the architecture is more interesting: **each resource type gets its own independent Cacher instance**. Pods have one. Services have another. Deployments get their own. Every resource group runs an isolated LIST+WATCH loop, maintaining its own in-memory cache.
 
-This design makes sense once you think about it: a namespace that hasn't changed in hours shouldn't block fresh pod data. Quiet resources stay quiet. Active resources churn independently. The per-resource isolation is what makes progress notifications critical: without them, every quiet resource would timeout waiting for revisions that will never arrive through normal events.
-
 As the [Kubernetes 1.34 blog post](https://kubernetes.io/blog/2024/08/15/consistent-read-from-cache-beta/) explains, this enhancement allows the API server to serve consistent read requests directly from the watch cache, significantly reducing the load on etcd and improving overall cluster performance.
 
 ## Architecture
@@ -54,7 +52,7 @@ Here's the sequence: The Reflector pattern kicks off with a complete LIST operat
 
 After initialization, the real trick begins: the cache maintains synchronization through a Watch stream that starts at LIST revision + 1. This **guarantees no events are missed** between the LIST and WATCH operations. The watch picks up exactly where the list left off. Events flow from etcd through a buffered channel (capacity: 100 events) and are processed by the `dispatchEvents()` goroutine, which runs continuously, matching events to interested watchers.
 
-The pattern is elegant but depends on continuous event flow. When events stop arriving, when resources go quiet, that's when progress notifications become essential. See [Reflector documentation](https://github.com/kubernetes/kubernetes/blob/release-1.34/staging/src/k8s.io/client-go/tools/cache/reflector.go) for the complete pattern.
+This pattern depends on continuous event flow. When events stop arriving, when resources go quiet, that's when progress notifications become essential. See [Reflector documentation](https://github.com/kubernetes/kubernetes/blob/release-1.34/staging/src/k8s.io/client-go/tools/cache/reflector.go) for the complete pattern.
 
 ## The Problem: "Timeout: Too large resource version"
 
@@ -137,16 +135,16 @@ If you've ever seen kubectl commands hang for exactly 3 seconds before returning
 
 This is where things get tricky. For infrequently-updated resources (namespaces, configmaps, etc.):
 
-```
-T0: Namespace cache at RV 3044, no namespace changes for 5 minutes
-T1: Other resources change (pods, services) → global etcd revision advances to 3047
-T2: Namespace Watch stream receives... nothing (no namespace events)
-T3: Namespace cache remains at RV 3044
-T4: Client lists pods, receives response with RV 3047
-T5: Client then requests consistent read of namespaces: "give me data at RV ≥ 3047"
-T6: Namespace cache: "I'm at 3044, need 3047... waiting"
-T7: (3 seconds later) Timeout!
-```
+| Time | Component | Event | Cache RV | etcd RV | Notes |
+|------|-----------|-------|----------|---------|-------|
+| T0 | Namespace cache | Idle, no changes | 3044 | 3044 | No namespace changes for 5 minutes |
+| T1 | Pod/Service caches | Resources changing | - | 3047 | Global etcd revision advances |
+| T2 | Namespace watch | Receives nothing | 3044 | 3047 | No namespace events to process |
+| T3 | Namespace cache | Still waiting | 3044 | 3047 | Cache stuck, unaware of global progress |
+| T4 | Client | Lists pods successfully | - | 3047 | Response includes current RV 3047 |
+| T5 | Client | Requests namespace read at RV ≥ 3047 | - | 3047 | Consistent read requirement |
+| T6 | Namespace cache | `waitUntilFreshAndBlock()` | 3044 | 3047 | "I'm at 3044, need 3047... waiting" |
+| T7 | Namespace cache | Timeout! | 3044 | 3047 | 3 seconds elapsed, returns error |
 
 The cache has no way to know if etcd has moved forward. Is the system healthy? Is something broken? It just sees... nothing.
 
@@ -179,7 +177,7 @@ This is exactly what we had forgotten to implement in our etcd-shim. We handled 
 
 #### 1. On-Demand: RequestWatchProgress()
 
-When the cache needs to catch up, it can explicitly request a progress notification. The implementation is beautifully simple. See [store.go:99-103](https://github.com/kubernetes/kubernetes/blob/release-1.34/staging/src/k8s.io/apiserver/pkg/storage/etcd3/store.go#L99-L103):
+When the cache needs to catch up, it can explicitly request a progress notification. See [store.go:99-103](https://github.com/kubernetes/kubernetes/blob/release-1.34/staging/src/k8s.io/apiserver/pkg/storage/etcd3/store.go#L99-L103):
 
 ```go
 func (s *store) RequestWatchProgress(ctx context.Context) error {
@@ -218,36 +216,15 @@ progressRequester := progress.NewConditionalProgressRequester(
 
 **Timeline showing how progress notifications solve the timeout:**
 
-Picture this:
-
-```
-T0: Namespace watch established at revision 3044
-    - No namespace changes happening
-
-T1: Pod creates/updates → etcd revisions 3045, 3046, 3047
-    - Namespace watch: silent (no namespace changes)
-    - Cache still at 3044
-
-T2: Client requests namespace LIST at RV 3047 (consistent read)
-    - Cache checks: notFresh(3047) → true (stuck at 3044)
-    - Starts waiting: waitUntilFreshAndBlock(3047)
-
-T3: progressRequester detects quiet watch
-    - Calls RequestProgress() on namespace watch stream
-
-T4: etcd sends progress notification
-    WatchResponse {
-        Header: { Revision: 3047 },
-        Events: []
-    }
-
-T5: Cache processes bookmark
-    - Updates internal revision: 3044 → 3047
-    - Signals waiters: "I'm fresh now!"
-
-T6: waitUntilFreshAndBlock() returns (within 3 seconds)
-    - Request served from cache successfully
-```
+| Time | Component | Action | Cache RV | etcd RV | Details |
+|------|-----------|--------|----------|---------|---------|
+| T0 | Namespace watch | Established | 3044 | 3044 | No namespace changes happening |
+| T1 | Pod resources | Creates/updates | 3044 | 3047 | Namespace watch: silent, cache stuck at 3044 |
+| T2 | Client | Requests namespace LIST at RV 3047 | 3044 | 3047 | `notFresh(3047)` → true, starts `waitUntilFreshAndBlock()` |
+| T3 | progressRequester | Detects quiet watch | 3044 | 3047 | Calls `RequestProgress()` on namespace watch stream |
+| T4 | etcd | Sends progress notification | 3044 | 3047 | `WatchResponse { Header: { Revision: 3047 }, Events: [] }` |
+| T5 | Namespace cache | Processes bookmark | 3047 | 3047 | Updates internal revision 3044 → 3047, signals waiters |
+| T6 | Namespace cache | Returns successfully | 3047 | 3047 | `waitUntilFreshAndBlock()` completes, request served from cache |
 
 
 ## Key Takeaways
