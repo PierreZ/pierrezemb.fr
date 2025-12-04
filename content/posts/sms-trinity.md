@@ -50,7 +50,7 @@ Then [a friend](https://bsky.app/profile/alexmillerdb.bsky.social/post/3m6ptancm
 
 Learning new languages with LLMs works well. The trick is to find or generate a spec of the language first, then ask for a tutorial tailored to your specific problem. In my case, I asked Claude to write a Starlark reference and a Fizzbee concepts recap, incremental roadmap to modelize something like QuiCK. Now we share vocabulary, and the conversations are productive.
 
-## The spec-model-simulation trinity
+## The SMS trinity (Spec-Model-Simulation)
 
 Now I have:
 
