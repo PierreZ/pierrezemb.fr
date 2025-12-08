@@ -1,16 +1,16 @@
 +++
-title = "Writing Rust FDB Workloads That Actually Find Bugs"
+title = "Designing Rust FDB Workloads That Actually Find Bugs"
 description = "Patterns and principles for writing Rust simulation workloads that catch bugs before production does."
-date = 2025-12-06
+date = 2025-12-09
 [taxonomies]
 tags = ["foundationdb", "rust", "testing", "simulation", "deterministic", "distributed-systems"]
 +++
 
 After [one trillion CPU-hours of simulation testing](/posts/diving-into-foundationdb-simulation/), FoundationDB has been stress-tested under conditions far worse than any production environment. Network partitions, disk failures, Byzantine faults. FDB handles them all. **But what about your code?** Your layer sits on top of FDB. Your indexes, your transaction logic, your retry handling. How do you know it survives chaos?
 
-At Clever Cloud, we were building [Materia](https://www.clever-cloud.com/materia/), our serverless database product. We were afraid to ship our layer code without the same level of testing FDB itself enjoys. So we hacked our way into FDB's simulation framework using [foundationdb-simulation](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-simulation). On our first seed, simulation surfaced one of the most dreaded edge cases for FDB layer developers: [`commit_unknown_result`](https://apple.github.io/foundationdb/developer-guide.html#transactions-with-unknown-results). The client can't always know if a transaction committed before the connection dropped. Our atomic counter increments were sometimes running twice. In production, you might see this once every few months under heavy load. In simulation? **Almost immediately.**
+At Clever Cloud, we were building [Materia](https://www.clever-cloud.com/materia/), our serverless database product. We were afraid to ship our layer code without the same level of testing FDB itself enjoys. So we hacked our way into FDB's simulation framework using [foundationdb-simulation](https://github.com/foundationdb-rs/foundationdb-rs/tree/4ed057a/foundationdb-simulation). On our first seed, simulation surfaced one of the most dreaded edge cases for FDB layer developers: [`commit_unknown_result`](https://apple.github.io/foundationdb/developer-guide.html#transactions-with-unknown-results). The client can't always know if a transaction committed before the connection dropped. Our atomic counter increments were sometimes running twice. In production, you might see this once every few months under heavy load and during failures. In simulation? **Almost immediately.**
 
-This post teaches you how to **think** about writing simulation workloads. Not just the mechanics, but the principles that make them effective. Whether you're a junior engineer or an LLM helping write tests, these patterns will guide you toward workloads that actually find bugs.
+This post won't walk you through the code mechanics. The [foundationdb-simulation crate](https://crates.io/crates/foundationdb-simulation) and its [README](https://github.com/foundationdb-rs/foundationdb-rs/tree/4ed057a/foundationdb-simulation) cover that. Instead, this teaches you how to **design** workloads that catch real bugs. Whether you're a junior engineer or an LLM helping write tests, these principles will guide you.
 
 ## Why Autonomous Testing Works
 
@@ -18,7 +18,7 @@ Traditional testing has you write specific tests for scenarios you imagined. But
 
 This is why simulation finds bugs so fast. You're not testing what you thought to test. You're testing what the probability distribution happens to generate, which includes edge cases you'd never have written explicitly. Add fault injection (a probability distribution over all possible ways the world can conspire to screw you) and now you're finding bugs that would take months or years to surface in production.
 
-This is what got me interested in simulation in the first place: how do you test the things you see during on-call shifts? Those weird transient bugs at 3 AM, the race conditions that happen once a month, the edge cases you only discover when production is on fire. Simulation shifts that complexity from SRE time to SWE time. What's a 3 AM page becomes a daytime debugging session. What's a high-pressure incident becomes a reproducible test case you can bisect, rewind, and experiment with freely.
+This is what got me interested in simulation in the first place: how do you test the things you see during on-call shifts? Those weird transient bugs at 3 AM, the race conditions that happen once a month, the edge cases you only discover when production is on fire. Simulation shifts that complexity from SRE time to SWE time. What was a 3 AM page becomes a daytime debugging session. What's a high-pressure incident becomes a reproducible test case you can bisect, rewind, and experiment with freely.
 
 ## The Sequential Luck Problem
 
@@ -34,7 +34,7 @@ The **operation alphabet** is the complete set of operations your workload can p
 
 **Adversarial inputs** that customers will inevitably send. Empty strings. Maximum-length values. Null bytes in the middle of strings. Unicode edge cases. Boundary integers (0, -1, MAX_INT). Customers never respect your API specs, so model the chaos they create.
 
-**Nemesis operations** that break things on purpose. Delete random data mid-test. Clear ranges that "shouldn't" be cleared. Retry immediately without backoff. Submit transactions that conflict with each other by design. These operations stress your error handling and recovery paths. The rare operations are where bugs hide. That batch update running once a day in production? In simulation, you'll hit its race condition in minutes, but only if your operation alphabet includes it.
+**Nemesis operations** that break things on purpose. Delete random data mid-test. Clear ranges that "shouldn't" be cleared. Crash batch jobs mid-execution to test recovery. Run compaction every operation instead of daily. Create conflict storms where multiple clients hammer the same key. Approach the 10MB transaction limit. These operations stress your error handling and recovery paths. The rare operations are where bugs hide. That batch job running once a day in production? In simulation, you'll hit its partial-failure edge case in minutes, but only if your operation alphabet includes it.
 
 ## Designing Invariants
 
@@ -48,9 +48,9 @@ Four patterns dominate invariant design:
 
 **Conservation Laws** track quantities that must stay constant. Inventory transfers between warehouses shouldn't change total inventory. Money transfers between accounts shouldn't create or destroy money. Sum everything up and verify the conservation law holds. This pattern is elegant because it doesn't require tracking individual operations, just the aggregate property.
 
-**Structural Integrity** verifies data structures remain valid. If you maintain a secondary index, verify every index entry points to an existing record and every record appears in the index exactly once. If you maintain a linked list in FDB, traverse it and confirm every node is reachable. The cycle validation pattern (creating a circular list where nodes point to each other) is a classic technique from FDB's own workloads. After chaos, traverse the cycle and verify you visit exactly N nodes.
+**Structural Integrity** verifies data structures remain valid. If you maintain a secondary index, verify every index entry points to an existing record and every record appears in the index exactly once. If you maintain a linked list in FDB, traverse it and confirm every node is reachable. The cycle validation pattern (creating a circular list where nodes point to each other) is a classic technique from [FDB's own Cycle workload](https://github.com/apple/foundationdb/blob/231f762/fdbserver/workloads/Cycle.actor.cpp). After chaos, traverse the cycle and verify you visit exactly N nodes.
 
-**Operation Logging** solves two problems at once: `maybe_committed` uncertainty and multi-client coordination. The trick from FDB's own AtomicOps workload: **log the intent alongside the operation in the same transaction**. Write both your operation AND a log entry recording what you intended. Since they're in the same transaction, they either both commit or neither does. No uncertainty. For multi-client workloads, each client logs under its own prefix (e.g., `log/{client_id}/`). In `check()`, client 0 reads all logs from all clients, replays them to compute expected state, and compares against actual state. If they diverge, something went wrong, and you'll know exactly which operations succeeded.
+**Operation Logging** solves two problems at once: `maybe_committed` uncertainty and multi-client coordination. The trick from [FDB's own AtomicOps workload](https://github.com/apple/foundationdb/blob/231f762/fdbserver/workloads/AtomicOps.actor.cpp): **log the intent alongside the operation in the same transaction**. Write both your operation AND a log entry recording what you intended. Since they're in the same transaction, they either both commit or neither does. No uncertainty. For multi-client workloads, each client logs under its own prefix (e.g., `log/{client_id}/`). In `check()`, client 0 reads all logs from all clients, replays them to compute expected state, and compares against actual state. If they diverge, something went wrong, and you'll know exactly which operations succeeded. See the [Rust atomic workload example](https://github.com/foundationdb-rs/foundationdb-rs/blob/4ed057a/foundationdb-simulation/examples/atomic/lib.rs) for a complete implementation.
 
 ## The Determinism Rules
 
@@ -89,18 +89,11 @@ Beyond the determinism rules above, these mistakes will bite you:
 
 **Wrapping FdbError in custom error types.** The `db.run()` retry mechanism checks if errors are retryable via `FdbError::is_retryable()`. If you wrap `FdbError` in your own error type (like `anyhow::Error` or a custom enum), the retry logic can't see the underlying error and won't retry. Keep `FdbError` unwrapped in your transaction closures, or ensure your error type preserves retryability information.
 
+**Assuming setup is safe from failures.** BUGGIFY is disabled during `setup()`, so you might think transactions can't fail. But simulation randomizes FDB knobs, which can still cause transaction failures. Always use `db.run()` with retry logic even in setup, or wrap your setup in a retry loop.
+
 ## The Real Value
 
 That `commit_unknown_result` edge case appeared on our first simulation seed. In production, we'd still be hunting it months later. But the real value of simulation testing isn't just finding bugs, it's **forcing you to think about correctness.** When you design a workload, you're forced to ask: "What happens when this retries during a partition?" "How do I verify correctness when transactions can commit in any order?" "What invariants must hold no matter what chaos occurs?" Designing for chaos becomes natural. And if it survives simulation, it survives production.
-
-## Further Reading
-
-For code examples to complement these principles:
-
-- [foundationdb-simulation README](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-simulation): Getting started with the Rust simulation crate
-- [Atomic workload example](https://github.com/foundationdb-rs/foundationdb-rs/blob/main/foundationdb-simulation/examples/atomic/lib.rs): A complete Rust workload showing the operation logging pattern
-- [AtomicOps.actor.cpp](https://github.com/apple/foundationdb/blob/main/fdbserver/workloads/AtomicOps.actor.cpp): FDB's own C++ workload demonstrating intent logging for maybe_committed handling
-- [Cycle.actor.cpp](https://github.com/apple/foundationdb/blob/main/fdbserver/workloads/Cycle.actor.cpp): The classic cycle validation pattern for testing transactional atomicity
 
 ---
 
