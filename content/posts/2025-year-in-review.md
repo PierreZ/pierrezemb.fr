@@ -7,7 +7,7 @@ draft = true
 tags = ["personal"]
 +++
 
-Time flies. It is already 2026! Looking back, 2025 was a year of returning to my roots, writing more than ever, and discovering that simulation testing is a superpower.
+2025 was the year I stopped managing and started shipping software again. Looking back, it was about returning to my roots, writing more than ever, and (fully) discovering that simulation testing is a superpower.
 
 ## Back in Engineering
 
@@ -15,7 +15,7 @@ In January, I announced my [return to engineering](/posts/back-engineering/) aft
 
 ### The Transition
 
-But I will be honest: the transition was harder than I expected. There was real imposter syndrome. Had I lost my edge? Was I still the technical person I used to be? The hardest part was not the code itself. It was giving myself **permission to focus**. Having another engineering manager handle the team while I dove into low-level work was the perfect setup. I am grateful to the whole team for making that transition possible. But after three years of context-switching between fires and people issues, sitting down to write code without interruption felt almost wrong. You do not just flip a switch and regain all that muscle memory.
+But I will be honest: the transition was harder than I expected. There was real imposter syndrome. Had I lost my edge? Was I still the technical person I used to be? The hardest part was not the code itself. It was giving myself **permission to focus**. Having another engineering manager handle the team while I dove into low-level work was the perfect setup. I am grateful to the whole team for making that transition possible. But after three years of context-switching between fires and people issues, sitting down to write code without interruption felt almost wrong. It took months to fully allow myself to focus without afterthoughts.
 
 ### BugBash 2025
 
@@ -29,7 +29,7 @@ One highlight was building the query engine for Materia. I wrote [datafusion-ind
 
 ### The etcd Shim
 
-Helping put the etcd shim into production was meaningful because of the long arc behind it. It started with discovering Apple's [FDB Record Layer](https://pierrez.github.io/fdb-book/the-record-layer/what-is-record-layer.html), a library that adds structured data, indexing, and queries on top of FoundationDB. At OVHcloud, I [prototyped an etcd layer](https://forums.foundationdb.org/t/a-foundationdb-layer-for-apiserver-as-an-alternative-to-etcd/2697) using those concepts. Then I moved to Clever Cloud and started backporting Record Layer ideas in Rust to build a toolbox for Materia products. We even hacked our way into FDB's simulator using [foundationdb-simulation](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-simulation), a crate that compiles Rust to run inside FDB's deterministic simulator. We published Materia KV. And now, that same toolbox has matured enough to power an etcd-compatible API backing Kubernetes control planes. Years of investing in deep understanding paid off in ways I could not have predicted.
+Helping put the etcd shim into production was meaningful because of the long arc behind it. I even [wrote about debugging the watch cache](/posts/diving-into-kubernetes-watch-cache/) along the way. It started with discovering Apple's [FDB Record Layer](https://pierrez.github.io/fdb-book/the-record-layer/what-is-record-layer.html), a library that adds structured data, indexing, and queries on top of FoundationDB. At OVHcloud, I [prototyped an etcd layer](https://forums.foundationdb.org/t/a-foundationdb-layer-for-apiserver-as-an-alternative-to-etcd/2697) using those concepts. Then I moved to Clever Cloud and started backporting Record Layer ideas in Rust to build a toolbox for Materia products. We even hacked our way into FDB's simulator using [foundationdb-simulation](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-simulation), a crate that compiles Rust to run inside FDB's deterministic simulator. We published Materia KV. And now, that same toolbox has matured enough to power an etcd-compatible API backing Kubernetes control planes. Years of investing in deep understanding paid off in ways I could not have predicted.
 
 ## Sharing
 
@@ -65,19 +65,17 @@ I cannot write about 2025 without talking about LLMs. I spent a **lot** of time 
 
 For years, I had a weekly habit: two hours dedicated to reading codebases I depend on. Understanding the internals of libraries, frameworks, databases. Then I stopped. Life got busy, management took over, and diving into unfamiliar code took too long to justify.
 
-With LLMs, I picked the habit back up. What used to take hours now takes minutes. I can explore a codebase conversationally, asking questions, jumping to relevant sections, building mental models faster than ever. I learn more now than I did in years.
+With LLMs, I picked the habit back up. What used to take hours now takes minutes. I can explore a codebase conversationally, asking questions, jumping to relevant sections, building mental models faster than ever. I learn more now than I did before.
 
 ### Writing Code
 
-They handle peripheral code well: glue code, boilerplate, scaffolding. But what I did not expect is that working with them forces me to flush out invariants and hidden rules somewhere explicit. You need to write things down for the LLM to understand, and that documentation ends up being useful for humans too.
+They handle peripheral code well: glue code, boilerplate, scaffolding. But what I did not expect is that working with them forces me to flesh out invariants and hidden rules somewhere explicit. You need to write things down for the LLM to understand, and that documentation ends up being useful for humans too.
 
-**Context is everything.** Given the right context, LLMs generate the right code. So I spent a lot of time (and tokens) generating project recaps and summaries to feed them. When working with libraries, I make local git clones so the LLM can browse the actual source code instead of relying on potentially outdated training data. I have been using Claude extensively, and I found [spec-kit](https://github.com/github/spec-kit) helpful for framing my prompts. It is a toolkit for "spec-driven development" that helps you focus on product scenarios instead of vibe-coding from scratch.
+**Context is everything.** Given the right context, LLMs generate the right code. So I spent a lot of time (and tokens) generating project recaps and summaries to feed them. When working with libraries, I make local git clones so the LLM can browse the actual source code instead of relying on potentially outdated training data. I have been using Claude extensively, and I found [spec-kit](https://github.com/github/spec-kit) helpful for framing my prompts. It is a toolkit for "spec-driven development" that helps you focus on product scenarios instead of vibe-coding from scratch. I wrote more about this in [Specs Are Back, But We're Missing the Tools](/posts/specs-are-back/).
 
-Two posts captured how I feel about this: Geoffrey Litt's "[Code like a surgeon](https://www.geoffreylitt.com/2025/10/24/code-like-a-surgeon)" and João Alves' "[When software becomes fast food](https://world.hey.com/joaoqalves/when-software-becomes-fast-food-23147c9b)". LLMs handle the grunt work, but expertise becomes more valuable, not less. They help me move faster, but I still need to know where to go.
+Some posts became unexpectedly useful as LLM context. My [practical guide to application metrics](/posts/practical-guide-to-application-metrics/) and my [guidelines for FDB workloads](/posts/writing-rust-fdb-workloads-that-find-bugs/) now live in project contexts. When I ask Claude to add instrumentation or write a simulation workload, it already knows my patterns.
 
-### Writing English
-
-LLMs also help me write in English. As a French native speaker, they help me reshape my words into something clearer. Properly helping me express what I actually mean.
+Three posts captured how I feel about this: Geoffrey Litt's "[Code like a surgeon](https://www.geoffreylitt.com/2025/10/24/code-like-a-surgeon)", João Alves' "[When software becomes fast food](https://world.hey.com/joaoqalves/when-software-becomes-fast-food-23147c9b)", and Simon Willison's "[Vibe Engineering](https://simonwillison.net/2025/Oct/7/vibe-engineering/)". LLMs handle the grunt work, but expertise becomes more valuable, not less. They help me move faster, but I still need to know where to go. They also help me write in English. As a French native speaker, LLMs reshape my words into something clearer.
 
 ### The Simulation Unlock
 
@@ -87,7 +85,7 @@ While working on [moonpool](https://github.com/PierreZ/moonpool), my hobby proje
 
 Simulation gives LLMs superpowers. Deterministic replay means the LLM can explore step by step without getting lost in non-deterministic noise. Same seed, same execution, every time. The LLM can iterate freely: try a fix, replay the exact same scenario, verify it works. Sometimes assertions tell the LLM exactly which edge cases to look for. The feedback loop is tight and reproducible.
 
-At the beginning of 2025, I had basic knowledge of deterministic simulation testing. By the end of the year, I had my own simulation framework in Rust: [moonpool](https://github.com/PierreZ/moonpool), inspired by FoundationDB's approach. I also wrote [guidelines for writing simulated FDB workloads in Rust](/posts/writing-rust-fdb-workloads-that-find-bugs/).
+At the beginning of 2025, I had basic knowledge of deterministic simulation testing. By the end of the year, I had my own simulation framework in Rust: [moonpool](https://github.com/PierreZ/moonpool), inspired by FoundationDB's approach.
 
 Simulation changes how you structure code. You design for chaos from the start. You think about failure modes during development, not after production teaches you the hard way. And it becomes a powerful way to share knowledge. Works for junior developers learning the codebase. Works for LLMs exploring edge cases. The same reproducible environment helps both.
 
@@ -95,7 +93,9 @@ For now, moonpool is a hobby project to understand FDB internals deeply. Maybe i
 
 ## Looking Ahead
 
-2025 reminded me why I love this job. Building things, learning in public, watching years of investment finally pay off. I am heading into 2026 with more energy than I have had in a while.
+2025 reminded me why I love this job. Building things, learning in public, watching years of investment finally pay off.
+
+For 2026, I want to push moonpool further. The goal is to make simulation testing accessible enough that others can use it for their own projects. If I can turn years of FDB exploration into a framework that helps people build more reliable systems, that would be a good year.
 
 ---
 
