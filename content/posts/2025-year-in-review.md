@@ -11,9 +11,9 @@ tags = ["personal"]
 
 ## Back in Engineering
 
-In January, I announced my [return to engineering](/posts/back-engineering/) after nearly two years in management. It felt like coming home.
-
 ### The Transition
+
+In January, I [went back to engineering](/posts/back-engineering/) after nearly two years in management. It felt like coming home.
 
 But I will be honest: the transition was harder than I expected. There was real imposter syndrome. Had I lost my edge? Was I still the technical person I used to be? The hardest part was not the code itself. It was giving myself **permission to focus**. Having another engineering manager handle the team while I dove into low-level work was the perfect setup. I am grateful to the whole team for making that transition possible. But after three years of context-switching between fires and people issues, sitting down to write code without interruption felt almost wrong. It took months to fully allow myself to focus without afterthoughts.
 
@@ -25,11 +25,15 @@ The conference in Washington D.C., organized by Antithesis, brought together peo
 
 ### DataFusion
 
-One highlight was building the query engine for Materia. I wrote [datafusion-index-provider](https://github.com/datafusion-contrib/datafusion-index-provider), a library that extends Apache DataFusion with index-based query acceleration. I had a lot of fun digging into how a query plan might look when fetching indexes: a two-phase model where you first scan indexes to identify matching row IDs, then fetch complete records. The first time DataFusion, FoundationDB, and our indexes all connected and a SELECT query returned real data, I remembered why I write software. I wrote more about this in [Thank You, DataFusion: Queries in Rust, Without the Pain](/posts/thank-you-datafusion/).
+One highlight was building the query engine for Materia. I wrote [datafusion-index-provider](https://github.com/datafusion-contrib/datafusion-index-provider), a library that extends Apache DataFusion with index-based query acceleration. I had a lot of fun digging into how a query plan might look when fetching indexes: a two-phase model where you first scan indexes to identify matching row IDs, then fetch complete records. The first time DataFusion, FoundationDB, and our indexes all connected and a SELECT query returned real data, [I remembered why I write software](/posts/thank-you-datafusion/).
 
 ### The etcd Shim
 
-Helping put the etcd shim into production was meaningful because of the long arc behind it. I even [wrote about debugging the watch cache](/posts/diving-into-kubernetes-watch-cache/) along the way. It started with discovering Apple's [FDB Record Layer](https://pierrez.github.io/fdb-book/the-record-layer/what-is-record-layer.html), a library that adds structured data, indexing, and queries on top of FoundationDB. At OVHcloud, I [prototyped an etcd layer](https://forums.foundationdb.org/t/a-foundationdb-layer-for-apiserver-as-an-alternative-to-etcd/2697) using those concepts. Then I moved to Clever Cloud and started backporting Record Layer ideas in Rust to build a toolbox for Materia products. We even hacked our way into FDB's simulator using [foundationdb-simulation](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-simulation), a crate that compiles Rust to run inside FDB's deterministic simulator. We published Materia KV. And now, that same toolbox has matured enough to power an etcd-compatible API backing Kubernetes control planes. Years of investing in deep understanding paid off in ways I could not have predicted.
+Helping put the etcd shim into production was meaningful because of the long arc behind it.
+
+At OVHcloud, I operated etcd for Kubernetes. It was a nightmare. etcd hits a performance ceiling fast, and you cannot scale it horizontally because the whole keyspace must fit on every member. When you outgrow one cluster, you boot another, split your keys, and now you operate two clusters. Or three. Or many. During France's first lockdown, I [prototyped an etcd layer](https://forums.foundationdb.org/t/a-foundationdb-layer-for-apiserver-as-an-alternative-to-etcd/2697) using Apple's [FDB Record Layer](https://pierrez.github.io/fdb-book/the-record-layer/what-is-record-layer.html). The prototype worked, but more importantly it showed me what was missing: **a reusable toolbox to encapsulate FoundationDB knowledge**, heavily inspired by the Record Layer itself.
+
+At Clever Cloud, we started building that toolbox in Rust, piece by piece, driven by what our layers actually needed. Our first layer was [Materia KV](https://www.clever-cloud.com/product/materia-kv/), exposing the Redis protocol. That forced us to build the foundational primitives. Then came etcd, which required **a lot** more work: watches, leases, revision tracking. We hacked our way into FDB's simulator with [foundationdb-simulation](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-simulation). I [debugged the watch cache](/posts/diving-into-kubernetes-watch-cache/) along the way. Years of frustration with etcd turned into an etcd-compatible API backing Kubernetes control planes.
 
 ## Sharing
 
@@ -53,9 +57,9 @@ I love making presentations. In 2025, I gave two talks at Devoxx France: one abo
 
 ### Open Source
 
-The [FoundationDB Rust crate](https://crates.io/crates/foundationdb) keeps growing. People have started asking for documentation about simulation testing, and a clear roadmap for upcoming features.
+The [FoundationDB Rust crate](https://crates.io/crates/foundationdb) keeps growing: 11 million downloads, used in production by real companies. But I was not a great maintainer this year. Development followed Clever Cloud's requirements. People asked for documentation about simulation testing and a roadmap, and I did not deliver.
 
-The reality of being a solo maintainer: development is driven by my company's requirements. Clever Cloud needs a feature, I implement it. That is not a complaint. It is just how open source often works when you are not backed by a foundation or dedicated team. The responsibility is real, but so is the satisfaction of seeing 11 million downloads and knowing the crate is used in production by real companies.
+That is not a complaint about open source. It is just honest. Being a solo maintainer without foundation backing means priorities get driven by the day job. Last week I finally wrote a roadmap and flushed my brain into GitHub issues so contributors can pick up work. I hope to do better in 2026.
 
 ## The LLM Year
 
@@ -71,7 +75,7 @@ With LLMs, I picked the habit back up. What used to take hours now takes minutes
 
 They handle peripheral code well: glue code, boilerplate, scaffolding. But what I did not expect is that working with them forces me to flesh out invariants and hidden rules somewhere explicit. You need to write things down for the LLM to understand, and that documentation ends up being useful for humans too.
 
-**Context is everything.** Given the right context, LLMs generate the right code. So I spent a lot of time (and tokens) generating project recaps and summaries to feed them. When working with libraries, I make local git clones so the LLM can browse the actual source code instead of relying on potentially outdated training data. I have been using Claude extensively, and I found [spec-kit](https://github.com/github/spec-kit) helpful for framing my prompts. It is a toolkit for "spec-driven development" that helps you focus on product scenarios instead of vibe-coding from scratch. I wrote more about this in [Specs Are Back, But We're Missing the Tools](/posts/specs-are-back/).
+**Context is everything.** Given the right context, LLMs generate the right code. So I spent a lot of time (and tokens) generating project recaps and summaries to feed them. When working with libraries, I make local git clones so the LLM can browse the actual source code instead of relying on potentially outdated training data. I have been using Claude extensively, and I found [spec-kit](https://github.com/github/spec-kit) helpful for framing my prompts. It is a toolkit for "spec-driven development" that helps you focus on product scenarios instead of vibe-coding from scratch. But [we are still missing the tools](/posts/specs-are-back/) to make this workflow seamless.
 
 Some posts became unexpectedly useful as LLM context. My [practical guide to application metrics](/posts/practical-guide-to-application-metrics/) and my [guidelines for FDB workloads](/posts/writing-rust-fdb-workloads-that-find-bugs/) now live in project contexts. When I ask Claude to add instrumentation or write a simulation workload, it already knows my patterns.
 
@@ -81,21 +85,21 @@ Three posts captured how I feel about this: Geoffrey Litt's "[Code like a surgeo
 
 The most mind-blowing moment of 2025 came when I combined LLMs with deterministic simulation testing.
 
-While working on [moonpool](https://github.com/PierreZ/moonpool), my hobby project for studying FoundationDB internals, Claude found a race condition I did not know existed. The devil lies in the details, and the most vicious bugs hide in things we do not know. Claude identified a faulty seed, debugged it using deterministic replay, and fixed it. This is **autonomous testing**: actively searching for bugs instead of writing thousands of tests. I wrote more about this in "[Testing: prevention vs discovery](/posts/testing-prevention-vs-discovery/)".
+While working on [moonpool](https://github.com/PierreZ/moonpool), my hobby project for backporting FoundationDB internals, Claude did something I did not expect: it [found a bug on its own](/posts/testing-prevention-vs-discovery/). Not by running tests I wrote, but by exploring failure scenarios I had not considered. It identified a faulty seed, replayed the exact execution, and fixed the race condition. This flipped my mental model. Most testing **prevents** known bugs from returning. Simulation lets you **discover** bugs you do not know exist.
 
-Simulation gives LLMs superpowers. Deterministic replay means the LLM can explore step by step without getting lost in non-deterministic noise. Same seed, same execution, every time. The LLM can iterate freely: try a fix, replay the exact same scenario, verify it works. Sometimes assertions tell the LLM exactly which edge cases to look for. The feedback loop is tight and reproducible.
+Simulation gives LLMs superpowers. Same seed, same execution, every time. The LLM can try a fix, replay the exact scenario, verify it works. Sometimes assertions tell it exactly which edge cases to look for. The feedback loop is tight and reproducible.
 
-At the beginning of 2025, I had basic knowledge of deterministic simulation testing. By the end of the year, I had my own simulation framework in Rust: [moonpool](https://github.com/PierreZ/moonpool), inspired by FoundationDB's approach.
+At the beginning of 2025, I had basic knowledge of deterministic simulation. By the end, I had built moonpool. Simulation changes how you structure code. You design for chaos from the start. You think about failure modes during development, not after production teaches you the hard way. The same reproducible environment helps junior developers and LLMs alike.
 
-Simulation changes how you structure code. You design for chaos from the start. You think about failure modes during development, not after production teaches you the hard way. And it becomes a powerful way to share knowledge. Works for junior developers learning the codebase. Works for LLMs exploring edge cases. The same reproducible environment helps both.
-
-For now, moonpool is a hobby project to understand FDB internals deeply. Maybe it becomes a production framework others can use. Maybe it integrates into Materia's testing infrastructure. Who knows? The journey is the point. But I am convinced: **simulation is the future.** Not just for databases. For any system where correctness matters. The ability to actively hunt for bugs instead of waiting for production to expose them changes everything.
+Maybe moonpool becomes a production framework others can use. Maybe it stays a hobby project for understanding FDB internals. The journey is the point. But I am convinced: **simulation is the future.** Not just for databases. For any system where correctness matters.
 
 ## Looking Ahead
 
-2025 reminded me why I love this job. Building things, learning in public, watching years of investment finally pay off.
+2025 reminded me why I love this work. Building systems, learning in public, watching years of investment pay off.
 
-For 2026, I want to push moonpool further. The goal is to make simulation testing accessible enough that others can use it for their own projects. If I can turn years of FDB exploration into a framework that helps people build more reliable systems, that would be a good year.
+For 2026, the habits stay: writing one or two posts per month, reading codebases with LLM assistance, speaking at conferences when invited. I want to push moonpool toward something others can actually use. Maybe I will have opportunities to contribute to FoundationDB directly. We have ambitious plans for Materia at Clever Cloud. And I will keep helping organize [FinistDevs](https://finistdevs.org/) in Brest.
+
+The theme is the same as 2025: go deeper, share what I learn, build things that last.
 
 ---
 
