@@ -52,7 +52,7 @@ At the beginning of 2025, I had basic knowledge of deterministic simulation. By 
 
 ## Sharing
 
-I set a goal to write one or two posts per month, and I published 22. You can trace my monthly focus just by looking at what I published. The results surprised me: traffic multiplied by 2.5x according to Plausible. This was also the first year where people actually reached out to say **thank you** for sharing. I always assumed no one was reading.
+I set a goal to write one or two posts per month, and I published 20. You can trace my monthly focus just by looking at what I published. The results surprised me: traffic multiplied by 2.5x according to Plausible. This was also the first year where people actually reached out to say **thank you** for sharing. I always assumed no one was reading.
 
 The top posts by visitors: [NixOS: The Good, The Bad, and The Ugly](/posts/nixos-good-bad-ugly/), [Unlocking Tokio's Hidden Gems](/posts/tokio-hidden-gems/), [Distributed Systems Resources](/posts/distsys-resources/), and [What if we embraced simulation-driven development?](/posts/simulation-driven-development/). Strangely enough, my most shared post was not about distributed systems or FoundationDB but about NixOS. I think people appreciated the honest take: the good, the bad, **and** the ugly. The Tokio post being #2 was also unexpected. Sometimes the posts you almost do not publish are the ones that resonate.
 
