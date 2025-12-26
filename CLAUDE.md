@@ -87,7 +87,7 @@ Write like a senior colleague sharing hard-won production wisdom over coffee. Bl
 
 1. **Technical authority** - Ground claims in specific experience (systems operated, incidents debugged, code contributed)
 2. **Conversational warmth** - First-person narrative, self-deprecating humor, acknowledge learning struggles
-3. **Visual rhythm** - Bold key terms, short punchy sentences, strategic whitespace
+3. **Visual rhythm** - Bold key terms, strategic whitespace. Use 1-2 punchy sentences max per post (typically as opener), then let sentences flow naturally.
 4. **Discovery narrative** - Take readers on a journey (debugging session, exploration, realization)
 
 ### Core Principles
