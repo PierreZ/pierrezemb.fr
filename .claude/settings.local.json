@@ -1,5 +1,29 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "WebFetch(domain:docs.rs)",
+      "WebFetch(domain:www.usenix.org)",
+      "WebSearch",
+      "WebFetch(domain:www.commitstrip.com)",
+      "WebFetch(domain:simonwillison.net)",
+      "Bash(grep:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(xargs -I {} sh -c 'grep -L \"\"draft = true\"\" \"\"{}\"\" 2>/dev/null || echo \"\"{}\"\"')",
+      "Bash(for f in /home/pierrez/workspace/markdown/pierrezemb.fr/content/posts/*.md)",
+      "Bash(do)",
+      "Bash(if grep -q \"date = 2025\" \"$f\")",
+      "Bash(! grep -q \"draft = true\" \"$f\")",
+      "Bash(then)",
+      "Bash(basename:*)",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(while read f)",
+      "Bash(do if ! grep -q \"draft = true\" \"$f\")",
+      "Bash(then basename \"$f\")"
+    ],
     "defaultMode": "acceptEdits"
   }
 }

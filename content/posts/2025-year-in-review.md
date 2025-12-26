@@ -1,13 +1,12 @@
 +++
 title = "2025: A Year in Review"
 description = "Reflections on returning to engineering, discovering simulation as a superpower, and the compounding value of years of distributed systems work."
-date = 2025-12-31
-draft = true
+date = 2025-12-24
 [taxonomies]
 tags = ["personal"]
 +++
 
-2025 was the year I stopped managing and started shipping software again. Looking back, it was about returning to my roots, writing more than ever, and (fully) discovering that simulation testing is a superpower.
+2025 was the year I stopped managing and started shipping software again. After nearly two years of context-switching between fires and people issues, I returned to the keyboard. As the year closes, it feels like the right time to look back. It was about **going deeper**: into code, into writing, and into understanding why simulation testing is a superpower.
 
 ## Back in Engineering
 
@@ -15,7 +14,7 @@ tags = ["personal"]
 
 In January, I [went back to engineering](/posts/back-engineering/) after nearly two years in management. It felt like coming home.
 
-But I will be honest: the transition was harder than I expected. There was real imposter syndrome. Had I lost my edge? Was I still the technical person I used to be? The hardest part was not the code itself. It was giving myself **permission to focus**. Having another engineering manager handle the team while I dove into low-level work was the perfect setup. I am grateful to the whole team for making that transition possible. But after three years of context-switching between fires and people issues, sitting down to write code without interruption felt almost wrong. It took months to fully allow myself to focus without afterthoughts.
+But I will be honest: the transition was harder than I expected. There was real imposter syndrome. Had I lost my edge? Was I still the technical person I used to be? The hardest part was not the code itself. It was giving myself **permission to focus**. Having another engineering manager handle the team while I dove into low-level work was the perfect setup. I am also grateful to the whole team for making that transition possible. But after three years of context-switching between fires and people issues, sitting down to write code without interruption felt almost wrong. It took months to fully allow myself to focus without afterthoughts.
 
 ### BugBash 2025
 
@@ -23,17 +22,29 @@ Then came [BugBash 2025](https://bugbash.antithesis.com/) in early April.
 
 The conference in Washington D.C., organized by Antithesis, brought together people like Kyle Kingsbury, Ankush Desai, and Mitchell Hashimoto to discuss software reliability. The highlight was meeting some of the original FoundationDB creators. Hearing their war stories and seeing how deeply simulation shaped FDB's legendary reliability reignited something in me. I had been using FDB's simulation for years, but I had never fully internalized that **[this could be how I write all software](/posts/simulation-driven-development/)**.
 
-### DataFusion
-
-One highlight was building the query engine for Materia. I wrote [datafusion-index-provider](https://github.com/datafusion-contrib/datafusion-index-provider), a library that extends Apache DataFusion with index-based query acceleration. I had a lot of fun digging into how a query plan might look when fetching indexes: a two-phase model where you first scan indexes to identify matching row IDs, then fetch complete records. The first time DataFusion, FoundationDB, and our indexes all connected and a SELECT query returned real data, [I remembered why I write software](/posts/thank-you-datafusion/).
-
-### The etcd Shim
+### Building the Toolbox, the Long Way Around
 
 Helping put the etcd shim into production was meaningful because of the long arc behind it.
 
-At OVHcloud, I operated etcd for Kubernetes. It was a nightmare. etcd hits a performance ceiling fast, and you cannot scale it horizontally because the whole keyspace must fit on every member. When you outgrow one cluster, you boot another, split your keys, and now you operate two clusters. Or three. Or many. During France's first lockdown, I [prototyped an etcd layer](https://forums.foundationdb.org/t/a-foundationdb-layer-for-apiserver-as-an-alternative-to-etcd/2697) using Apple's [FDB Record Layer](https://pierrez.github.io/fdb-book/the-record-layer/what-is-record-layer.html). The prototype worked, but more importantly it showed me what was missing: **a reusable toolbox to encapsulate FoundationDB knowledge**, heavily inspired by the Record Layer itself.
+#### The Origin
 
-At Clever Cloud, we started building that toolbox in Rust, piece by piece, driven by what our layers actually needed. Our first layer was [Materia KV](https://www.clever-cloud.com/product/materia-kv/), exposing the Redis protocol. That forced us to build the foundational primitives. Then came etcd, which required **a lot** more work: watches, leases, revision tracking. We hacked our way into FDB's simulator with [foundationdb-simulation](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-simulation). I [debugged the watch cache](/posts/diving-into-kubernetes-watch-cache/) along the way. Years of frustration with etcd turned into an etcd-compatible API backing Kubernetes control planes.
+At OVHcloud, I operated HBase and etcd for various platforms. Both were operational nightmares in their own ways.
+
+HBase was weak to network issues. Every incident triggered region split inconsistencies. We ran hbck in brutal ways just to keep things running. HBase led me to FDB, a system built to handle network chaos.
+
+etcd hit a performance ceiling fast. We were adding hundreds of customers per etcd cluster, each with their own Kubernetes control plane. I [talked about this at KubeCon](https://www.youtube.com/watch?v=IrJyrGQ_R9c). Spawning three etcd nodes per customer is not a valid approach at scale, whether in the cloud or on-premise. You need to mutualize. But you cannot scale etcd horizontally because the whole keyspace must fit on every member. When you outgrow one cluster, you boot another, split your keys, and now you operate two clusters. Or three. Or many.
+
+Then I discovered Apple's [FDB Record Layer](https://pierrez.github.io/fdb-book/the-record-layer/what-is-record-layer.html). It was an eye-opener. Here was a way to **virtualize database-like systems** on top of FoundationDB. Build any storage abstraction you want on a rock-solid distributed foundation. During France's first lockdown, I [prototyped an etcd layer](https://forums.foundationdb.org/t/a-foundationdb-layer-for-apiserver-as-an-alternative-to-etcd/2697) using the Record Layer. The prototype worked, but more importantly, the Record Layer showed me what was important: **a reusable toolbox to encapsulate FoundationDB knowledge**.
+
+I moved to Clever Cloud to build exactly that: serverless systems based on FoundationDB. We started building the toolbox in Rust, piece by piece, driven by what our layers actually needed. I wanted the same guarantees as FDB for testing my code, so we [hacked our way into FDB's simulator](/posts/diving-into-foundationdb-simulation/) with [foundationdb-simulation](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-simulation). Our first layer was [Materia KV](https://www.clever-cloud.com/product/materia-kv/), exposing the Redis protocol. That forced us to build the foundational primitives.
+
+#### DataFusion
+
+One highlight was building the query engine for Materia. I wrote [datafusion-index-provider](https://github.com/datafusion-contrib/datafusion-index-provider), a library that extends Apache DataFusion with index-based query acceleration. I had a lot of fun digging into how a query plan might look when fetching indexes: a two-phase model where you first scan indexes to identify matching row IDs, then fetch complete records. The interesting part was combining **AND** and **OR** operations. AND predicates build a left-deep tree of joins to intersect row IDs across indexes. OR predicates use unions with deduplication to merge results without fetching the same record twice. The first time DataFusion, FoundationDB, and our indexes all connected and a SELECT query returned real data, [I remembered why I write software](/posts/thank-you-datafusion/).
+
+#### The etcd Shim
+
+Then came etcd, which required **a lot** more work: watches, leases, revision tracking. I [debugged the watch cache](/posts/diving-into-kubernetes-watch-cache/) along the way. We are not alone in this approach: [AWS](https://aws.amazon.com/blogs/containers/under-the-hood-amazon-eks-ultra-scale-clusters/) and [GKE](https://cloud.google.com/blog/products/containers-kubernetes/gke-65k-nodes-and-counting?hl=en) also run custom storage layers for Kubernetes at scale. No more splitting clusters when you outgrow them. No more operational nightmares. FoundationDB handles the hard distributed systems parts. Years of frustration with etcd turned into an etcd-compatible API backing Kubernetes control planes.
 
 ## Sharing
 
