@@ -87,13 +87,31 @@ Write like a senior colleague sharing hard-won production wisdom over coffee. Bl
 
 1. **Technical authority** - Ground claims in specific experience (systems operated, incidents debugged, code contributed)
 2. **Conversational warmth** - First-person narrative, self-deprecating humor, acknowledge learning struggles
-3. **Visual rhythm** - Bold key terms, strategic whitespace. Use 1-2 punchy sentences max per post (typically as opener), then let sentences flow naturally.
-4. **Discovery narrative** - Take readers on a journey (debugging session, exploration, realization)
+3. **Visual rhythm** - Bold key terms, strategic whitespace. One punchy sentence can open a post, but body paragraphs flow naturally at 3-6 sentences each.
+4. **Discovery narrative** - Take readers on a journey (debugging session, exploration, conceptual progression)
+
+### Narrative Flow (Critical)
+
+**Every post is a journey, not a list of facts.** This is the most important principle. The reader should feel guided through a discovery, with each paragraph setting up the next.
+
+**How to achieve narrative flow:**
+
+- **Questions as transitions**: Use questions to bridge concepts. "The question is: how do we test this?" or "But what happens when the network splits?" These guide the reader forward.
+- **Build mental models progressively**: Start with a concrete problem, show a specific example, extract the principle, then show broader application. Never dump abstract concepts without grounding them first.
+- **Connect every section**: Each paragraph should have a reason to follow the previous one. If you can reorder sections without losing meaning, the narrative flow is broken.
+- **Use analogies**: Make abstract concepts visceral with real-world comparisons. "The difference between dev and production is like learning to drive versus driving in Paris."
+
+**Paragraph rhythm:**
+- Opening hook: 1-2 punchy sentences to grab attention
+- Body paragraphs: 3-6 sentences with natural flow
+- Occasional 1-2 sentence pauses for emphasis on key insights
+- Never sacrifice flow for brevity. A choppy post with disconnected sections fails even if each section is technically correct.
 
 ### Core Principles
 
 - **Production-first**: Every concept connects to operational reality (on-call, failures, scale)
-- **Concrete over abstract**: Real numbers ("70+ node cluster"), actual systems, specific failure modes
+- **Concrete over abstract**: Always use precise numbers ("28,000 ports / 60 seconds = 466 connections/second"), never vague quantities ("hundreds of"). Name specific systems you have operated (HBase 250+ nodes, 70-machine Hadoop cluster). Specific failure modes beat generic descriptions.
+- **Named concepts stick**: Give memorable names to patterns and ideas ("The Bash Script Test", "Sequential Luck Problem", "The 15-Minute Hang"). Readers remember named concepts months later.
 - **Show transformation**: "What was a 3 AM page becomes a daytime debugging session"
 - **Bold for emphasis**: Never italics or em dashes
 
@@ -112,7 +130,12 @@ Write like a senior colleague sharing hard-won production wisdom over coffee. Bl
 
 **Code examples**: Always Context → Code → Explanation. Comments explain WHY, not WHAT.
 
-**References**: Weave into narrative (no "Further Reading" sections). Include commit hashes for GitHub links. Cross-link related posts extensively to create a knowledge web.
+**References (integrated, never listed):**
+- Links appear mid-sentence, as part of the argument: "As [this study of 136 network partition failures](link) found..."
+- Include commit hashes for GitHub links: `[foundationdb-simulation](https://github.com/.../tree/4ed057a/...)`
+- Cross-link related posts to create a knowledge web: "...using techniques like [simulation-driven development](/posts/simulation-driven-development/)..."
+- Research papers get specifics: "A [study at OSDI 2018](link) found that 80% of partition failures were catastrophic"
+- Never create "Further Reading" or "Resources" sections. Every reference earns its place by supporting the narrative.
 
 **Endings**: Before the standard footer, close with a provocative question or invitation to share experiences. Example: "Do you think your datastore has gone through the same tests?"
 
@@ -122,7 +145,7 @@ English is not my first language. This shapes my writing: I use simple, direct s
 
 ### Anti-patterns
 
-Avoid: "delve into", "dive deep", "in the world of", "it's worth noting", em dashes, semicolons, overly complex sentences, explaining what you're about to explain ("In this post, I will...")
+Avoid: "delve into", "dive deep", "in the world of", "it's worth noting", em dashes, semicolons, overly complex sentences, explaining what you're about to explain ("In this post, I will..."), choppy disconnected sections, vague numbers ("hundreds of"), reference lists at the end
 
 ### Standard Footer
 ```markdown
