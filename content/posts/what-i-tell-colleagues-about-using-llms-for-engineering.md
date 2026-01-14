@@ -27,7 +27,9 @@ A plan is only as good as the context it is built on.
 
 ## Context is Everything
 
-The output quality depends entirely on the context you provide. This sounds obvious, but the implications took me a while to internalize. I now create context files with domain knowledge, code patterns, and project summaries. Writing down the hidden coding style rules that exist only in your head is surprisingly valuable. The conventions you enforce in code review but never documented? Write them down. The LLM will follow them, and so will newcomers on your team. I am currently experimenting with Claude skills to make this context reusable across sessions. The difference between [vibe coding and vibe engineering](https://simonwillison.net/2025/Oct/7/vibe-engineering/), as Simon Willison puts it, is whether you stay accountable for what the LLM produces. Accountability requires understanding, and understanding requires context.
+The output quality depends entirely on the context you provide. This sounds obvious, but the implications took me a while to internalize. I now create context files with domain knowledge, code patterns, and project summaries. Writing down the hidden coding style rules that exist only in your head is surprisingly valuable. The conventions you enforce in code review but never documented? Write them down. The LLM will follow them, and so will newcomers on your team. I am currently experimenting with Claude skills to make this context reusable across sessions.
+
+The difference between [vibe coding and vibe engineering](https://simonwillison.net/2025/Oct/7/vibe-engineering/), as Simon Willison puts it, is whether you stay accountable for what the LLM produces. Accountability requires understanding, and understanding requires context.
 
 Without enough context framing the problem, Claude over-engineers. I have seen it add abstraction layers, configuration options, and patterns I never asked for. The cure is constraints: explicit context about what simplicity looks like in this codebase. The LLM can generate code faster than I ever could, but knowing what context matters is expertise that cannot be delegated.
 
@@ -49,6 +51,8 @@ This is why Rust and Claude work so well together. The compiler gives **actionab
 
 **TDD** fits perfectly here. Tests are easy for you to read and verify, and they give fast feedback to the LLM. Write the test first, let Claude implement until it passes. You stay in control of the specification while delegating the implementation.
 
+For software that needs to be correct, the feedback must be exhaustive. I maintain the [FoundationDB Rust crate](https://crates.io/crates/foundationdb). Over 11 million downloads, used by real companies. The [binding tester](/posts/providing-safety-fdb-rs/) generates operation sequences and compares our implementation against the reference. We run the equivalent of **219 days of continuous testing each month** across our CI runners. When Claude contributes code, the binding tester tells it exactly where behavior diverges. This kind of feedback gives confidence to change things in a database driver that you would never touch otherwise.
+
 ### Simulation: Feedback for Distributed Systems
 
 Compiler feedback catches syntax and types. Tests catch logic errors. But what about bugs that hide in timing and network partitions?
@@ -57,15 +61,9 @@ Distributed systems fail in ways that only manifest under specific conditions. [
 
 Distributed systems need feedback loops that inject failures **before** production. This is what [deterministic simulation](/posts/simulation-driven-development/) provides. Same seed, same execution, same bugs. When every run is reproducible, the LLM can methodically explore the state space, find a failure, and debug it step by step.
 
-I maintain the [FoundationDB Rust crate](https://crates.io/crates/foundationdb). Over 11 million downloads, used by real companies. The [binding tester](/posts/providing-safety-fdb-rs/) generates operation sequences and compares our implementation against the reference. It explores the state space of the API: transactions, ranges, watches, atomic operations. We run the equivalent of **219 days of continuous testing each month** across our CI runners. When Claude contributes code, the binding tester tells it exactly where behavior diverges.
+In [moonpool](https://github.com/PierreZ/moonpool), Claude [discovered a bug I did not know existed](/posts/testing-prevention-vs-discovery/) through active exploration of edge cases I had not considered. [Armin Ronacher](https://x.com/mitsuhiko/status/2011048778896212251) recently noted that agents can now port entire codebases to new languages with all tests passing. Moonpool is exactly this: a backport of FoundationDB's low-level internals to Rust.
 
-In [moonpool](https://github.com/PierreZ/moonpool), Claude [discovered a bug I did not know existed](/posts/testing-prevention-vs-discovery/) through active exploration of edge cases I had not considered. [Armin Ronacher](https://x.com/mitsuhiko/status/2011048778896212251) recently noted that agents can now port entire codebases to new languages with all tests passing. Moonpool is exactly this: a backport of FoundationDB's low-level internals to Rust. More posts about this journey are coming.
-
-Testing is not just about **preventing** old bugs from returning. With the right infrastructure, LLMs can **discover** new bugs. Prevention testing asks "did we break what used to work?" Discovery testing asks "what else is broken that we have not found yet?" The more states your tests explore, the more leverage you get from AI assistance.
-
-AI amplifies expertise. It does not replace it. The years I spent operating distributed systems, debugging production incidents, understanding FoundationDB internals. That expertise determines what context to provide and what feedback matters. The LLM accelerates execution, but the direction comes from experience.
-
-What would your workflow look like if you built the infrastructure for AI to discover bugs instead of just preventing them?
+The most awful bugs are the unknown unknowns. You cannot write a test for a bug you do not know exists. Simulation and state exploration are the cheatsheet. If the code survives exhaustive exploration of edge cases, failures, and adversarial conditions, it behaves correctly. It does not matter whether an LLM wrote it or you did.
 
 ---
 
