@@ -1,8 +1,8 @@
 +++
 title = "What I Tell Colleagues About Using LLMs for Engineering"
 description = "LLMs amplify expertise, they don't replace it. Here's what works: planning, context, feedback loops, and building systems that let AI discover bugs."
-date = 2026-01-14
-draft = true
+date = 2026-01-15
+draft = false
 [taxonomies]
 tags = ["llm", "software-engineering", "rust", "testing"]
 +++
@@ -15,13 +15,29 @@ The shift matters because [code is becoming cheap](https://world.hey.com/joaoqal
 
 The first months were honestly frustrating. Code that looked right but broke in subtle ways. APIs that no longer existed. Patterns that didn't match my codebase. It took experimentation to find what actually works. These are the patterns that survived.
 
+## What Becomes Reachable
+
+I keep hearing that LLMs unlock velocity. We can ship faster! While that may be true, I think it misses the main benefit. LLMs are about reaching work that would never get done otherwise.
+
+Every engineering team has a backlog of things that matter but never happen: comprehensive doc tests, database migrations, dependency updates, technical debt. These tasks sit in dream lists because the return on investment is too low given the effort required. LLMs change that equation.
+
+[moonpool](https://github.com/PierreZ/moonpool) is my concrete example. Backporting FoundationDB's low-level internals to Rust was always a dream project. I had operated distributed systems for years and understood the concepts, but the sheer volume of translation work kept it out of reach. I could throw multiple codebases at Claude for analysis, create recap files summarizing key patterns, and nourish my own implementation plan in hours instead of days. The project exists because LLMs made it reachable.
+
+This is the shift worth paying attention to: LLMs amplify expertise, they do not replace it. The knowledge of what to build and why remains the bottleneck. The execution barrier just got lower.
+
 ## Plan First, Always
 
 Here is the paradox: when code becomes cheap, design becomes more valuable. Not less. You can now afford to spend time on architecture, discuss tradeoffs, commit to an approach before writing a single line of code. [Specs are coming back](/posts/specs-are-back/), and the judgment to write good ones still requires years of building systems.
 
 Every significant task now starts in Plan Mode with `ultrathink`. Boris Cherny [says thinking is on by default now](https://x.com/bcherny/status/2007892431031988385) and the command does not do much anymore, but old habits die hard. The practical goal is breaking work into chunks small enough that the AI can digest the context without hallucinating. This is not about limiting ambition. It is about matching task scope to context window.
 
-For large tasks, I produce a **spec file** that survives context compaction. When Claude eventually summarizes the conversation, the spec remains as the source of truth. Without this discipline, I found myself repeating context over and over, watching the model forget decisions we had already made. The spec file became the anchor point that persisted across context boundaries, and suddenly long tasks became manageable.
+For large tasks, I produce a **spec file** that Claude and I iterate on together. Claude Code has an `AskUserQuestion` tool that lets Claude ask clarifying questions mid-task. Combined with a spec file, this becomes powerful: Claude asks about edge cases, I refine the requirements, we converge on an approach before writing code. The collaboration happens in the spec, not scattered across conversation turns. As a bonus, the spec survives context compaction and remains the source of truth when Claude summarizes the conversation.
+
+Instead of generating a spec from assumptions, I tell Claude to clarify first. Here is an example prompt I use:
+
+> ultrathink. Generate a spec.md for adding a new API endpoint to this codebase. Before writing anything, ask me about the endpoint's purpose, request/response schema, authentication requirements, and edge cases. Then produce a comprehensive spec covering motivation, technical design, error handling, and testing strategy.
+
+The result is a spec that matches what I actually need, not what Claude guessed I might want. Fewer iterations, better alignment.
 
 A plan is only as good as the context it is built on.
 
@@ -33,7 +49,7 @@ The difference between [vibe coding and vibe engineering](https://simonwillison.
 
 Without enough context framing the problem, Claude over-engineers. I have seen it add abstraction layers, configuration options, and patterns I never asked for. The cure is constraints: explicit context about what simplicity looks like in this codebase. The LLM can generate code faster than I ever could, but knowing what context matters is expertise that cannot be delegated.
 
-Context works when it is accurate. There is one category of context that deserves special attention.
+Context works when it is accurate. Documentation often is not.
 
 ## Clone Your Dependencies
 
@@ -61,9 +77,11 @@ Distributed systems fail in ways that only manifest under specific conditions. [
 
 Distributed systems need feedback loops that inject failures **before** production. This is what [deterministic simulation](/posts/simulation-driven-development/) provides. Same seed, same execution, same bugs. When every run is reproducible, the LLM can methodically explore the state space, find a failure, and debug it step by step.
 
-In [moonpool](https://github.com/PierreZ/moonpool), Claude [discovered a bug I did not know existed](/posts/testing-prevention-vs-discovery/) through active exploration of edge cases I had not considered. [Armin Ronacher](https://x.com/mitsuhiko/status/2011048778896212251) recently noted that agents can now port entire codebases to new languages with all tests passing. Moonpool is exactly this: a backport of FoundationDB's low-level internals to Rust.
+In moonpool, Claude [discovered a bug I did not know existed](/posts/testing-prevention-vs-discovery/) through active exploration of edge cases I had not considered. [Armin Ronacher](https://x.com/mitsuhiko/status/2011048778896212251) recently noted that agents can now port entire codebases to new languages with all tests passing. The combination of simulation and LLMs makes this possible.
 
-The most awful bugs are the unknown unknowns. You cannot write a test for a bug you do not know exists. Simulation and state exploration are the cheatsheet. If the code survives exhaustive exploration of edge cases, failures, and adversarial conditions, it behaves correctly. It does not matter whether an LLM wrote it or you did.
+The most awful bugs are the **unknown unknowns**. You cannot write a test for a bug you do not know exists. Simulation and state exploration are the cheatsheet. If the code survives exhaustive exploration of edge cases, failures, and adversarial conditions, it behaves correctly. It does not matter whether an LLM wrote it or you did.
+
+What dream project has been sitting on your list, waiting for the execution barrier to drop?
 
 ---
 
