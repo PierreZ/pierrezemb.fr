@@ -33,7 +33,9 @@ read version                                          commit version
      │   a frozen snapshot       may commit writes here     │
 ```
 
-The longer your transaction runs, the wider this window grows. FoundationDB enforces a strict **5-second transaction limit** because Resolvers keep conflict history in memory and storage servers cache multi-version data to serve reads at old versions. Five seconds is the practical limit for that in-memory state. A transaction that completes in 50 milliseconds has almost no exposure. A transaction that takes 4.5 seconds is exposed to every concurrent write on every key it read.
+The longer your transaction runs, the wider this window grows. FoundationDB enforces a strict **5-second transaction limit**, which is exactly **5 million versions** (`MAX_WRITE_TRANSACTION_LIFE_VERSIONS = 5 * VERSIONS_PER_SECOND`). The Resolver tracks conflict history in memory up to this age; transactions older than `currentVersion - 5,000,000` are rejected as "transaction too old."
+
+A transaction that completes in 50 milliseconds has almost no exposure. A transaction that takes 4.5 seconds is exposed to every concurrent write on every key it read.
 
 This is why long transactions are one of the most common sources of production trouble. More work means more time, wider window, more conflicts. The fix is parallelizing your reads so the transaction completes faster, splitting work into smaller transactions when full atomicity isn't required, or using [continuations](/posts/understanding-fdb-record-layer-continuations/) to checkpoint progress across transaction boundaries.
 
@@ -56,21 +58,13 @@ Every read your transaction performs adds a **read-conflict range** to your tran
                      key_C ∈ {B..D}? → YES → ABORT
 ```
 
-The straightforward cases follow the rule: `get` and `get_range` create read conflicts, `set`, `clear`, and `clear_range` create write conflicts. No surprises there. The interesting operations are the ones that break the pattern.
+The straightforward cases follow the rule: `get` and `get_range` create read conflicts, `set`, `clear`, and `clear_range` create write conflicts.
 
-**Atomic operations** like `atomic_add`, `atomic_min`, and `atomic_max` create write conflicts but **no read conflicts**. This is why they're the primary tool for avoiding contention. They get a full treatment in the section below.
-
-**Snapshot reads** skip adding read conflicts while returning the same data from the same consistent snapshot. Your transaction won't abort if that data changes before commit. This makes them the main tool for phantom conflict avoidance, covered in the Snapshot Reads section below.
-
-FDB also exposes **manual conflict APIs**: `add_read_conflict_key` and `add_read_conflict_range` let you inject read conflicts explicitly. This is useful when you've done a snapshot read but still want to conflict on specific keys, giving you fine-grained control over exactly which keys can abort your transaction.
-
-Finally, `get_range` only adds the start and end keys as conflict range boundaries, not every key/value pair returned. A range read returning 1,000 keys adds the same conflict range as one returning 3 keys. The conflict surface is the range itself, not the data inside it.
-
-The simplest conflict scenario to watch for is the **hot key**: a single key read and written by many concurrent transactions. A naive global counter, a "last updated" timestamp, a configuration value everyone checks. The fix depends on access patterns: atomic operations for counters (more on this below), or sharding across multiple keys for extreme write rates.
+The simplest conflict pattern is the **hot key**: a single key read and written by many concurrent transactions. A naive global counter, a "last updated" timestamp, a configuration value everyone checks. The read-modify-write creates a read conflict, and under concurrent updates, all but one transaction fails. The following sections cover three escape hatches: phantom conflicts and how to avoid them with snapshot reads, atomic operations that write without reading, and versionstamps that generate unique IDs without coordination.
 
 ## The Phantom Conflict Problem
 
-When you call `get(key)`, FDB adds that single key to your read conflict set. Straightforward. But when you call `get_range(start, end)`, FDB adds **the entire range** to your conflict set, not just the keys that happened to exist, not just the keys your code iterated over. The mathematical range from start to end, including every possible key that could exist within it. **You can conflict on keys you never saw.**
+When you call `get(key)`, FDB adds that single key to your read conflict set. Straightforward. But when you call `get_range(start, end)`, FDB adds **the entire range** to your conflict set ([see NativeAPI.actor.cpp](https://github.com/apple/foundationdb/blob/main/fdbclient/NativeAPI.actor.cpp#L4611-L4640)), not just the keys that happened to exist, not just the keys your code iterated over. The mathematical range from start to end, including every possible key that could exist within it. The SIGMOD 2021 paper calls this **phantom read prevention**: "The read set is checked against the modified key ranges of concurrent committed transactions, which prevents phantom reads." **You can conflict on keys you never saw.**
 
 ```
 Your range read: get_range("order/user1/", "order/user1/\xff")
@@ -95,7 +89,7 @@ Imagine you're scanning a user's orders to check if they have any pending shipme
 
 ## Snapshot Reads
 
-A snapshot read returns the same data as a regular read from the same consistent snapshot, but it does not add any read conflicts to your transaction. The operation is `tr.snapshot().get(key)` or `tr.snapshot().get_range(start, end)`. The data you get back is identical. The only difference is what happens at commit time: the Resolver won't check whether those keys changed.
+A snapshot read returns the same data as a regular read from the same consistent snapshot, but it does not add any read conflicts to your transaction. The operation is `tr.snapshot().get(key)` or `tr.snapshot().get_range(start, end)`. The data you get back is identical. The only difference is what happens at commit time: the Resolver won't check whether those keys changed. FDB also exposes **manual conflict APIs**: `add_read_conflict_key` and `add_read_conflict_range` let you inject read conflicts explicitly. This is the complement to snapshot reads: you read without conflicts, then selectively add conflicts on exactly the keys you care about.
 
 When would you want this? Whenever you need to read data for your logic but don't need the transaction to abort if that data changes concurrently. A common case is reading configuration or metadata that rarely changes and where a slightly stale value is acceptable within the transaction's own snapshot.
 
@@ -131,7 +125,7 @@ tr.atomic_add(counter_key, 1)
 
 The [Record Layer](https://foundationdb.github.io/fdb-record-layer/) exploits this for aggregate indexes. A `COUNT` index issues `atomic_add(count_key, 1)` on every record insertion and `atomic_add(count_key, -1)` on deletion. A `SUM` index adds the field's value. `MAX_EVER` and `MIN_EVER` use `atomic_max` and `atomic_min`. Unlimited concurrent updates to the same aggregate, zero conflicts between writers.
 
-**The trap**: if you read a key and also atomically modify it in the same transaction, you lose all the benefits. The read already added a conflict range. The pattern only works when you genuinely don't need to see the current value.
+**The trap**: if you read a key and also atomically modify it in the same transaction, you lose all the benefits. The FoundationDB documentation is explicit: "If a transaction uses both an atomic operation and a strictly serializable read on the same key, the benefits of using the atomic operation (for both conflict checking and performance) are lost." The read already poisoned the transaction. The pattern only works when you genuinely don't need to see the current value.
 
 ## Versionstamps: Conflict-Free Ordering
 
@@ -159,7 +153,7 @@ The Record Layer uses this for its `VERSION` index, which powers CloudKit's sync
 
 The next time you see a conflict error, ask yourself: what did I read that I didn't need to? The answer is usually hiding in a range read that could have been narrower, a read-modify-write that could have been an atomic operation, or a check that could have used a snapshot read.
 
-What conflict patterns have you hit in your own layers? I'd love to hear about creative solutions.
+The next time you're debugging a conflict storm, grep your code for `get_range`. How many of those could be snapshot reads with selective conflicts?
 
 ---
 
