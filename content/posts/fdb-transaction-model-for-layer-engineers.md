@@ -62,6 +62,32 @@ The straightforward cases follow the rule: `get` and `get_range` create read con
 
 The simplest conflict pattern is the **hot key**: a single key read and written by many concurrent transactions. A naive global counter, a "last updated" timestamp, a configuration value everyone checks. The read-modify-write creates a read conflict, and under concurrent updates, all but one transaction fails. The following sections cover three escape hatches: phantom conflicts and how to avoid them with snapshot reads, atomic operations that write without reading, and versionstamps that generate unique IDs without coordination.
 
+### How the Resolver Stores Conflict Ranges
+
+The Resolver tracks every write-conflict range from every committed transaction within the 5-million-version window. How does it query this efficiently? A naive approach would check every committed write against your read conflicts. With thousands of commits per second over 5 seconds, that's millions of comparisons.
+
+FoundationDB uses a **SkipList** with version-aware pointers. Each node stores a key and up to 26 levels of forward pointers. The clever part: each level also stores the **maximum commit version** of any key reachable through that pointer.
+
+```
+SkipList Structure (simplified to 4 levels)
+                                                          max_version
+Level 3:  HEAD ─────────────────────────────────► key_M ─────────► NULL
+                    [max: 4,200,000]                       [max: 4,800,000]
+
+Level 2:  HEAD ───────► key_D ───────► key_M ───────► key_T ───────► NULL
+               [max: 4,100,000] [max: 4,200,000] [max: 4,800,000]
+
+Level 1:  HEAD ─► key_B ─► key_D ─► key_G ─► key_M ─► key_R ─► key_T ─► NULL
+
+Level 0:  HEAD ─► key_A ─► key_B ─► key_C ─► key_D ─► ... (all keys)
+```
+
+When checking conflicts for a transaction with read version 4,150,000, the Resolver starts at the top level. If `max_version` on a pointer is less than the read version, **skip the entire subtree**. No commits in that range could conflict. Jump to the next pointer, repeat. Only descend levels when you might have conflicts. What would be O(N) scans becomes O(log N) jumps.
+
+Memory matters here. The Resolver allocates SkipList nodes from **FastAllocator pools** (64-byte and 128-byte buckets) to avoid heap fragmentation under sustained load. State mutations live in arena-allocated vectors grouped by version. When a version becomes old enough that all commit proxies have advanced past it, the Resolver purges the entire version's data in one sweep.
+
+What happens under memory pressure? The Resolver enforces a **1MB default limit** (`RESOLVER_STATE_MEMORY_LIMIT`). Exceed it, and incoming commit requests block until cleanup catches up. In production, you'll see this as commit latency spikes when write volume overwhelms the Resolver's ability to purge old versions.
+
 ## The Phantom Conflict Problem
 
 When you call `get(key)`, FDB adds that single key to your read conflict set. Straightforward. But when you call `get_range(start, end)`, FDB adds **the entire range** to your conflict set ([see NativeAPI.actor.cpp](https://github.com/apple/foundationdb/blob/main/fdbclient/NativeAPI.actor.cpp#L4611-L4640)), not just the keys that happened to exist, not just the keys your code iterated over. The mathematical range from start to end, including every possible key that could exist within it. The SIGMOD 2021 paper calls this **phantom read prevention**: "The read set is checked against the modified key ranges of concurrent committed transactions, which prevents phantom reads." **You can conflict on keys you never saw.**
@@ -92,6 +118,8 @@ Imagine you're scanning a user's orders to check if they have any pending shipme
 A snapshot read returns the same data as a regular read from the same consistent snapshot, but it does not add any read conflicts to your transaction. The operation is `tr.snapshot().get(key)` or `tr.snapshot().get_range(start, end)`. The data you get back is identical. The only difference is what happens at commit time: the Resolver won't check whether those keys changed. FDB also exposes **manual conflict APIs**: `add_read_conflict_key` and `add_read_conflict_range` let you inject read conflicts explicitly. This is the complement to snapshot reads: you read without conflicts, then selectively add conflicts on exactly the keys you care about.
 
 When would you want this? Whenever you need to read data for your logic but don't need the transaction to abort if that data changes concurrently. A common case is reading configuration or metadata that rarely changes and where a slightly stale value is acceptable within the transaction's own snapshot.
+
+**The trade-off is explicit**: you're accepting that your decision might be based on data that changed concurrently. This is safe for read-mostly metadata or filtering logic. It's dangerous for business-critical checks like balance verification or uniqueness constraints. If your code path is "read X, decide based on X, write Y", and the decision must hold at commit time, you need the read conflict.
 
 The real power of snapshot reads comes from combining them with manual conflict APIs. Go back to the phantom conflict problem: you need to scan a user's orders to check for pending shipments, but you don't want inserts of new orders to abort your transaction. With a regular `get_range`, any write within that range kills you. With a snapshot range read, you get the data without the conflict surface:
 
@@ -131,7 +159,7 @@ The [Record Layer](https://foundationdb.github.io/fdb-record-layer/) exploits th
 
 Generating sequential IDs the obvious way means reading the current maximum, incrementing it, and writing the new value. That's a read-modify-write on a single key, which is exactly the conflict pattern we've been trying to avoid. Every concurrent transaction reads the same max ID, and all but one will abort.
 
-**Versionstamps** solve this by deferring ID assignment to commit time. Instead of your transaction deciding what the next ID is, FoundationDB fills it in at the moment of commit. A versionstamp is a **10-byte value**: 8 bytes of commit version (assigned by the Sequencer) plus 2 bytes of batch ordering. The result is globally unique and monotonically increasing across the entire cluster. You write a key containing a placeholder that FDB replaces with the actual versionstamp at commit. Your transaction doesn't know the final key until it commits, but multiple concurrent appends generate different versionstamps and write to different keys. Zero conflicts. As a secondary benefit, versionstamps also help with hot spots from monotonic keys. For key design patterns that spread writes across shards, see [crafting keys in FoundationDB](/posts/crafting-keys-in-fdb/).
+**Versionstamps** solve this by deferring ID assignment to commit time. Instead of your transaction deciding what the next ID is, FoundationDB fills it in at the moment of commit. A versionstamp is a **12-byte value**: 8 bytes of commit version (assigned by the Sequencer), 2 bytes of batch ordering, and 2 bytes of user version. The result is globally unique and monotonically increasing across the entire cluster. You write a key containing a placeholder that FDB replaces with the actual versionstamp at commit. Your transaction doesn't know the final key until it commits, but multiple concurrent appends generate different versionstamps and write to different keys. Zero conflicts. As a secondary benefit, versionstamps also help with hot spots from monotonic keys. For key design patterns that spread writes across shards, see [crafting keys in FoundationDB](/posts/crafting-keys-in-fdb/).
 
 ```
 // Write a log entry with a versionstamp key (placeholder filled at commit)
