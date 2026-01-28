@@ -89,6 +89,7 @@ Write like a senior colleague sharing hard-won production wisdom over coffee. Bl
 2. **Conversational warmth** - First-person narrative, self-deprecating humor, acknowledge learning struggles
 3. **Visual rhythm** - Bold key terms, strategic whitespace. One punchy sentence can open a post, but body paragraphs flow naturally at 3-6 sentences each.
 4. **Discovery narrative** - Take readers on a journey (debugging session, exploration, conceptual progression)
+5. **Direct voice** - State what happens, don't frame it pedagogically. Prefer "here's what happens" over "Think of this as". Never tell the reader how to read ("I'd suggest reading that sentence twice") or announce what you're about to explain.
 
 ### Narrative Flow (Critical)
 
@@ -103,7 +104,8 @@ Write like a senior colleague sharing hard-won production wisdom over coffee. Bl
 
 **Paragraph rhythm:**
 - Opening hook: 1-2 punchy sentences to grab attention
-- Body paragraphs: 3-6 sentences with natural flow
+- Body paragraphs: 3-6 sentences that flow like a whiteboard explanation or coffee-break walkthrough. Each sentence should set up the next. If you can delete a sentence and the paragraph still reads the same, that sentence was filler.
+- Never split a single idea across multiple 1-2 sentence paragraphs. If three short paragraphs all explain the same concept, combine them into one flowing paragraph with natural connectives.
 - Occasional 1-2 sentence pauses for emphasis on key insights
 - Never sacrifice flow for brevity. A choppy post with disconnected sections fails even if each section is technically correct.
 
@@ -146,6 +148,10 @@ English is not my first language. This shapes my writing: I use simple, direct s
 ### Anti-patterns
 
 Avoid: "delve into", "dive deep", "in the world of", "it's worth noting", em dashes, semicolons, overly complex sentences, explaining what you're about to explain ("In this post, I will..."), choppy disconnected sections, vague numbers ("hundreds of"), reference lists at the end
+
+**Filler sentences** that sound insightful but say nothing: "The pattern is clear", "This is the danger zone", "Understanding this table changes how you design every data structure", "Each row is a tool in your toolkit"
+
+**Meta-commentary** about the post itself: "This is the mental model I wish I'd had", "This asymmetry is the foundation of every pattern we'll explore", "Once you see it, you can't unsee it"
 
 ### Standard Footer
 ```markdown
