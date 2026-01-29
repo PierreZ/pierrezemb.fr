@@ -2,7 +2,6 @@
 title = "FoundationDB's Transaction Model for Layer Engineers"
 description = "How optimistic concurrency control works in FoundationDB, and how to design data structures that stop fighting it"
 date = 2026-01-27
-draft = true
 [taxonomies]
 tags = ["foundationdb", "distributed-systems", "database", "transactions"]
 +++
@@ -15,7 +14,9 @@ FoundationDB implements these guarantees using **Optimistic Concurrency Control*
 
 All writes are buffered locally in the client until commit. Nothing goes to the cluster while your transaction is running. At commit time, the client sends the buffered writes and the read/write conflict sets to the Resolver in a single request. A read-only transaction that calls commit is mostly a no-op: the network thread checks there are no writes to send and skips the round-trip.
 
-No locks means no waiting, but it also means **your reads determine whether YOU can conflict, and your writes determine what OTHER transactions will conflict with**. A read-only transaction never conflicts. It observes a snapshot and goes away. A write-only transaction also never conflicts. It blindly sets keys and commits. Only transactions that both read and write can fail. And here is what took me a while to internalize: your writes don't cause your conflicts. Your reads do. The writes cause problems for future transactions, but your transaction was doomed the moment you issued reads on keys that someone else was modifying. Every time you add a read to a transaction, ask yourself: **do I actually need to conflict on this?**
+No locks means no waiting, but it also means **your reads determine whether YOU can conflict, and your writes determine what OTHER transactions will conflict with**. A read-only transaction never conflicts. It observes a snapshot and goes away. A write-only transaction also never conflicts. It blindly sets keys and commits. Only transactions that both read and write can fail.
+
+Here is what took me a while to internalize: your writes don't cause your conflicts. Your reads do. The writes cause problems for future transactions, but your transaction was doomed the moment you issued reads on keys that someone else was modifying. Every time you add a read to a transaction, ask yourself: **do I actually need to conflict on this?**
 
 ## Read Version, Commit Version, and the Window of Vulnerability
 
@@ -62,32 +63,6 @@ The straightforward cases follow the rule: `get` and `get_range` create read con
 
 The simplest conflict pattern is the **hot key**: a single key read and written by many concurrent transactions. A naive global counter, a "last updated" timestamp, a configuration value everyone checks. The read-modify-write creates a read conflict, and under concurrent updates, all but one transaction fails. The following sections cover three escape hatches: phantom conflicts and how to avoid them with snapshot reads, atomic operations that write without reading, and versionstamps that generate unique IDs without coordination.
 
-### How the Resolver Stores Conflict Ranges
-
-The Resolver tracks every write-conflict range from every committed transaction within the 5-million-version window. How does it query this efficiently? A naive approach would check every committed write against your read conflicts. With thousands of commits per second over 5 seconds, that's millions of comparisons.
-
-FoundationDB uses a **SkipList** with version-aware pointers. Each node stores a key and up to 26 levels of forward pointers. The clever part: each level also stores the **maximum commit version** of any key reachable through that pointer.
-
-```
-SkipList Structure (simplified to 4 levels)
-                                                          max_version
-Level 3:  HEAD ─────────────────────────────────► key_M ─────────► NULL
-                    [max: 4,200,000]                       [max: 4,800,000]
-
-Level 2:  HEAD ───────► key_D ───────► key_M ───────► key_T ───────► NULL
-               [max: 4,100,000] [max: 4,200,000] [max: 4,800,000]
-
-Level 1:  HEAD ─► key_B ─► key_D ─► key_G ─► key_M ─► key_R ─► key_T ─► NULL
-
-Level 0:  HEAD ─► key_A ─► key_B ─► key_C ─► key_D ─► ... (all keys)
-```
-
-When checking conflicts for a transaction with read version 4,150,000, the Resolver starts at the top level. If `max_version` on a pointer is less than the read version, **skip the entire subtree**. No commits in that range could conflict. Jump to the next pointer, repeat. Only descend levels when you might have conflicts. What would be O(N) scans becomes O(log N) jumps.
-
-Memory matters here. The Resolver allocates SkipList nodes from **FastAllocator pools** (64-byte and 128-byte buckets) to avoid heap fragmentation under sustained load. State mutations live in arena-allocated vectors grouped by version. When a version becomes old enough that all commit proxies have advanced past it, the Resolver purges the entire version's data in one sweep.
-
-What happens under memory pressure? The Resolver enforces a **1MB default limit** (`RESOLVER_STATE_MEMORY_LIMIT`). Exceed it, and incoming commit requests block until cleanup catches up. In production, you'll see this as commit latency spikes when write volume overwhelms the Resolver's ability to purge old versions.
-
 ## The Phantom Conflict Problem
 
 When you call `get(key)`, FDB adds that single key to your read conflict set. Straightforward. But when you call `get_range(start, end)`, FDB adds **the entire range** to your conflict set ([see NativeAPI.actor.cpp](https://github.com/apple/foundationdb/blob/main/fdbclient/NativeAPI.actor.cpp#L4611-L4640)), not just the keys that happened to exist, not just the keys your code iterated over. The mathematical range from start to end, including every possible key that could exist within it. The SIGMOD 2021 paper calls this **phantom read prevention**: "The read set is checked against the modified key ranges of concurrent committed transactions, which prevents phantom reads." **You can conflict on keys you never saw.**
@@ -115,7 +90,7 @@ Imagine you're scanning a user's orders to check if they have any pending shipme
 
 ## Snapshot Reads
 
-A snapshot read returns the same data as a regular read from the same consistent snapshot, but it does not add any read conflicts to your transaction. The operation is `tr.snapshot().get(key)` or `tr.snapshot().get_range(start, end)`. The data you get back is identical. The only difference is what happens at commit time: the Resolver won't check whether those keys changed. FDB also exposes **manual conflict APIs**: `add_read_conflict_key` and `add_read_conflict_range` let you inject read conflicts explicitly. This is the complement to snapshot reads: you read without conflicts, then selectively add conflicts on exactly the keys you care about.
+A snapshot read returns the same data as a regular read from the same consistent snapshot, but it does not add any read conflicts to your transaction. The operation is `tr.snapshot().get(key)` or `tr.snapshot().get_range(start, end)`. The data you get back is identical. The only difference is what happens at commit time: the Resolver won't check whether those keys changed. FDB also exposes **manual conflict APIs**: `add_read_conflict_key` and `add_read_conflict_range` let you inject read conflicts explicitly. This is the complement to snapshot reads: you read without conflicts, then selectively add conflicts on exactly the keys you care about. On the write side, `add_write_conflict_key` and `add_write_conflict_range` let you inject write conflicts without actually writing data. This is useful for implementing locks or coordination primitives: your transaction can claim a key to block others without storing anything there.
 
 When would you want this? Whenever you need to read data for your logic but don't need the transaction to abort if that data changes concurrently. A common case is reading configuration or metadata that rarely changes and where a slightly stale value is acceptable within the transaction's own snapshot.
 
@@ -181,7 +156,33 @@ The Record Layer uses this for its `VERSION` index, which powers CloudKit's sync
 
 The next time you see a conflict error, ask yourself: what did I read that I didn't need to? The answer is usually hiding in a range read that could have been narrower, a read-modify-write that could have been an atomic operation, or a check that could have used a snapshot read.
 
-The next time you're debugging a conflict storm, grep your code for `get_range`. How many of those could be snapshot reads with selective conflicts?
+None of these techniques require changing FoundationDB itself. They're all about how you design your key schema and structure your transactions. As always, data-modeling in ordered key-value stores is the hard part of the job.
+
+## Appendix: How the Resolver Tracks Conflicts
+
+The Resolver tracks every write-conflict range from every committed transaction within the 5-million-version window. How does it query this efficiently? A naive approach would check every committed write against your read conflicts. With thousands of commits per second over 5 seconds, that's millions of comparisons.
+
+FoundationDB uses a **SkipList** with version-aware pointers. Each node stores a key and up to 26 levels of forward pointers. The clever part: each level also stores the **maximum commit version** of any key reachable through that pointer.
+
+```
+SkipList Structure (simplified to 4 levels)
+                                                          max_version
+Level 3:  HEAD ─────────────────────────────────► key_M ─────────► NULL
+                    [max: 4,200,000]                       [max: 4,800,000]
+
+Level 2:  HEAD ───────► key_D ───────► key_M ───────► key_T ───────► NULL
+               [max: 4,100,000] [max: 4,200,000] [max: 4,800,000]
+
+Level 1:  HEAD ─► key_B ─► key_D ─► key_G ─► key_M ─► key_R ─► key_T ─► NULL
+
+Level 0:  HEAD ─► key_A ─► key_B ─► key_C ─► key_D ─► ... (all keys)
+```
+
+When checking conflicts for a transaction with read version 4,150,000, the Resolver starts at the top level. If `max_version` on a pointer is less than the read version, **skip the entire subtree**. No commits in that range could conflict. Jump to the next pointer, repeat. Only descend levels when you might have conflicts. What would be O(N) scans becomes O(log N) jumps.
+
+Memory matters here. The Resolver allocates SkipList nodes from **FastAllocator pools** (64-byte and 128-byte buckets) to avoid heap fragmentation under sustained load. State mutations live in arena-allocated vectors grouped by version. When a version becomes old enough that all commit proxies have advanced past it, the Resolver purges the entire version's data in one sweep.
+
+What happens under memory pressure? The Resolver enforces a **1MB default limit** (`RESOLVER_STATE_MEMORY_LIMIT`). Exceed it, and incoming commit requests block until cleanup catches up. In production, you'll see this as commit latency spikes when write volume overwhelms the Resolver's ability to purge old versions.
 
 ---
 
