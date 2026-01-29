@@ -27,8 +27,8 @@ zola serve
 # Build static site to public/ directory
 zola build
 
-# Check site for errors
-zola check
+# Check site for errors (DO NOT RUN - checks 500+ external links, very slow)
+# zola check
 ```
 
 ### Deployment
