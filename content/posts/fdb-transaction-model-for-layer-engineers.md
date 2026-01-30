@@ -98,35 +98,11 @@ The trade-off is that you're accepting your decision might be based on data that
 
 But what if you need to read broadly and conflict narrowly? FDB exposes **manual conflict APIs** that complement snapshot reads. `add_read_conflict_key` and `add_read_conflict_range` let you inject read conflicts explicitly: you read without conflicts, then selectively add conflicts on exactly the keys you care about. On the write side, `add_write_conflict_key` and `add_write_conflict_range` let you inject write conflicts without actually writing data. This is useful for implementing locks or coordination primitives where your transaction claims a key to block others without storing anything there.
 
-Go back to the phantom conflict problem: you need to scan a user's orders to check for pending shipments, but you don't want inserts of new orders to abort your transaction. With a regular `get_range`, any write within that range kills you. With a snapshot range read plus manual conflicts, you get the data without the conflict surface:
-
-```
-// Regular range read: conflicts on the entire range
-orders = tr.get_range("order/user1/", "order/user1/\xff")
-
-// Snapshot range read: same data, no read conflicts added
-orders = tr.snapshot().get_range("order/user1/", "order/user1/\xff")
-
-// Add conflicts only on the specific keys you care about
-for order in orders:
-    if order.status == "pending":
-        tr.add_read_conflict_key(order.key)
-```
-
-The snapshot read gives you all the data. The manual `add_read_conflict_key` calls protect only the keys your logic actually depends on. If another transaction inserts a new order, your transaction doesn't care. If another transaction modifies a pending order you're acting on, your transaction correctly conflicts. You went from conflicting on the entire keyspace range to conflicting on exactly the keys that matter.
+Go back to the phantom conflict problem: you need to scan a user's orders to check for pending shipments, but you don't want inserts of new orders to abort your transaction. With a regular `get_range`, any write within that range kills you. With a snapshot range read plus manual conflicts, you read the entire range via `tr.snapshot().get_range()` without adding any read conflicts, then call `add_read_conflict_key` only on the specific pending orders your logic depends on. If another transaction inserts a new order, your transaction doesn't care. If another transaction modifies a pending order you're acting on, your transaction correctly conflicts. You went from conflicting on the entire keyspace range to conflicting on exactly the keys that matter.
 
 ## Atomic Operations: Writing Without Reading
 
-When you need to increment a counter, the obvious approach is to read the current value, add one, and write the result back. This creates a read conflict on that key, and under concurrent updates, transactions start failing because they all race to write their incremented value. **Atomic operations** take a different approach: they send an instruction to the storage server ("add this delta to whatever value is there") without your transaction ever knowing the current value. No read, no read conflict.
-
-```
-// Read-modify-write: creates read conflict, will fail under contention
-value = tr.get(counter_key)
-tr.set(counter_key, value + 1)
-
-// Atomic: no read conflict, concurrent updates all succeed
-tr.atomic_add(counter_key, 1)
-```
+When you need to increment a counter, the obvious approach is to read the current value, add one, and write the result back. This creates a read conflict on that key, and under concurrent updates, transactions start failing because they all race to write their incremented value. **Atomic operations** take a different approach: they send an instruction to the storage server ("add this delta to whatever value is there") without your transaction ever knowing the current value. No read, no read conflict. Instead of `tr.get(key)` followed by `tr.set(key, value + 1)`, you call `tr.atomic_add(key, 1)` and concurrent updates all succeed.
 
 The [Record Layer](https://foundationdb.github.io/fdb-record-layer/) exploits this for aggregate indexes. A `COUNT` index issues `atomic_add(count_key, 1)` on every record insertion and `atomic_add(count_key, -1)` on deletion. A `SUM` index adds the field's value. `MAX_EVER` and `MIN_EVER` use `atomic_max` and `atomic_min`. Unlimited concurrent updates to the same aggregate, zero conflicts between writers.
 
