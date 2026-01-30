@@ -1,12 +1,12 @@
 +++
 title = "FoundationDB's Transaction Model for Layer Engineers"
 description = "How optimistic concurrency control works in FoundationDB, and how to design data structures that stop fighting it"
-date = 2026-01-27
+date = 2026-01-30
 [taxonomies]
 tags = ["foundationdb", "distributed-systems", "database", "transactions"]
 +++
 
-FoundationDB gives you serializable transactions with external consistency, automatic sharding, and fault tolerance. That's a strong foundation for building layers. But once your first layer hits production under real load, you start seeing transaction conflicts you don't understand. The logic looks correct: read a key, check a condition, write the result. Under load, conflicts pile up and throughput collapses.
+FoundationDB gives you serializable transactions with external consistency, automatic sharding, and fault tolerance. But once your first layer hits production under real load, you start seeing transaction conflicts you don't understand. The logic looks correct: read a key, check a condition, write the result. Under load, conflicts pile up and throughput collapses.
 
 ## How OCC Works
 
@@ -14,7 +14,9 @@ FoundationDB implements these guarantees using **Optimistic Concurrency Control*
 
 All writes are buffered locally in the client until commit. Nothing goes to the cluster while your transaction is running. At commit time, the client sends the buffered writes and the read/write conflict sets to the Resolver in a single request. A read-only transaction that calls commit is mostly a no-op: the network thread checks there are no writes to send and skips the round-trip.
 
-No locks means no waiting, but it also means **your reads determine whether YOU can conflict, and your writes determine what OTHER transactions will conflict with**. A read-only transaction never conflicts. It observes a snapshot and goes away. A write-only transaction also never conflicts. It blindly sets keys and commits. Only transactions that both read and write can fail. When they do, your writes don't cause your conflicts. Your reads do. The writes cause problems for future transactions, but your transaction was doomed the moment you issued reads on keys that someone else was modifying. Every time you add a read to a transaction, ask yourself: **do I actually need to conflict on this?**
+No locks means no waiting, but it also means your reads and writes play different roles in conflict detection. **Your reads determine whether YOU can conflict. Your writes determine what OTHER transactions will conflict with.**
+
+A read-only transaction never conflicts. It observes a snapshot and goes away. A write-only transaction also never conflicts. It blindly sets keys and commits. Only transactions that both read and write can fail. When they do, your writes don't cause your conflicts. Your reads do. The writes cause problems for future transactions, but your transaction was doomed the moment you issued reads on keys that someone else was modifying. Every time you add a read to a transaction, ask yourself: **do I actually need to conflict on this?**
 
 ## Read Version, Commit Version, and the Window of Vulnerability
 
@@ -59,7 +61,7 @@ Every read your transaction performs adds a **read-conflict range** to your tran
 
 `get` and `get_range` create read conflicts. `set`, `clear`, and `clear_range` create write conflicts.
 
-The simplest conflict pattern is the **hot key**: a single key read and written by many concurrent transactions. A naive global counter, a "last updated" timestamp, a configuration value everyone checks. The read-modify-write creates a read conflict, and under concurrent updates, all but one transaction fails. The following sections cover three escape hatches: phantom conflicts and how to avoid them with snapshot reads, atomic operations that write without reading, and versionstamps that generate unique IDs without coordination.
+The simplest conflict pattern is the **hot key**: a single key read and written by many concurrent transactions. A naive global counter, a "last updated" timestamp, a configuration value everyone checks. The read-modify-write creates a read conflict, and under concurrent updates, all but one transaction fails.
 
 ## The Phantom Conflict Problem
 
@@ -90,13 +92,13 @@ Imagine you're scanning a user's orders to check if they have any pending shipme
 
 A snapshot read returns the same data as a regular read from the same consistent snapshot, but it does not add any read conflicts to your transaction. The operation is `tr.snapshot().get(key)` or `tr.snapshot().get_range(start, end)`. The data you get back is identical. The only difference is what happens at commit time: the Resolver won't check whether those keys changed.
 
-FDB also exposes **manual conflict APIs** that complement snapshot reads. `add_read_conflict_key` and `add_read_conflict_range` let you inject read conflicts explicitly: you read without conflicts, then selectively add conflicts on exactly the keys you care about. On the write side, `add_write_conflict_key` and `add_write_conflict_range` let you inject write conflicts without actually writing data. This is useful for implementing locks or coordination primitives where your transaction claims a key to block others without storing anything there.
-
 When would you want this? Whenever you need to read data for your logic but don't need the transaction to abort if that data changes concurrently. A common case is reading configuration or metadata that rarely changes and where a slightly stale value is acceptable within the transaction's own snapshot.
 
 The trade-off is that you're accepting your decision might be based on data that changed concurrently. This is safe for read-mostly metadata or filtering logic. It's dangerous for business-critical checks like balance verification or uniqueness constraints. If your code path is "read X, decide based on X, write Y", and the decision must hold at commit time, you need the read conflict.
 
-The real power of snapshot reads comes from combining them with manual conflict APIs. Go back to the phantom conflict problem: you need to scan a user's orders to check for pending shipments, but you don't want inserts of new orders to abort your transaction. With a regular `get_range`, any write within that range kills you. With a snapshot range read, you get the data without the conflict surface:
+But what if you need to read broadly and conflict narrowly? FDB exposes **manual conflict APIs** that complement snapshot reads. `add_read_conflict_key` and `add_read_conflict_range` let you inject read conflicts explicitly: you read without conflicts, then selectively add conflicts on exactly the keys you care about. On the write side, `add_write_conflict_key` and `add_write_conflict_range` let you inject write conflicts without actually writing data. This is useful for implementing locks or coordination primitives where your transaction claims a key to block others without storing anything there.
+
+Go back to the phantom conflict problem: you need to scan a user's orders to check for pending shipments, but you don't want inserts of new orders to abort your transaction. With a regular `get_range`, any write within that range kills you. With a snapshot range read plus manual conflicts, you get the data without the conflict surface:
 
 ```
 // Regular range read: conflicts on the entire range
@@ -134,19 +136,7 @@ But there's a trap: if you read a key and also atomically modify it in the same 
 
 Generating sequential IDs the obvious way means reading the current maximum, incrementing it, and writing the new value. That's a read-modify-write on a single key, which is exactly the conflict pattern we've been trying to avoid. Every concurrent transaction reads the same max ID, and all but one will abort.
 
-**Versionstamps** solve this by deferring ID assignment to commit time. Instead of your transaction deciding what the next ID is, FoundationDB fills it in at the moment of commit. A versionstamp is a **12-byte value**: 8 bytes of commit version (assigned by the Sequencer), 2 bytes of batch ordering, and 2 bytes of user version. The result is globally unique and monotonically increasing across the entire cluster. You write a key containing a placeholder that FDB replaces with the actual versionstamp at commit. Your transaction doesn't know the final key until it commits, but multiple concurrent appends generate different versionstamps and write to different keys. Zero conflicts. As a secondary benefit, versionstamps also help with hot spots from monotonic keys. For key design patterns that spread writes across shards, see [crafting keys in FoundationDB](/posts/crafting-keys-in-fdb/).
-
-```
-// Write a log entry with a versionstamp key (placeholder filled at commit)
-log_key = pack(log_subspace, VERSIONSTAMP_PLACEHOLDER, entry_id)
-tr.set_versionstamped_key(log_key, data)
-
-// Later, read everything since a known version
-changes = tr.get_range(
-    pack(log_subspace, last_known_version),
-    pack(log_subspace, MAX_VERSIONSTAMP)
-)
-```
+**Versionstamps** solve this by deferring ID assignment to commit time. Instead of your transaction deciding what the next ID is, FoundationDB fills it in at the moment of commit. A versionstamp is a **12-byte value**: 8 bytes of commit version (assigned by the Sequencer), 2 bytes of batch ordering, and 2 bytes of user version. The result is globally unique and monotonically increasing across the entire cluster. You write a key containing a placeholder that FDB replaces with the actual versionstamp at commit. Your transaction doesn't know the final key until it commits, but multiple concurrent appends generate different versionstamps and write to different keys. Zero conflicts. Versionstamps also spread writes across shards, avoiding the hot spots that monotonic keys create. For more key design patterns, see [crafting keys in FoundationDB](/posts/crafting-keys-in-fdb/).
 
 The Record Layer uses this for its `VERSION` index, which powers CloudKit's sync protocol. Each record stores its commit version, and a secondary index maps versions to primary keys. When a mobile device syncs, it scans the version index starting from its last-known version. Writers don't coordinate at all.
 
@@ -154,7 +144,7 @@ One limitation: you cannot read a versionstamped key within the same transaction
 
 ### Cross-Cluster Ordering
 
-Versionstamps are monotonically increasing within a single cluster, but versions assigned by different FoundationDB clusters are uncorrelated. This creates a problem when migrating data between clusters for load balancing or locality. A sync index based purely on versionstamps would break: updates committed after the move might sort before updates committed before the move.
+Versionstamps work within a single cluster. But what happens when data moves between clusters? Versions assigned by different FoundationDB clusters are uncorrelated. This creates a problem when migrating data between clusters for load balancing or locality. A sync index based purely on versionstamps would break: updates committed after the move might sort before updates committed before the move.
 
 The Record Layer solves this with an **incarnation** counter. Each user starts with incarnation 1, incremented every time their data moves to a different cluster. On every record update, the current incarnation is written to the record's header. The VERSION sync index maps `(incarnation, version)` pairs to changed records, sorting first by incarnation, then by version. Updates after a move have a higher incarnation and correctly sort after pre-move updates, even if the new cluster's version numbers are lower.
 
