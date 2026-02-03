@@ -235,3 +235,27 @@ h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+
+/* Tag cloud styling */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75em;
+}
+
+.tag-item {
+    display: inline-block;
+    padding: 0.4em 0.8em;
+    background-color: rgba(0, 217, 146, 0.1);
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.tag-item:hover {
+    background-color: rgba(0, 217, 146, 0.25);
+}
+
+.tag-count {
+    color: #888;
+    font-size: 0.85em;
+}
