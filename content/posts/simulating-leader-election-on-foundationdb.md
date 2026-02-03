@@ -13,7 +13,7 @@ But what if you could give an LLM [the right feedback loop](/posts/llms-for-engi
 
 ## The Algorithm
 
-The recipe uses a ballot-based approach, similar to Raft's term concept but simpler. Leaders hold time-bounded leases. Ballots are monotonically increasing fencing tokens that prevent stale leaders from corrupting state. FDB's serializable transactions handle mutual exclusion without explicit locking.
+The recipe uses a ballot-based approach, similar to Raft's term concept but simpler. The algorithm is based on ["Leader Election Using NewSQL Database Systems"](https://inria.hal.science/hal-01775025v1/document) (Ismail et al., DAIS 2015), which uses a database as distributed shared memory. Our implementation differs by leveraging FDB's [strictly serializable transactions](/posts/fdb-transaction-model-for-layer-engineers/) and versionstamps instead of timestamps. Leaders hold time-bounded leases. Ballots are monotonically increasing fencing tokens that prevent stale leaders from corrupting state. FDB's serializable transactions handle mutual exclusion without explicit locking.
 
 The key insight is storing the leader state at a **single key**, making all operations O(1) instead of O(N) candidate scanning. Most leader election implementations require scanning all candidates to determine who's in charge. With N candidates, that's N reads per query. Our approach stores the current leader explicitly, so checking who's leader is a single read. Claiming leadership is a single write with a conflict check. No quorum is needed because FDB already provides the coordination guarantees we need through its serializable transactions.
 
@@ -50,42 +50,43 @@ Simulation on top of FoundationDB may feel redundant. FDB itself has been valida
 
 Simulation introduces chaos to answer that question. Network partitions, process crashes, clock skew up to ±1 second. Same seed, same execution, same bugs. Deterministic replay.
 
-{% mermaid() %}
-flowchart LR
-    subgraph Setup
-        A[Client 0 initializes]
-        B[All candidates register]
-    end
+| Phase | Who | What |
+|-------|-----|------|
+| **Setup** | Client 0 | Initialize election, register all candidates |
+| **Chaos** | All clients | Loop: heartbeat → try claim → maybe resign (10%) |
+| **Check** | Client 0 | Read logs, snapshot state, run 13 invariants |
 
-    subgraph Chaos["Chaos (all clients)"]
-        C[Heartbeat]
-        D[Try claim leadership]
-        E[Maybe resign]
-        C --> D --> E --> C
-    end
+FDB's simulator runs built-in chaos workloads alongside ours: **RandomClogging** injects network partitions, **Attrition** kills and reboots processes. Our workload adds clock skew simulation up to ±1 second.
 
-    subgraph Check
-        F[Client 0 reads all logs]
-        G[Takes FDB snapshot]
-        H[Runs invariants]
-        F --> G --> H
-    end
+Each operation logs its intent atomically in the same transaction, using the pattern from FDB's own [AtomicOps workload](https://github.com/apple/foundationdb/blob/main/fdbserver/workloads/AtomicOps.actor.cpp). The `SetVersionstampedKey` [atomic operation](/posts/fdb-transaction-model-for-layer-engineers/#atomic-operations-writing-without-reading) writes both the leader election mutation and its log entry in a single transaction. If the transaction commits, both succeed. If it aborts, neither does. This gives us a proper write-ahead log without the complexity of two-phase commit. The log key uses a versionstamp prefix for true FDB commit ordering. No clock skew ambiguity.
 
-    Setup --> Chaos
-    Chaos --> Check
+### How Atomic Logging Works
 
-    subgraph Injected["Injected Failures"]
-        I[Network partitions]
-        J[Process kills]
-        K[Clock skew ±1s]
-    end
+Each operation writes a log entry in the same transaction as the operation itself. The log key uses a versionstamp prefix, so entries sort by true FDB commit order, not by wall clock (which can drift ±1 second under simulation).
 
-    Injected -.-> Chaos
-{% end %}
+```
+Log Key Structure:
+┌─────────────────────┬───────────┬────────┐
+│ versionstamp (10B)  │ client_id │ op_num │
+└─────────────────────┴───────────┴────────┘
+         ↑
+   Assigned by FDB at commit time
+```
 
-During **setup**, client 0 initializes the election and registers all candidates. During **chaos**, all clients loop through their operations: heartbeat, try to claim leadership, maybe resign. FDB's simulator injects network partitions, process kills, and clock skew up to ±1 second throughout.
+Here's what a typical log might look like after chaos:
 
-Each operation logs its intent atomically in the same transaction, using the pattern from FDB's own [AtomicOps workload](https://github.com/apple/foundationdb/blob/main/fdbserver/workloads/AtomicOps.actor.cpp). The log key uses a versionstamp prefix for true FDB commit ordering. No clock skew ambiguity.
+| Versionstamp | Client | Op | Result |
+|--------------|--------|-----|--------|
+| 0x0001... | 0 | Register | ✓ |
+| 0x0002... | 1 | Register | ✓ |
+| 0x0003... | 2 | Register | ✓ |
+| 0x0004... | 0 | TryBecomeLeader | ✓ became leader, ballot=1 |
+| 0x0005... | 1 | TryBecomeLeader | ✗ conflict |
+| 0x0006... | 0 | Heartbeat | ✓ |
+| 0x0007... | 2 | TryBecomeLeader | ✓ became leader, ballot=2 |
+| 0x0008... | 2 | Resign | ✓ |
+
+Client 0 became leader with ballot 1. Client 1's claim failed (conflict). Client 2 later claimed ballot 2 when client 0's lease expired, then resigned. The versionstamp ordering is ground truth: no matter how skewed each client's clock was, the log shows exactly what committed and in what order.
 
 During **check**, client 0 reads all logs and database state in a single snapshot, then runs the invariants. Same seed, same execution, same bugs. Deterministic replay.
 
@@ -93,7 +94,7 @@ During **check**, client 0 reads all logs and database state in a single snapsho
 
 Here's where Claude Code enters the story. I asked it to generate invariants for leader election validation. I didn't give it a detailed specification. I pointed it at my [previous post about designing workloads that find bugs](/posts/writing-rust-fdb-workloads-that-find-bugs/) and said "apply these patterns to leader election."
 
-It generated 13 invariants. Here are the five most important ones:
+It generated 13 invariants. Here are the seven most important ones:
 
 | Invariant | What | Why | How |
 |-----------|------|-----|-----|
@@ -102,6 +103,8 @@ It generated 13 invariants. Here are the five most important ones:
 | **OneValuePerBallot** | Each ballot number maps to exactly one client | Two clients claiming the same ballot means either conflict detection failed or ballot increment is broken. Classic split-brain symptom | Scan all claims, verify no two different clients ever claimed the same ballot number |
 | **LeaderIsCandidate** | Current leader must exist in the candidates registry | Edge cases like crash-during-registration or eviction-while-claiming can leave orphaned leaders | Read leader state, verify a matching candidate entry exists |
 | **NoOverlappingLeadership** | Every leadership claim has a globally unique versionstamp | FDB serializes commits globally. Duplicate versionstamps mean either a logging bug or actual split-brain | Collect all claim versionstamps, verify no duplicates |
+| **GlobalBallotSuccession** | Each new leader must have ballot > previous leader's ballot | Catches state regression after partition heals. An old leader can't "go back" to a stale ballot | Track previous_ballot in log entries, verify new_ballot > previous_ballot for every transition |
+| **LeaseExpiryAfterClaim** | Lease must expire after the claim timestamp | Clock skew can cause a leader to claim with an already-expired lease. This catches incorrect lease calculation or extreme clock drift | For each claim, verify lease_expiry_nanos > claim_timestamp_nanos |
 
 ## The Honest Ending
 
