@@ -1,8 +1,7 @@
 +++
 title = "Simulating Leader Election on top of FoundationDB"
 description = "Can LLM-generated code be trusted for distributed systems? Only if you have the right feedback loop."
-date = 2026-01-30
-draft = true
+date = 2026-02-05
 [taxonomies]
 tags = ["foundationdb", "rust", "simulation", "distributed-systems", "consensus", "leader-election"]
 +++
@@ -46,7 +45,7 @@ Then the process enters a loop: send heartbeats to prove liveness, try to claim 
 
 ## The Simulation Workload
 
-Simulation on top of FoundationDB may feel redundant. FDB itself has been validated through [a trillion CPU-hours of simulation](/posts/diving-into-foundationdb-simulation/). But FDB's resiliency doesn't mean your code is resilient. Your layer sits on top of FDB. Your transaction logic, your conflict handling, your retry behavior. How does YOUR code respond when FDB is unhealthy?
+Simulation on top of FoundationDB may feel redundant. FDB itself has been validated through [a trillion CPU-hours of simulation](/posts/diving-into-foundationdb-simulation/). But FDB's resiliency doesn't mean your code is resilient. Your layer sits on top of FDB. Your transaction logic, your conflict handling, your retry behavior. How does your code respond when FDB is unhealthy?
 
 Simulation introduces chaos to answer that question. Network partitions, process crashes, clock skew up to ±1 second. Same seed, same execution, same bugs. Deterministic replay.
 
@@ -94,7 +93,7 @@ During **check**, client 0 reads all logs and database state in a single snapsho
 
 Here's where Claude Code enters the story. I asked it to generate invariants for leader election validation. I didn't give it a detailed specification. I pointed it at my [previous post about designing workloads that find bugs](/posts/writing-rust-fdb-workloads-that-find-bugs/) and said "apply these patterns to leader election."
 
-It generated 13 invariants. Here are the seven most important ones:
+It generated [13 invariants](https://github.com/foundationdb-rs/foundationdb-rs/blob/main/foundationdb-recipes-simulation/README.md). Here are the seven most important ones:
 
 | Invariant | What | Why | How |
 |-----------|------|-----|-----|
@@ -106,13 +105,15 @@ It generated 13 invariants. Here are the seven most important ones:
 | **GlobalBallotSuccession** | Each new leader must have ballot > previous leader's ballot | Catches state regression after partition heals. An old leader can't "go back" to a stale ballot | Track previous_ballot in log entries, verify new_ballot > previous_ballot for every transition |
 | **LeaseExpiryAfterClaim** | Lease must expire after the claim timestamp | Clock skew can cause a leader to claim with an already-expired lease. This catches incorrect lease calculation or extreme clock drift | For each claim, verify lease_expiry_nanos > claim_timestamp_nanos |
 
-## The Honest Ending
+## What's Next
 
 The leader election recipe has just been merged into foundationdb-rs as experimental. I haven't run it in production yet. The entire development was simulation-driven: write code, run simulation, fix what breaks, repeat. The simulation runs in CI on every PR.
 
 Simulation gives us guarantees that the code behaves correctly under the right rules, even when FDB is tortured. Network partitions, clock skew, process crashes. The invariants verify that safety properties hold through all of it. Not a proof of correctness, but confidence earned through chaos.
 
 The invariants that Claude Code generated encode patterns from prior simulation work: dual-path validation from AtomicOps, fencing tokens from the literature, lease checks tied to clock skew. What the LLM provided was speed: weeks of invariant development compressed into hours of review. The LLM proposes, simulation disposes.
+
+If you have ideas for new tortures or invariants, the [simulation code](https://github.com/foundationdb-rs/foundationdb-rs/tree/main/foundationdb-recipes-simulation) is open. Merge requests welcome.
 
 ---
 
