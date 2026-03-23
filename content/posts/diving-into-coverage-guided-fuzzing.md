@@ -105,7 +105,7 @@ graph TB
     FT -.->|LLVM callbacks| SR
 {% end %}
 
-A `RUSTC_WRAPPER` script injects the SanitizerCoverage flags only when compiling `fuzz_target`. The [sancov-rt](https://github.com/PierreZ/rust-mini-fuzzer/blob/9760481/sancov-rt/src/lib.rs) crate implements the callbacks and provides safe APIs to reset, snapshot, and classify the counters. The [mini-fuzzer](https://github.com/PierreZ/rust-mini-fuzzer/blob/9760481/mini-fuzzer/src/main.rs) engine stays clean.
+A `RUSTC_WRAPPER` script injects the SanitizerCoverage flags only when compiling `fuzz_target`. The [sancov-rt](https://github.com/PierreZ/rust-mini-fuzzer/blob/f379b6f/sancov-rt/src/lib.rs) crate implements the callbacks and provides safe APIs to reset, snapshot, and classify the counters. The [mini-fuzzer](https://github.com/PierreZ/rust-mini-fuzzer/blob/f379b6f/mini-fuzzer/src/main.rs) engine stays clean.
 
 So after each run we have 10 counters. The obvious next step: compare them to what we saw before. Any counter at a new value means new coverage, right? Not quite.
 
@@ -113,7 +113,7 @@ So after each run we have 10 counters. The obvious next step: compare them to wh
 
 An edge hit 37 times versus 38 times is not meaningfully different, but a naive comparison would flag it as "new coverage." Without some form of noise reduction, every tiny variation in execution counts looks like progress. The corpus grows unbounded with functionally identical inputs, and the fuzzer wastes time mutating duplicates instead of exploring new territory.
 
-AFL solved this with a simple insight: **bucket** the raw counts into coarse classes. The technique maps each 8-bit counter value through a [lookup table](https://github.com/PierreZ/rust-mini-fuzzer/blob/9760481/sancov-rt/src/lib.rs#L187):
+AFL solved this with a simple insight: **bucket** the raw counts into coarse classes. The technique maps each 8-bit counter value through a [lookup table](https://github.com/PierreZ/rust-mini-fuzzer/blob/f379b6f/sancov-rt/src/lib.rs#L187):
 
 | Raw count | Bucket | Meaning         |
 |-----------|--------|-----------------|
