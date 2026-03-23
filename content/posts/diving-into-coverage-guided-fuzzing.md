@@ -1,19 +1,26 @@
 +++
 title = "Diving Into Coverage-Guided Fuzzing"
 description = "How a 600-line Rust fuzzer discovers a 3-byte crash sequence in 9,000 iterations instead of 16 million"
-date = 2026-03-05
-draft = true
+date = 2026-03-23
 [taxonomies]
 tags = ["rust", "fuzzing", "testing", "simulation", "diving-into"]
 +++
 
 > [Diving Into](/tags/diving-into/) is a blogpost series where we are digging a specific part of the project's codebase. In this episode, we will dig into the implementation behind coverage-guided fuzzing.
 
-I have spent a lot of time building [simulation tests](/posts/simulation-driven-development/). Sometimes I throw random operations at the system with different seeds, hoping something breaks. Sometimes I manually craft failure scenarios based on intuition about what might go wrong. The interesting bugs always hide behind specific combinations of inputs, and random testing finds the easy ones. The hard ones need guidance.
+I have spent a lot of time building [simulation tests](/posts/simulation-driven-development/). Sometimes I throw random operations at the system with different seeds, hoping something breaks. Sometimes I manually craft failure scenarios based on intuition about what might go wrong. The interesting bugs always hide behind specific combinations of inputs, and random testing finds the easy ones quickly. But then the iteration counter keeps climbing and nothing new breaks, and you start wondering whether the fuzzer is making progress or just burning CPU. The hard bugs need guidance.
 
-[Antithesis](https://antithesis.com/) solves this by using **coverage-guided fuzzing** to steer their simulation framework. After each test input, they observe which code paths were executed and push the next mutation toward branches never taken before. Instead of bruteforcing the input space, coverage becomes the compass.
+[Antithesis](https://antithesis.com/) solves this by using **coverage-guided fuzzing** to steer their simulation framework. After each test input, they observe which code paths were executed and push the next mutation toward branches never taken before. Instead of bruteforcing the input space, coverage becomes the compass. I built [rust-mini-fuzzer](https://github.com/PierreZ/rust-mini-fuzzer) to understand how this works from the inside. A function that crashes only on a specific 3-byte sequence: 9,000 iterations to find it with coverage guidance, instead of the 16 million a random fuzzer would need.
 
-I built [rust-mini-fuzzer](https://github.com/PierreZ/rust-mini-fuzzer) to understand how this works. A function that crashes only on a specific 3-byte sequence: 9,000 iterations to find it with coverage guidance, instead of the 16 million a random fuzzer would need.
+## The vocabulary
+
+Three concepts make this work.
+
+**Fuzzing** is throwing generated inputs at a program and watching if it crashes. Unlike property-based testing, which checks invariants ("this function always returns a sorted list"), fuzzing asks a simpler question: does this input make the program blow up? You do not write assertions. The crash **is** the signal.
+
+A **corpus** is the collection of inputs the fuzzer has found interesting so far. It starts from a seed, often just a handful of zero bytes, and grows as the fuzzer discovers inputs that trigger new behavior. You do not write the corpus by hand. The fuzzer builds it for you, one mutation at a time. It is the fuzzer's memory of what worked.
+
+**Coverage guidance** is the insight that makes modern fuzzing practical. After each run, the fuzzer observes which code paths the input exercised. If the input reached a branch that no previous input ever touched, that input is "interesting" and enters the corpus. The next round of mutations starts from that new interesting input, pushing deeper. [AFL](https://lcamtuf.coredump.cx/afl/) (American Fuzzy Lop), written by Michal Zalewski, popularized this approach, and most of the techniques we will implement here come from AFL's design.
 
 ## The target
 
@@ -38,9 +45,9 @@ pub fn target(data: &[u8]) -> &'static str {
 }
 ```
 
-Look at the nesting. A random fuzzer must guess all three bytes simultaneously. Each byte has 256 possible values, and the three checks are independent, so the probability of a random 3-byte input hitting the panic is **1 in 256 x 256 x 256 = 1 in 16,777,216**. On average, the fuzzer needs 16 million attempts before stumbling on `['F', 'U', 'Z']` by pure luck.
+Look at the nesting. A random fuzzer must guess all three bytes simultaneously. Each byte has 256 possible values, and the byte values are independent, so the probability of a random 3-byte input hitting the panic is **1 in 256 x 256 x 256 = 1 in 16,777,216**. On average, the fuzzer needs 16 million attempts before stumbling on `['F', 'U', 'Z']` by pure luck.
 
-But a fuzzer that observes which branches were taken breaks this into three independent searches. First it discovers an input where `data[0] == b'F'` (new branch covered, ~1 in 256 attempts). That input enters the corpus. Next mutation round, it starts from that `F` input and finds `data[1] == b'U'` (~1 in 256 again). Then `data[2] == b'Z'` (~1 in 256). The expected total: **256 + 256 + 256 = 768 attempts**, not 16 million.
+But a fuzzer that observes which branches were taken breaks this into three **independent searches**. First it discovers an input where `data[0] == b'F'` (new branch covered, ~1 in 256 attempts). That input enters the corpus. Next mutation round, it starts from that `F` input and finds `data[1] == b'U'` (~1 in 256 again). Then `data[2] == b'Z'` (~1 in 256). The expected total: **256 + 256 + 256 = 768 attempts**, not 16 million.
 
 **Coverage turns a multiplicative problem into an additive one.**
 
@@ -58,9 +65,9 @@ graph TD
     E -->|no| F[Discard]
 {% end %}
 
-Pick an input from the corpus. Mutate it. Run the target. Check if the mutated input triggered any new coverage. If yes, add it to the corpus. If the target panicked, we found a crash. Repeat. The corpus starts with a single seed input and grows as the fuzzer discovers inputs that exercise new behavior.
+Pick an input from the corpus. Mutate it. Run the target. Check if the mutated input triggered any new coverage. If yes, add it to the corpus. If the target panicked, we found a crash. Repeat. The corpus starts with a single seed input, in our case three zero bytes, and that is enough. It does not matter that the seed is garbage, because coverage feedback will steer mutations toward interesting territory. Every time the fuzzer discovers an input that makes the program do something it has never done before, that input joins the corpus and becomes a starting point for future mutations. The corpus evolves on its own.
 
-The mutation strategy is deliberately simple: three operations chosen at random. **Insert** a random byte, **flip** a random byte, or **erase** a random byte. No grammar, no structure awareness. The coverage feedback does the steering, so the mutations can afford to be dumb. But how does the fuzzer actually observe which branches were taken?
+The mutation strategy is deliberately simple: three operations chosen at random. **Insert** a random byte at a random position, **flip** a random byte to a random value, or **erase** a random byte. No grammar awareness, no structure, no knowledge of the target. This sounds too dumb to work, but it does not need to be smart. The mutations are the fuzzer's hands, coverage feedback is its eyes. Dumb hands with good eyes beat smart hands that are blind. But how does the fuzzer actually observe which branches were taken?
 
 ## Getting coverage from the compiler
 
@@ -78,11 +85,11 @@ graph TD
     F -->|false| I["return partial-FU"]
 {% end %}
 
-Each arrow is an edge that LLVM instruments with its own counter. Count the arrows: 8 edges from the branches we wrote, plus LLVM splits [critical edges](https://en.wikipedia.org/wiki/Control_flow_graph#Special_edges) (transitions that skip intermediate blocks) by inserting dummy blocks. This is why our simple function produces 10 instrumented edges, not the handful you might expect from reading the source. After running the target, each counter tells you how many times that edge was taken, giving us 10 bytes of coverage data per execution.
+Each arrow is an edge that LLVM instruments with its own counter. Count the arrows in the diagram: 8 edges from the branches we wrote. But LLVM also inserts counters for [critical edges](https://en.wikipedia.org/wiki/Control_flow_graph#Special_edges), transitions that skip intermediate blocks in the control flow graph. The compiler splits these by adding dummy blocks with their own counters, even though they do not appear in the source. This is why our simple function produces 10 instrumented edges, not the 8 you see in the diagram. After running the target, each counter tells you how many times that edge was taken, giving us 10 bytes of coverage data per execution.
 
-LLVM fires two callbacks during static initialization, before `main()` even runs. The first, `__sanitizer_cov_8bit_counters_init`, receives a pointer to the counter array. The second, `__sanitizer_cov_pcs_init`, receives a parallel **PC table** that maps each counter index back to a code address, useful for printing human-readable edge names when reporting crashes. Between every fuzzer iteration, we zero the counters with `reset()`, run the target, then `snapshot()` the counters before they get wiped for the next round.
+Here is what happens at runtime. When the program starts, before `main()` even runs, LLVM fires two callbacks during static initialization. The first, `__sanitizer_cov_8bit_counters_init`, hands us a pointer to the counter array so we know where the bytes live in memory. The second, `__sanitizer_cov_pcs_init`, hands us a parallel **PC table** that maps each counter index back to a code address, useful for printing human-readable edge names when reporting crashes. Once we have those pointers, the fuzzer loop becomes mechanical: zero all counters with `reset()`, run the target, then `snapshot()` the counters into an owned `Vec<u8>` before they get wiped for the next round. Ten bytes in, ten bytes out, thousands of times per second.
 
-The tricky part is **selective instrumentation**. If you instrument the fuzzer itself, its own mutation and formatting code pollutes the coverage metrics. The [project](https://github.com/PierreZ/rust-mini-fuzzer) uses a three-crate workspace:
+The tricky part is **selective instrumentation**. If you instrument the fuzzer itself, its own mutation logic, string formatting, and random number generation create thousands of edges that have nothing to do with the target's behavior. Every `format!` call, every `Vec::push`, every branch inside the RNG would show up in the coverage map and drown out the signal from the target. The [project](https://github.com/PierreZ/rust-mini-fuzzer) solves this with a three-crate workspace:
 
 {% mermaid() %}
 graph TB
@@ -98,15 +105,15 @@ graph TB
     FT -.->|LLVM callbacks| SR
 {% end %}
 
-A `RUSTC_WRAPPER` script injects the SanitizerCoverage flags only when compiling `fuzz_target`. The [sancov-rt](https://github.com/PierreZ/rust-mini-fuzzer/blob/main/sancov-rt/src/lib.rs) crate implements the callbacks and provides safe APIs to reset, snapshot, and classify the counters. The [mini-fuzzer](https://github.com/PierreZ/rust-mini-fuzzer/blob/main/mini-fuzzer/src/main.rs) engine stays clean.
+A `RUSTC_WRAPPER` script injects the SanitizerCoverage flags only when compiling `fuzz_target`. The [sancov-rt](https://github.com/PierreZ/rust-mini-fuzzer/blob/9760481/sancov-rt/src/lib.rs) crate implements the callbacks and provides safe APIs to reset, snapshot, and classify the counters. The [mini-fuzzer](https://github.com/PierreZ/rust-mini-fuzzer/blob/9760481/mini-fuzzer/src/main.rs) engine stays clean.
 
 So after each run we have 10 counters. The obvious next step: compare them to what we saw before. Any counter at a new value means new coverage, right? Not quite.
 
 ## From raw counts to useful signal
 
-An edge hit 37 times versus 38 times is not meaningfully different, but a naive comparison would flag it as "new coverage." The corpus would explode with nearly identical inputs that discovered nothing real.
+An edge hit 37 times versus 38 times is not meaningfully different, but a naive comparison would flag it as "new coverage." Without some form of noise reduction, every tiny variation in execution counts looks like progress. The corpus grows unbounded with functionally identical inputs, and the fuzzer wastes time mutating duplicates instead of exploring new territory.
 
-**[AFL](https://lcamtuf.coredump.cx/afl/)** (American Fuzzy Lop), the coverage-guided fuzzer written by Michal Zalewski, solved this with a simple insight: **bucket** the raw counts into coarse classes. The technique maps each 8-bit counter value through a [lookup table](https://github.com/PierreZ/rust-mini-fuzzer/blob/main/sancov-rt/src/lib.rs#L175):
+AFL solved this with a simple insight: **bucket** the raw counts into coarse classes. The technique maps each 8-bit counter value through a [lookup table](https://github.com/PierreZ/rust-mini-fuzzer/blob/9760481/sancov-rt/src/lib.rs#L187):
 
 | Raw count | Bucket | Meaning         |
 |-----------|--------|-----------------|
@@ -130,9 +137,9 @@ pub fn classify_counts(buf: &mut [u8]) {
 }
 ```
 
-Now 37 and 38 both map to bucket 64. But 7 (bucket 8) and 8 (bucket 16) are genuinely different behaviors: the loop crossed a threshold. **Bucketing filters noise while preserving signal.**
+Now 37 and 38 both map to bucket 64. But 7 (bucket 8) and 8 (bucket 16) are genuinely different behaviors: the loop crossed a threshold. Remember that counters are reset to zero before each run, so the count reflects how many times an edge was hit **within a single execution**. Imagine a target with a retry loop. An input that triggers 3 retries (bucket 4) and one that triggers 7 retries (bucket 8) exercise genuinely different behavior. But 5 retries and 6 retries both land in bucket 8, and the fuzzer correctly ignores the difference. Our target has no loops, so every edge is hit 0 or 1 times per run, and bucketing barely comes into play. The real benefit shows up in targets with loops, parsers, and recursion, where raw counts fluctuate wildly but the coarse bucket stays stable. **Bucketing filters noise while preserving signal.**
 
-But when is an input worth keeping?
+Bucketing tells us what changed, but we still need to decide: is it worth keeping?
 
 ## Detecting novelty: max-reduce
 
@@ -156,7 +163,9 @@ pub fn has_new_coverage(&mut self, current: &[u8]) -> bool {
 }
 ```
 
-This catches both new edges (bucket goes from 0 to 1) and deeper exploration of known edges (bucket goes from 16 to 32). Our target has no loops, so in this example every new corpus entry comes from a new edge. But in a target with loops, an input that hits a loop body 20 times (bucket 32) is genuinely different from one that hits it 5 times (bucket 8). The binary approach would ignore the longer input because the edge was already "seen." Max-reduce keeps it. The corpus evolves toward both **breadth and depth**.
+Walk through it with our target. The seed `[0, 0, 0]` goes straight into the corpus without being tested. The history starts at all zeros. The first mutation runs and exercises some edges, say the `data[0] != b'F'` path. Those edges jump from bucket 0 to bucket 1, higher than the history, so: novel input, add to corpus, update history. Many mutations later, one happens to land `'F'` at position 0. The edge for `data[0] == b'F'` fires for the first time, bucket 1. That is higher than the history's 0 for that edge, so the function returns `true`: novel again, into the corpus. Now suppose the fuzzer runs another input that also hits `data[0] == b'F'` once. Same edge, same bucket 1. Not higher than the stored 1, so not novel. Discarded. The fuzzer only keeps inputs that push the frontier forward, which is why the corpus does not explode.
+
+Our target has no loops, so in this example every new corpus entry comes from a brand new edge. But in a target with loops, an input that hits a loop body 20 times (bucket 32) is genuinely different from one that hits it 5 times (bucket 8). The binary "seen or not seen" approach would ignore the longer input because the edge was already known. Max-reduce keeps it because the bucket is higher. The corpus evolves toward both **breadth** (new edges) and **depth** (deeper execution of known edges).
 
 ## Watching it work
 
@@ -219,9 +228,9 @@ Three searches of ~256, not one search of 16 million. The multiplicative problem
 
 ## From bytes to distributed systems
 
-This same loop works beyond byte buffers. Tools like [Antithesis](https://antithesis.com/) extend it to **distributed systems**: instead of mutating bytes, they mutate scheduling decisions, network events, and failure injections across a cluster of real processes. The input space is no longer "bytes fed to a function" but "the sequence of everything that can happen to a distributed system." The core primitive is the same: observe coverage, steer toward unexplored territory, find bugs that no amount of [manual testing would catch](/posts/testing-prevention-vs-discovery/).
+This same loop works beyond byte buffers. Tools like [Antithesis](https://antithesis.com/) extend it to **distributed systems**: instead of mutating bytes, they mutate scheduling decisions, network events, and failure injections across a cluster of real processes. The input space is no longer "bytes fed to a function" but "the sequence of everything that can happen to a distributed system." The core primitive is the same: observe coverage, steer toward unexplored territory, find bugs that no amount of [manual testing would catch](/posts/testing-prevention-vs-discovery/). The same additive-versus-multiplicative insight applies. Instead of hoping that random scheduling stumbles on the one interleaving that breaks consensus, coverage guidance steers toward interleavings that exercise new code paths. The search space explodes, but coverage still compresses it.
 
-The full source is on [GitHub](https://github.com/PierreZ/rust-mini-fuzzer), no dependencies beyond `rand` and `backtrace`. What would happen to your system under millions of randomized scenarios, with coverage guidance steering every mutation toward the code paths you have never tested?
+This is what I was missing in my [simulation tests](/posts/simulation-driven-development/). Random seeds find the shallow bugs. Coverage-guided mutations find the ones hiding behind specific sequences that no amount of intuition would predict. The full source is on [GitHub](https://github.com/PierreZ/rust-mini-fuzzer), no dependencies beyond `rand` and `backtrace`. What would happen to your system under millions of randomized scenarios, with coverage guidance steering every mutation toward the code paths you have never tested?
 
 ---
 
