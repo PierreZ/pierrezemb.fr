@@ -7,6 +7,10 @@ This page gives an overview over some talks I have done over the last years. Mos
 
 If you’d like to have me as a speaker at your conference or meet-up, please get in touch.
 
+## 2026
+
+* FinistDevs / FinistAI: [Testing: Prevention vs Discovery](/slides/2026-03-prevention-vs-discovery.pdf)
+
 ## 2025
 
 * FinistDevs: [From contributor to main maintainer of a Rust database driver](https://docs.google.com/presentation/d/13pCaWXNkITj5Sh4dKofILbxPg_Wb2BBedbbi2Mv4PoE/edit?usp=sharing)
