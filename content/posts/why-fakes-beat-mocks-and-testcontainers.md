@@ -57,7 +57,18 @@ Two principles help you choose where to draw the boundary.
 
 **Abstraction sufficiency.** Fake at the level where the fake can represent all failure modes your code cares about, without simulating complexity below. If your code uses TCP streams, fake TCP streams. You do not need to simulate packet fragmentation or TCP retries because your code never sees packets. But you can still inject connection drops, slow reads, and partial writes. The fake is **self-sufficient** at that abstraction. FoundationDB does exactly this: their [`INetwork`](/posts/diving-into-foundationdb-simulation/) interface fakes at the TCP stream level, not the packet level. Their simulation covers every failure their application code will encounter without modeling anything below the stream abstraction.
 
-Both principles point to the same place in practice: the highest boundary where your application interacts with the dependency. For a typical service, that means domain-level traits like `UserRepository` or `ObjectStore`, and OS primitives like network, disk, and clock.
+Both principles point to the same place in practice: the highest boundary where your application interacts with the dependency. For common dependencies, the boundary looks like this:
+
+| Dependency | Fake at | Fake with |
+|---|---|---|
+| **Database** | Domain-level trait (`UserRepository`) | `HashMap` or `BTreeMap` |
+| **Message broker** | Producer/Consumer traits | In-memory channel |
+| **Cache** | Command-level trait | `HashMap` with TTL tracking |
+| **Object storage** | `put`/`get`/`list` trait | `HashMap<String, Vec<u8>>` |
+| **External API** | Client trait | Canned responses + injectable errors |
+| **Clock** | `now()` trait | Manually advanced counter |
+
+Not every fake needs the same depth. A no-op that returns `Ok(())` is enough when you do not care about the component's behavior. An in-memory implementation with real data operations covers most cases. Chaos injection is only needed when you want to test failure handling. Start with the simplest fake that catches the bugs you care about.
 
 Start with the trait:
 
