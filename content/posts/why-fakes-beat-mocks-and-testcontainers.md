@@ -1,8 +1,7 @@
 +++
 title = "Why Fakes Beat Mocks and Testcontainers"
 description = "Trait-based fakes test partial failures that mocks and Testcontainers fundamentally cannot simulate. They are also the on-ramp to simulation-driven development."
-date = 2026-03-25
-draft = true
+date = 2026-03-26
 [taxonomies]
 tags = ["testing", "simulation", "distributed-systems"]
 +++
