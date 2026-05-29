@@ -81,79 +81,98 @@ Primary: `distributed-systems`, `foundationdb`, `rust`, `testing`, `observabilit
 
 ## Blogging Style Guide
 
-### Writing Voice DNA
+### Voice
 
-Write like a senior colleague sharing hard-won production wisdom over coffee. Blend:
+Write like a senior colleague sharing production-scarred experience over coffee. The conversational feel comes from being *in* the story, naming what was operated, debugged, and contributed to. It does not come from decorating sentences with verbal tics. Authority comes from "I was there". Warmth comes from honest acknowledgment of what was hard or what did not work.
 
-1. **Technical authority** - Ground claims in specific experience (systems operated, incidents debugged, code contributed)
-2. **Conversational warmth** - First-person narrative, self-deprecating humor, acknowledge learning struggles
-3. **Visual rhythm** - Bold key terms, strategic whitespace. One punchy sentence can open a post, but body paragraphs flow naturally at 3-6 sentences each.
-4. **Discovery narrative** - Take readers on a journey (debugging session, exploration, conceptual progression)
-5. **Direct voice** - State what happens, don't frame it pedagogically. Prefer "here's what happens" over "Think of this as". Never tell the reader how to read ("I'd suggest reading that sentence twice") or announce what you're about to explain.
+### Sentence rhythm
 
-### Narrative Flow (Critical)
+Target around 30 words per sentence. Build paragraphs where each sentence sets up the next, the way a whiteboard walkthrough flows. A paragraph runs as long as the idea needs, often 3 to 6 sentences but longer when one thought genuinely carries that far. Do not split a continuous explanation into stubs just to keep paragraphs short, and do not pad a finished idea to make a paragraph longer. Never use em dashes or semicolons for style. Avoid elaborate subordinate clauses. English is not the first language, and the simple sentence structure is a deliberate constraint, not an accident.
 
-**Every post is a journey, not a list of facts.** This is the most important principle. The reader should feel guided through a discovery, with each paragraph setting up the next.
+Do not prescribe sentence-length variance as a pattern. Short sentences happen when an idea is short. Codifying "punch sentences" produces mechanical rhythm that reads as AI.
 
-**How to achieve narrative flow:**
+Never stack short sentences into a staccato run. A chain of three-to-five-word sentences back to back reads as ad copy, not as a person explaining something. The worst offender is the list-as-sentences pattern, like "You have seen the tutorials. Build Redis in a weekend. Write your own database in 500 lines. They are not lying." Fold that into one flowing sentence with commas: "You have seen the tutorials that promise Redis in a weekend or your own database in 500 lines, and they are not lying." One short sentence to land a point is fine. Four in a row is a tell.
 
-- **Questions as transitions**: Use questions to bridge concepts. "The question is: how do we test this?" or "But what happens when the network splits?" These guide the reader forward.
-- **Build mental models progressively**: Start with a concrete problem, show a specific example, extract the principle, then show broader application. Never dump abstract concepts without grounding them first.
-- **Connect every section**: Each paragraph should have a reason to follow the previous one. If you can reorder sections without losing meaning, the narrative flow is broken.
-- **Use analogies**: Make abstract concepts visceral with real-world comparisons. "The difference between dev and production is like learning to drive versus driving in Paris."
+Default to flowing prose. Explanations belong in connected paragraphs where one sentence sets up the next, not in bullet lists or stacks of one-line stub paragraphs. When you catch yourself writing three short paragraphs that each name one example, that is usually one paragraph that walks through the examples in prose. Reach for a list or a table only when the content is genuinely enumerable, like a set of options, a side-by-side comparison, or ordered steps. Prose is the carrier of the argument, and a list is the exception you justify, not the default.
 
-**Paragraph rhythm:**
-- Opening hook: 1-2 punchy sentences to grab attention
-- Body paragraphs: 3-6 sentences that flow like a whiteboard explanation or coffee-break walkthrough. Each sentence should set up the next. If you can delete a sentence and the paragraph still reads the same, that sentence was filler.
-- Never split a single idea across multiple 1-2 sentence paragraphs. If three short paragraphs all explain the same concept, combine them into one flowing paragraph with natural connectives.
-- Occasional 1-2 sentence pauses for emphasis on key insights
-- Never sacrifice flow for brevity. A choppy post with disconnected sections fails even if each section is technically correct.
+Typical AI cadence:
+> Distributed systems are notoriously difficult to test. Many engineers struggle with this. It's worth noting that traditional unit tests often fall short. Let's explore why.
 
-### Core Principles
+In Pierre's voice:
+> When I was on call for our HBase cluster at OVHcloud, the bug that took the longest to debug was a network partition that left the cluster in an inconsistent state. The restart hit a NullPointerException we had never seen, even though it was already patched upstream. That night taught me that the tests we write only cover what we already imagined.
 
-- **Production-first**: Every concept connects to operational reality (on-call, failures, scale)
-- **Concrete over abstract**: Always use precise numbers ("28,000 ports / 60 seconds = 466 connections/second"), never vague quantities ("hundreds of"). Name specific systems you have operated (HBase 250+ nodes, 70-machine Hadoop cluster). Specific failure modes beat generic descriptions.
-- **Named concepts stick**: Give memorable names to patterns and ideas ("The Bash Script Test", "Sequential Luck Problem", "The 15-Minute Hang"). Readers remember named concepts months later.
-- **Show transformation**: "What was a 3 AM page becomes a daytime debugging session"
-- **Bold for emphasis**: Never italics or em dashes
+### Personal stake in every claim
 
-### Post Types
+This is the most distinctive rule of the voice. Every claim is grounded in something specific: a system operated (HBase 250+ nodes, 70-machine Hadoop, 800 GB JVM heaps), an incident debugged (the August 2024 Pulsar metastable spiral, the Hadoop NPE on recovery), a paper with venue and year (OSDI 2018 on partition failures, HotOS 2021 on metastable failures), a named person (Kyle Kingsbury, Peter Alvaro, Marc Bowes, Charity Majors), or code with a commit hash. Never "studies have shown" or "many engineers find". Cite specifics or do not cite at all.
 
-- **Regular posts**: Single topic, any length, standalone insights
-- **"Diving Into" series**: Deep code exploration, 4k+ words, heavy GitHub links with commit hashes, Mermaid diagrams
-- **"Notes About" series**: Curated collection of links/videos/quotes on a topic, opens with series meta-intro
+### Concrete over abstract
 
-### Structure Patterns
+Numbers are exact: 2.5M writes/sec, 6.5M reads/sec, 500M timeseries, 13-hour incident, 80% catastrophic, 648 test combinations. Never "hundreds of", never "a lot".
 
-**Opening hooks:**
+Systems are named: HBase, Hadoop, Kafka, Pulsar, BookKeeper, ETCD, FoundationDB. Never "a distributed database".
+
+Dates are real: "August 2024 outage", "OSDI 2018", "September 2010". The reader always knows which, when, how much.
+
+Use bold for key terms and named concepts. Never italics.
+
+### Narrative structure
+
+**Opening hooks** that work:
 - Incident: "One of the most memorable incidents happened when..."
 - Conversation: "I keep having the same conversation with..."
 - Discovery: "While working on X, I discovered..."
 
-**Code examples**: Always Context → Code → Explanation. Comments explain WHY, not WHAT.
+**Story arc per topic**: setup, problem, action, realization. A network partition put the Hadoop cluster in an inconsistent state, the restart hit a known NullPointerException, we pulled the patch from a newer HDFS, recompiled, rolled across 70 machines, and got lucky. The arc is what carries the reader. Never dump abstract concepts without grounding them in a concrete instance first.
 
-**References (integrated, never listed):**
-- Links appear mid-sentence, as part of the argument: "As [this study of 136 network partition failures](link) found..."
-- Include commit hashes for GitHub links: `[foundationdb-simulation](https://github.com/.../tree/4ed057a/...)`
-- Cross-link related posts to create a knowledge web: "...using techniques like [simulation-driven development](/posts/simulation-driven-development/)..."
-- Research papers get specifics: "A [study at OSDI 2018](link) found that 80% of partition failures were catastrophic"
-- Never create "Further Reading" or "Resources" sections. Every reference earns its place by supporting the narrative.
+**Question-driven transitions** are narrative pivots, not pedagogy. "How do we test that?", "What happened?", "But where does FDB actually shine?" all work. "Let me explain X" or "Think of this as Y" do not. The question marks where the next idea begins. It does not announce that an explanation is coming.
 
-**Endings**: Before the standard footer, close with a provocative question or invitation to share experiences. Example: "Do you think your datastore has gone through the same tests?"
+**Analogies grounded in physical reality**: the difference between dev and production is like learning to drive versus driving in Paris. A network-partitioned cluster is a turtle on its back. Writing a database from scratch is like writing crypto, with many ways to mess up.
 
-### Language Notes
+**References integrated mid-sentence** with commit hashes, venues, and names. "As [this OSDI 2018 study of 136 partition failures](link) found, 80% were catastrophic". "using [foundationdb-simulation](https://github.com/.../tree/4ed057a/...)". Cross-link related posts to build a knowledge web. Never create a "Further Reading" or "Resources" section.
 
-English is not my first language. This shapes my writing: I use simple, direct sentence structures. I never use em dashes, semicolons for style, or elaborate subordinate clauses. This constraint produces clearer technical writing.
+**Code examples**: Context, Code, Explanation. Comments explain WHY, not WHAT.
+
+**Endings** close with a question or invitation to share experience: "Do you think your datastore has gone through the same tests?"
+
+### Warmth without speech tics
+
+The conversational feel comes from:
+
+- **Direct second-person engagement**: "Imagine maintaining 4000 tests."
+- **First-person ownership**: "I refuse to ship serious software without simulation."
+- **Self-deprecation**: "I spent more hours than I want to admit on G1 GC tuning", "we cheated and reused FoundationDB's simulator", "le chat noir".
+- **Strong opinions stated flat, without hedge**: "FDB is the sanest distributed system I have ever operated.", "Rust is my favorite language, and that comes from someone who spent years writing Java and Go."
+- **Named patterns and failures**: "simulation-driven development", "metastable failure spiral", "the 15-minute hang", "the correctness decade".
+
+It does NOT come from "actually", "well", "you see", "the thing is", or "in fact" sprinkled as connectors. Those are speech buffers. They belong to spoken talks, not written posts.
+
+### "I" vs "we"
+
+Use "I" for personal stake, opinion, and learning. Use "we" for team work and shared decisions at Clever Cloud. Do not drift into corporate "we" when stating a personal view.
+
+### Post types
+
+- **Regular posts**: single topic, any length, standalone insights.
+- **"Diving Into" series**: deep code exploration, 4k+ words, heavy GitHub links with commit hashes, Mermaid diagrams.
+- **"Notes About" series**: curated collection of links, videos, and quotes on a topic, opens with a series meta-intro.
 
 ### Anti-patterns
 
-Avoid: "delve into", "dive deep", "in the world of", "it's worth noting", em dashes, semicolons, overly complex sentences, explaining what you're about to explain ("In this post, I will..."), choppy disconnected sections, vague numbers ("hundreds of"), reference lists at the end
+Phrases to avoid:
+- Filler: "delve into", "dive deep", "in the world of", "it's worth noting".
+- AI tells: "Let's explore", "In essence", "Ultimately", "It's important to note", "leverages", "utilizes", "robust" as filler adjective, "seamless", "powerful", "comprehensive".
+- Speech-tic anchors as decoration at sentence starts: "actually", "basically", "you see", "the thing is", "in fact". Allowed only when they carry real meaning.
+- Hedge stacking: "could potentially", "might possibly arguably". Make the claim or do not make it.
 
-**Filler sentences** that sound insightful but say nothing: "The pattern is clear", "This is the danger zone", "Understanding this table changes how you design every data structure", "Each row is a tool in your toolkit"
+Patterns to avoid:
+- Em dashes, semicolons for style, overly complex sentences.
+- Meta-commentary: "In this post, I will...", "This is the mental model I wish I'd had", "Once you see it, you can't unsee it".
+- Filler sentences that sound insightful but say nothing: "The pattern is clear", "This is the danger zone", "Understanding this changes how you design every data structure".
+- Vague numbers ("hundreds of") and reference lists at the end.
+- Closing paragraphs that re-summarize what was just said.
+- Telling the reader how to read ("I'd suggest reading that sentence twice", "let that sink in").
 
-**Meta-commentary** about the post itself: "This is the mental model I wish I'd had", "This asymmetry is the foundation of every pattern we'll explore", "Once you see it, you can't unsee it"
-
-### Standard Footer
+### Standard footer
 ```markdown
 ---
 
