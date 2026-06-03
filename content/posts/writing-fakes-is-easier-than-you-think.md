@@ -7,25 +7,27 @@ draft = true
 tags = ["testing", "simulation", "distributed-systems", "foundationdb"]
 +++
 
-A few months ago I wrote about why [fakes beat mocks and Testcontainers](/posts/why-fakes-beat-mocks-and-testcontainers/), and it started a lot of conversations, mostly with colleagues at work. They liked the idea, then came back with questions.
+A few months ago I wrote about why [fakes beat mocks and Testcontainers](/posts/why-fakes-beat-mocks-and-testcontainers/), and it kept coming up in conversations with colleagues at work. They liked the idea, then came back with the same doubt, that faking something the size of Postgres sounds like far too much work to be worth it.
 
 ## Drawing the line
 
 > So what am I actually faking?
 
-It depends on what you own. Own the client of a system and you fake the wire, but the wire means the contract your language gives you, not the layer below it. FoundationDB fakes the network as a TCP `read` and `write`, never as packets moving through a switch, because Flow code only ever sees a byte stream. Use S3 and you own the client, so you fake the server it talks to, a `put`, a `get`, a `list`. Own the service that reaches for the database and you fake the call into it, the `UserRepository` you wrote, not the engine under it.
+Two questions decide it together, and faking the wrong layer almost always means you answered only one of them. The first is what you own, since your code runs right up to the moment it calls into something you did not write, and the fake has to sit somewhere along that ownership line. The second is whose error handling you are trying to exercise, because the reason to fake at all is to push failures into the code you wrote and watch it cope, which only works when the fake sits low enough to hand those failures to the exact code you want to harden.
 
-To find the line, follow what can fail. Walk your code and mark every call that hands work to the outside, the network, the disk, the database, the clock. Those are the only places a fake has anything to do, so that is where it lives.
+FoundationDB's backup is the example that made this click for me, because it owns the S3 client, the code that issues a `put`, waits on a `get`, and parses whatever comes back, while it plainly does not own S3 itself. The error handling they wanted to harden lived inside that client, so the fake could not be the client, it had to be the server beneath it, a shim they controlled that was free to answer with the timeouts, the error codes, and the half-truncated bodies a real S3 throws on a bad day. Every one of those answers lands in the client's own recovery path, which was the entire point, where faking the client would have tested nothing, since the client was the very code they were trying to harden.
 
-This is also why that career-sized estimate is wrong. Count the methods your code calls. Postgres does thousands of things and your service uses six of them. The fake covers the six and grows with your code, never with the manual.
+Move the code you care about and the line moves with it, so when the thing you want to harden is your own logic sitting on top of a database, you stop caring about the SQL driver's error handling and care only about yours, and the boundary climbs to the `UserRepository` trait you wrote. There the fake just implements that trait, a `HashMap` that can also hand back the errors your logic has to survive, and you never reach down to the engine underneath because nothing you are testing lives there.
+
+When you cannot see the line, walk your code and mark every call that hands work to something you do not control, the network, the disk, the database, the clock, then for each mark ask whose recovery code you want to run, because that answer alone tells you whether to fake the call itself or the layer just beneath it.
 
 ## Building it
 
 > Fine, but building it is the real work.
 
-With the line at the trait, what is left to build is small. You throw away production and scale, the same way the weekend tutorials hand you a working Twitter in an afternoon by never serving a second user. What stays behind is correctness, and correctness is a data structure.
+Once the line sits at the trait, what is left to build turns out to be small, because you get to throw away production and scale the same way the weekend tutorials hand you a working Twitter in an afternoon by quietly never serving a second user. What stays behind is correctness, and correctness is just a data structure.
 
-The shape depends on one question. Do several clients have to see the same state? A broker has producers and consumers on the same queue, a network has peers on the same bytes, so each one needs a singleton that holds the state and lends out references. A repository with a single caller needs none of that. `FakeUserRepository` is a `HashMap`, and that is the end of it.
+The shape it takes comes down to one question, whether several clients have to share the same state. A broker has producers and consumers on one queue, a network has peers reading the same bytes, and each needs a singleton that owns the state and lends out references to it. A repository with a single caller carries none of that weight, which is why `FakeUserRepository` can be a bare `HashMap` and nothing more.
 
 ```rust
 trait UserRepository {
@@ -46,9 +48,9 @@ impl UserRepository for FakeUserRepository {
 }
 ```
 
-An S3 fake is a `HashMap<String, Vec<u8>>`. Answering a `get` never needed petabytes spread across a fleet. Let it return at once and ignore latency, since correctness does not depend on how long a call takes. The delays and the hangs come back on purpose later. Keep a logical clock if you need ordering or expiry, a number you bump yourself, but never read the wall clock.
+An S3 fake is nothing more than a `HashMap<String, Vec<u8>>`, because answering a `get` never needed petabytes spread across a fleet, only the bytes you once put under that key. You let it answer instantly and ignore latency, since correctness does not depend on how long a call takes, and the delays and the hangs you strip out here come back on purpose later. The only state worth keeping beyond the data itself is a logical clock for ordering or expiry, a number you bump yourself instead of ever reading the wall clock.
 
-Anything your code does not call, you panic on. A silent empty return is how a test passes for the wrong reason, so the fake refuses out loud. The panic is also a TODO you can grep for, and it turns "is my fake done yet" into a list you can read.
+Anything your code does not call yet, you panic on, because a silent empty return lets a test pass for the wrong reason, while a panic refuses out loud. That same panic doubles as a TODO you can grep for, so the question of whether your fake is finished stops being a worry and becomes a list you can read.
 
 ```rust
 async fn run_raw_sql(&self, _: &str) -> Result<Rows, StorageError> {
@@ -56,29 +58,27 @@ async fn run_raw_sql(&self, _: &str) -> Result<Rows, StorageError> {
 }
 ```
 
-Whoever hits it has two honest choices. Write the missing method, a few more lines. Or send that test to the real database. Both are fine. The fake never grows past what the code in front of it asks for.
+Whoever hits it has two honest choices, either write the missing method, which is usually a few more lines, or send that test to the real database, and both are fine. The fake never grows past what the code in front of it asks for.
 
-Then someone brings up the transaction. Surely you cannot fake atomicity. But in a fake, atomicity is holding the mutex across the writes and letting nothing see the gap. The write-ahead log, the crash that lands between the two writes, the replica that has not caught up, all of it is there to keep that promise while the machine is on fire, and a fake is never on fire. I built a faithful FoundationDB fake on this one idea. MVCC, snapshot isolation, conflict detection at commit, the whole cluster shrinking to four fields behind a mutex. It came out [under 400 lines](/posts/diving-into-foundationdb-simulation/). One trait, two implementations picked at startup, so the code above cannot tell which one it got, and a passing test ran the same path that ships.
+Then someone always brings up the transaction, certain that atomicity is the one thing you cannot fake, when it is really nothing more than holding the mutex across the writes and letting nothing observe the gap between them. The write-ahead log, the crash that lands between two writes, the replica that has not caught up, all of that machinery exists to keep that promise while the machine is on fire, and a fake is never on fire. I built a faithful [FoundationDB](/posts/diving-into-foundationdb-simulation/) fake on exactly this one idea, with MVCC, snapshot isolation, and conflict detection at commit, the whole cluster shrinking to four fields behind a mutex, and it came out under 400 lines, one trait with two implementations chosen at startup, so the code above could never tell which one it got and a passing test ran the same path that ships.
 
 ## Keeping it honest
 
 > How do I know it matches the real thing?
 
-That one is fair. The fake drifts from the database, a test passes against it, the bug ships anyway. So write one suite against the trait and run it against both. The fake runs on every commit, fast and deterministic. The real database runs in a container at night, slow but honest. When they disagree, you know by morning which one lied.
+That worry is the fair one, because a fake really can drift from the database it stands in for, the test keeps passing against the drifted version, and the bug ships anyway. The fix is to write one suite against the trait and point it at both implementations, the fake on every commit where it is fast and deterministic, the real database in a container overnight where it is slow but honest. On the morning after the two disagree, you know which of them was lying.
 
-This makes fidelity a finite job. You are not rebuilding Postgres in your head. You are listing the behaviors your code depends on and checking the real one still holds them. The list is short because your usage is short.
+That cross-check is what makes fidelity a finite job, because you are not rebuilding Postgres in your head, you are only listing the behaviors your code leans on and confirming the real database still honors them, a list that stays short because your usage was short to begin with.
 
 ## Making it worse
 
 > A fake only ever gives me the happy path.
 
-Only if you let it. A faithful fake is useful, but a fake that lies is where the bugs come from. So teach it the worst your database can do. The failures that page you are not the loud ones, your code already catches those. They are the quiet ones, a write that reports success and vanishes, a read that hands back old data, a call that never returns. This is where the delays and the hangs from before are useful.
+It only gives you the happy path if you let it stay polite, because the fake that catches bugs is the one that can lie the way your database does, which is why you teach it the worst the real thing is capable of. The failures that page you are never the loud ones your code already handles, they are the quiet ones, a write that reports success and then vanishes, a read that hands back data from an hour ago, a call that never returns, and this is where the delays and the hangs you stripped out earlier come back to earn their place.
 
-Take Galera. Jepsen ran a [healthy cluster](https://jepsen.io/analyses/mariadb-galera-cluster-12.1.2) with no injected faults and watched it lose committed transactions, lose updates, and serve stale reads, landing in places below Read Uncommitted. **If I was running Galera**, I would set my fake to lose committed transactions at a high rate and run it under simulation, just to see whether my code can handle it. The real cluster does this rarely and without a sound. The fake does it often, and on a seed, so a failing run replays it exactly.
+Galera makes the case better than I could, because Jepsen ran a [healthy cluster](https://jepsen.io/analyses/mariadb-galera-cluster-12.1.2) with no injected faults and still watched it lose committed transactions, lose updates, and serve stale reads, landing below Read Uncommitted. If I was running it, I would set my fake to drop committed transactions at a high rate and run my code against that under simulation, to see whether it survives what the real cluster already does on a calm day. The cluster does this rarely and without a sound, while the fake does it constantly and on a fixed seed, so the run that finally breaks replays itself exactly.
 
-## Count the operations, not the manual
-
-None of this grows with the size of Postgres, and that was the trap all along. The fake never had to match the database, only the slice your code reaches for. So when someone says their database is too complex to fake, its size is the wrong thing to look at. Count the calls your service makes against it. That is the only number that matters, and it is small.
+The fake never had to match the whole database, only the thin slice your code ever reaches for, so the next time one feels too big to fake, do not ask what it is capable of, ask instead how few of its methods your own code actually calls. How many is that, really, for the database you were about to give up on?
 
 ---
 
