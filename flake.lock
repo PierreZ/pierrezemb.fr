@@ -18,29 +18,13 @@
         "type": "github"
       }
     },
-    "loveit": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1723969748,
-        "narHash": "sha256-frYA5nFx6cfOEDqAewVS+2/+GhvbwEVAeGuia/yL9dY=",
-        "ref": "refs/heads/main",
-        "rev": "4b7e01f914a26f3f45dba77b951dd34a62eb0a6b",
-        "revCount": 104,
-        "type": "git",
-        "url": "https://codeberg.org/alanpearce/zola-bearblog.git"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://codeberg.org/alanpearce/zola-bearblog.git"
-      }
-    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1744232761,
-        "narHash": "sha256-gbl9hE39nQRpZaLjhWKmEu5ejtQsgI5TWYrIVVJn30U=",
+        "lastModified": 1780243769,
+        "narHash": "sha256-x5UQuRsH3MqI0U9afaXSNqzTPSeZlRLvFAav2Ux1pNw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "f675531bc7e6657c10a18b565cfebd8aa9e24c14",
+        "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
         "type": "github"
       },
       "original": {
@@ -52,8 +36,8 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "loveit": "loveit",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "zola-quorum-schematics": "zola-quorum-schematics"
       }
     },
     "systems": {
@@ -68,6 +52,23 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "zola-quorum-schematics": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1780557333,
+        "narHash": "sha256-wmYeMPucWpyJdgitIvs1/eQDpuFpFvJEqwAjzSdEMV0=",
+        "owner": "PierreZ",
+        "repo": "zola-quorum-schematics",
+        "rev": "5af57f4beafce26b81cd7da0d0037f1230621a99",
+        "type": "github"
+      },
+      "original": {
+        "owner": "PierreZ",
+        "ref": "5af57f4",
+        "repo": "zola-quorum-schematics",
         "type": "github"
       }
     }
