@@ -1,6 +1,10 @@
 # Hugo default output directory
 public
 
+# Zola-generated syntax highlight stylesheets ([markdown.highlighting])
+static/giallo-light.css
+static/giallo-dark.css
+
 ## OS Files
 # Windows
 Thumbs.db
