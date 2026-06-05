@@ -49,39 +49,43 @@ home_post_limit = 5
 read_modes = true
 default_read_mode = "quorum"
 theme_color = "#15324d"
-status_online = "● online"
-status_uptime = "uptime: 6y"
 copyright = "© 2026 Pierre Zemb"
 og_image = "images/myself.jpg"
+og_locale = "en_US"
 
 [extra.search]
 enabled = true
 
 [extra.plausible]
-domain = "pierrezemb.fr"
+# Per-site script (Oct 2025+): loads pa-*.js and self-bootstraps via plausible.init()
+src = "https://plausible.io/js/pa-YUTyBK3EWpBoZR4gYgoZp.js"
+
+[extra.twitter]
+site = "@PierreZ"
+creator = "@PierreZ"
 
 [[extra.nav]]
-name = "home"
+name = "Home"
 url = "$BASE_URL/"
 
 [[extra.nav]]
-name = "blog"
+name = "Blog"
 url = "$BASE_URL/posts/"
 
 [[extra.nav]]
-name = "tags"
+name = "Tags"
 url = "$BASE_URL/tags/"
 
 [[extra.nav]]
-name = "talks"
+name = "Talks"
 url = "$BASE_URL/talks/"
 
 [[extra.nav]]
-name = "podcasts"
+name = "Podcasts"
 url = "$BASE_URL/podcasts/"
 
 [[extra.nav]]
-name = "contact"
+name = "Contact"
 url = "$BASE_URL/contact/"
 
 [[extra.social]]
@@ -95,7 +99,3 @@ url = "https://x.com/PierreZ"
 [[extra.social]]
 name = "bluesky"
 url = "https://bsky.app/profile/pierrezemb.fr"
-
-[[extra.social]]
-name = "rss"
-url = "/rss.xml"

@@ -58,17 +58,17 @@
     "zola-quorum-schematics": {
       "flake": false,
       "locked": {
-        "lastModified": 1780557333,
-        "narHash": "sha256-wmYeMPucWpyJdgitIvs1/eQDpuFpFvJEqwAjzSdEMV0=",
+        "lastModified": 1780676645,
+        "narHash": "sha256-Fw5XTwkTDm0OAzR6C0vWntjTVxT/j0GNHYQ/y1qGcxA=",
         "owner": "PierreZ",
         "repo": "zola-quorum-schematics",
-        "rev": "5af57f4beafce26b81cd7da0d0037f1230621a99",
+        "rev": "ccef242f012fdd8cc2daca218873e18a82bb28c0",
         "type": "github"
       },
       "original": {
         "owner": "PierreZ",
-        "ref": "5af57f4",
         "repo": "zola-quorum-schematics",
+        "rev": "ccef242f012fdd8cc2daca218873e18a82bb28c0",
         "type": "github"
       }
     }

@@ -1,0 +1,8 @@
+{
+  "name": "Pierre Zemb's Blog",
+  "short_name": "pierrezemb.fr",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }],
+  "theme_color": "#15324d",
+  "background_color": "#f6f7f4",
+  "display": "standalone"
+}
