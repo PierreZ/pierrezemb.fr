@@ -8,17 +8,17 @@ This is Pierre Zemb's personal website/blog built with **Zola**, a fast static s
 
 ## Technology Stack
 
-- **Static Site Generator**: Zola (not Hugo - README is outdated)
-- **Theme**: zola-bearblog (minimalist Bear Blog aesthetic)
+- **Static Site Generator**: Zola
+- **Theme**: zola-quorum-schematics (custom blueprint/terminal theme, vendored in `themes/`)
 - **Development Environment**: Nix Flakes
-- **Deployment**: GitHub Pages via separate repository (PierreZ/portfolio)
+- **Deployment**: `./deploy.sh` builds the site and pushes it to the PierreZ/portfolio repo, which is served by Clever Cloud (Apache behind the Sozu proxy)
 - **Content Format**: Markdown with TOML frontmatter
 
 ## Essential Commands
 
 ### Development
 ```bash
-# Enter Nix development environment (sets up Zola + theme)
+# Enter Nix development environment (provides Zola; theme is vendored in themes/)
 nix develop
 
 # Start local development server (includes drafts)
@@ -33,7 +33,7 @@ zola build
 
 ### Deployment
 ```bash
-# Deploy to GitHub Pages (PierreZ/portfolio repository)
+# Build and push the site to PierreZ/portfolio (served by Clever Cloud)
 ./deploy.sh
 ```
 
@@ -44,6 +44,7 @@ zola build
 - `/content/`: Root pages (contact.md, talks.md, podcasts.md)
 - `/static/images/[post-name]/`: Images for specific posts
 - `/templates/`: Custom HTML templates extending the theme
+- `/themes/zola-quorum-schematics/`: vendored theme, tracked in-repo
 - `/public/`: Generated static site (gitignored)
 
 ### Key Configuration
@@ -54,10 +55,10 @@ zola build
   - Tag-based taxonomy system
 
 ### Customizations
-- **Dark theme**: Green accent color (#00d992)
-- **Shortcodes**: `{% mermaid %}`, `{% youtube %}`, `{% latest %}`
-- **Analytics**: Plausible.io integration
-- **Icons**: Font Awesome 6.6.0 and Feather icons
+- **Theme color**: `#15324d`; two color schemes (blueprint / cyanotype) with a manual toggle
+- **Shortcodes**: `{% mermaid %}`, `{% youtube %}`, `{% quote %}`, `{% note %}`
+- **Analytics**: Plausible.io integration (per-site script, see `[extra.plausible]`)
+- **Favicon**: full icon set in `static/` (svg + ico + 16/32 PNG + apple-touch + android-chrome), enabled via `[extra.favicon] legacy = true`
 
 ## Writing Content
 

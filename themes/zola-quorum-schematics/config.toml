@@ -1,0 +1,135 @@
+# ==========================================================================
+#  zola-quorum-schematics — demo site config (doubles as living documentation)
+#  This file configures the EXAMPLE site shipped with the theme. When you use
+#  the theme in your own site, copy the [extra] block below and adapt it.
+# ==========================================================================
+
+base_url = "https://example.com"
+title = "Pierre Zemb's Blog"
+description = "A Zola theme that looks like an architect's drawing sheet but breathes like a terminal."
+author = "Pierre Zemb"
+
+# Taxonomies: tags, with their own feeds.
+taxonomies = [
+  { name = "tags", feed = true },
+]
+
+# Feeds (RSS + Atom) and search index.
+generate_feeds = true
+feed_filenames = ["atom.xml", "rss.xml"]
+build_search_index = true
+
+# We ship plain CSS (no Sass).
+compile_sass = false
+
+# Link checker: keep `zola check` green offline by skipping external social
+# domains used in the demo content. Internal links & anchors are still checked.
+[link_checker]
+skip_prefixes = [
+  "https://github.com",
+  "https://twitter.com",
+  "https://bsky.app",
+  "https://www.clever-cloud.com",
+  "https://example.com",
+]
+
+[markdown]
+# Clickable anchors on headings (the `#` revealed on hover).
+insert_anchor_links = "right"
+
+[markdown.highlighting]
+# Emit highlighting as CSS classes so we can ship a light + a dark stylesheet
+# and switch between them with the color-theme toggle (instead of being locked
+# to prefers-color-scheme via media queries).
+style = "class"
+light_theme = "solarized-light"
+dark_theme = "solarized-dark"
+
+[search]
+include_title = true
+include_description = true
+include_content = true
+
+# ==========================================================================
+#  THEME OPTIONS — every key below is optional and has a sensible default in
+#  the templates. See README.md for the full reference.
+# ==========================================================================
+[extra]
+
+# Brand shown in the top-left of the nav. Falls back to `title` if unset (which
+# may be long — set a short brand here).
+logo = "Pierre Zemb"
+
+# Profile image shown beside the home-page hero intro. Path under static/ (or a
+# full https URL). Omit to hide it.
+avatar = "images/avatar.jpg"
+
+# --- Console strip (the terminal client: prompt + distributed read log) ---
+prompt_user   = "root@pierrezemb.fr"
+prompt_path   = "~/blog"
+# No-JS fallback label for the replica a read is "served from" (read.js drives the
+# live read state once JS loads).
+read_replica  = "node-0"
+
+# --- Home page post listing ---
+# How many of the latest posts to list on the home page (`ls -t ./posts | head -N`).
+home_post_limit = 5
+
+# --- Cluster schematic (3 nodes drawn in the console = the replica set) ---
+cluster_enabled = true
+
+# --- Read modes (quorum R=2 ⇄ single R=1) ---
+# The cluster always has one silently-faulty replica. A quorum read out-votes and
+# read-repairs it (clean, checksums match); a single read lands on it and serves
+# corrupted blocks (typoglycemia, checksum mismatch). The `read: quorum` button by
+# the theme toggle (and clicking the cluster) switches modes. Set false to disable
+# the toggle + the fault entirely (a plain healthy quorum).
+read_modes        = true
+default_read_mode = "quorum"        # initial mode: "quorum" or "single"
+
+# --- Hero specs + dimension line (optional theme features; left off here) ---
+# specs = [{ label = "domain", value = "distributed systems" }, ...]
+# dimline_start = "2019"
+# dimline_end   = "2026 · 6 yrs"
+
+# --- SEO / social cards ---
+# og_image: path under static/ (or a full https URL) used for OpenGraph/Twitter
+# cards when a page sets no [extra].image of its own. Left unset in the demo.
+# og_image = "og.png"
+# theme_color: the mobile browser-chrome color (<meta name="theme-color">).
+theme_color = "#15324d"
+
+# --- Analytics (optional; omit the block entirely to disable) ---
+# Set `src` for Plausible's current per-site script (Oct 2025+), OR `domain` for
+# the classic script. If both are set, `src` wins. See README for details.
+# [extra.plausible]
+# src    = "https://plausible.io/js/pa-XXXXX.js"
+# domain = "example.com"
+
+# --- Footer: revision history + social links ---
+copyright   = "© 2026 Pierre Zemb · built deterministically"
+[extra.search]
+enabled = true
+
+[[extra.nav]]
+name = "home"
+url = "$BASE_URL/"
+[[extra.nav]]
+name = "blog"
+url = "$BASE_URL/posts/"
+[[extra.nav]]
+name = "tags"
+url = "$BASE_URL/tags/"
+[[extra.nav]]
+name = "about"
+url = "$BASE_URL/about/"
+
+[[extra.social]]
+name = "github"
+url = "https://github.com/PierreZ"
+[[extra.social]]
+name = "twitter"
+url = "https://twitter.com/PierreZ"
+[[extra.social]]
+name = "bluesky"
+url = "https://bsky.app/profile/pierrezemb.fr"

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-head">
+    <div class="hero-text">
+      {% if section.title %}<h1>{{ section.title | safe }}</h1>{% endif %}
+      <div class="hero-intro">
+        {{ section.content | safe }}
+      </div>
+    </div>
+    {%- if config.extra.avatar %}
+    <img class="hero-avatar" src="{{ get_url(path=config.extra.avatar) | safe }}" alt="{{ config.extra.author | default(value=config.title) }}" width="150" height="150" loading="eager">
+    {%- endif %}
+  </div>
+  {%- if config.extra.specs %}
+  <div class="specs">
+    {%- for s in config.extra.specs %}<span><b>{{ s.label }}:</b> {{ s.value }}</span>{% endfor %}
+  </div>
+  {%- endif %}
+  {%- if config.extra.dimline_start or config.extra.dimline_end %}
+  <div class="dimline"><span>{{ config.extra.dimline_start }}</span><span class="bar"></span><span>{{ config.extra.dimline_end }}</span></div>
+  {%- endif %}
+</section>
+
+{%- set posts = get_section(path="posts/_index.md") %}
+{%- set home_limit = config.extra.home_post_limit | default(value=5) %}
+<div class="sec-head">eza -snew -r ./posts | head -{{ home_limit }}</div>
+<div class="bom">
+  {%- for page in posts.pages | slice(end=home_limit) %}
+  {{ m::bom_row(page=page) }}
+  {%- endfor %}
+</div>
+{% endblock content %}

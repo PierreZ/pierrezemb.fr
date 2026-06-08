@@ -1,0 +1,4 @@
+<blockquote>
+{{ body | markdown(inline=true) | safe }}
+{%- if author %}<span class="who">{{ author }}{% if source %}, {{ source }}{% endif %}</span>{% endif %}
+</blockquote>

@@ -1,5 +1,5 @@
 {
-  description = "blog";
+  description = "pierrez-blueprint — a Zola theme (blueprint × terminal)";
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";

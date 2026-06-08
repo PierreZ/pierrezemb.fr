@@ -1,0 +1,22 @@
+<div class="console">
+  <div class="log">
+    <div class="ln" id="console-cmd"><span class="sig">{{ config.extra.prompt_user | default(value="user@host") }}</span>:<span class="path">{{ config.extra.prompt_path | default(value="~/blog") }}</span>$ <span id="read-cmd" data-target="{{ bp_target }}">./read --quorum {{ bp_target }}</span></div>
+    <div class="ln out">
+      {%- if bp_kind == "doc" -%}
+      <span id="console-out"><span class="ok">✓</span> quorum 2/3 · served by <span class="rc-node">{{ bp_replica | default(value="node-0") }}</span></span>
+      {%- elif bp_kind == "404" -%}
+      <span id="console-out"><span class="warn">✗</span> read failed · key not found on 0/3 replicas · NoSuchKey</span>
+      {%- else -%}
+      <span id="console-out"><span class="ok">✓</span> quorum 2/3 · {{ bp_count }} {{ bp_noun }}{{ bp_count | pluralize }} · committed</span>
+      {%- endif -%}
+      <span class="cursor"></span></div>
+  </div>
+  {%- if config.extra.read_modes | default(value=true) %}
+  <button class="readmode" id="readbtn" type="button" aria-label="switch read mode" aria-pressed="false" title="switch to single read (R=1)">read: quorum</button>
+  {%- endif %}
+  {%- if config.extra.cluster_enabled | default(value=true) %}
+  <div class="cluster-cell">
+    {% include "partials/cluster.html" %}
+  </div>
+  {%- endif %}
+</div>

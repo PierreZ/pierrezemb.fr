@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+
+{% block title %}{{ page.title }} | {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description | default(value=config.description) }}{% endblock description %}
+
+{% block content %}
+{%- set is_post = "posts" in page.components -%}
+<article class="article">
+  <div class="crumbs">
+    {%- if is_post %}
+    <span class="sig">~</span> / <a href="{{ get_url(path='@/posts/_index.md') | safe }}">blog</a> / {{ page.slug }}
+    {%- else %}
+    <span class="sig">~</span> / {{ page.slug }}
+    {%- endif %}
+  </div>
+
+  <h2 class="title">{{ page.title }}</h2>
+
+  {%- if is_post %}
+  <div class="meta-row">
+    {%- if page.date %}<span class="m"><b>{{ page.date | date(format="%Y-%m-%d") }}</b></span>{% endif %}
+    <span class="m">read: <b>~{{ page.reading_time }} min</b></span>
+    {%- if page.taxonomies.tags %}
+    <span class="m tags">tags: {% for t in page.taxonomies.tags %}<a href="{{ get_taxonomy_url(kind='tags', name=t) | safe }}">#{{ t }}</a>{% if not loop.last %} {% endif %}{% endfor %}</span>
+    {%- endif %}
+  </div>
+  {%- endif %}
+
+  {%- if page.toc and not page.extra.hide_table_of_contents %}
+  <nav class="toc">
+    <div class="h">index of sections</div>
+    {{ m::toc_list(items=page.toc, prefix="", depth=4) }}
+  </nav>
+  {%- endif %}
+
+  <div class="prose">
+    {{ page.content | safe }}
+  </div>
+</article>
+{% endblock content %}

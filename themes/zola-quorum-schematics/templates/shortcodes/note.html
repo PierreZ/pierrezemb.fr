@@ -1,0 +1,4 @@
+<div class="note">
+  <span class="note-h">{{ title | default(value="note") }}</span>
+  {{ body | markdown(inline=true) | safe }}
+</div>

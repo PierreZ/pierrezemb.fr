@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}404 · key not found | {{ config.title }}{% endblock title %}
+{% block description %}No replica has this key. The quorum read found nothing.{% endblock description %}
+
+{% block content %}
+<section class="hero">
+  <h1>404 · key <span class="u">not found</span></h1>
+  <p>The coordinator asked all three replicas for this key. They all came back
+  empty-handed. Either it was never committed, or it was tombstoned and compacted
+  into the void.</p>
+
+  <div class="specs">
+    <span><b>op:</b> read</span>
+    <span><b>replicas asked:</b> 3</span>
+    <span><b>acked:</b> 0</span>
+    <span><b>verdict:</b> NoSuchKey</span>
+  </div>
+</section>
+
+<div class="sec-head">cat ./postmortem.md</div>
+<article class="article">
+  <div class="prose">
+    <p>Leading hypotheses, in rough order of operational embarrassment:</p>
+    <ul>
+      <li>The write is still sitting in someone's outbox. <em>Eventual</em> consistency
+      means eventually — not now.</li>
+      <li>A network partition swallowed it. It may come back after the next leader
+      election. It may not.</li>
+      <li>It was tombstoned, and the compaction already ran. There is no undo for entropy.</li>
+      <li>You're reading at a timestamp from the future. Retry with a snapshot the cluster
+      has actually seen.</li>
+    </ul>
+    <p>Recommended recovery — fall back to a node you trust:</p>
+    <p>
+      <a href="{{ config.base_url | safe }}">→ cd ~</a> &nbsp;·&nbsp;
+      <a href="{{ get_url(path='@/posts/_index.md') | safe }}">→ ls ./posts</a>
+    </p>
+  </div>
+</article>
+{% endblock content %}

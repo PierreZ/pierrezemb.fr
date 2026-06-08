@@ -1,0 +1,44 @@
+name = "zola-quorum-schematics"
+description = "An architect's drawing sheet that breathes like a terminal: command-history nav, page-aware quorum-read console, blinking cursor, and a hidden disk-failure easter egg. Two color themes (blueprint / cyanotype), Roboto prose with monospace terminal chrome, zero CDN."
+license = "MIT"
+homepage = "https://github.com/PierreZ/zola-quorum-schematics"
+# Minimum Zola version: 0.19 introduced the [markdown.highlighting] config
+# (class style + light_theme/dark_theme) this theme relies on; also needs page.toc + now().
+min_version = "0.19.0"
+demo = "https://github.com/PierreZ/zola-quorum-schematics"
+
+[author]
+name = "Pierre Zemb"
+homepage = "https://pierrezemb.fr"
+
+[original]
+author = "Pierre Zemb"
+homepage = "https://pierrezemb.fr"
+repo = "https://github.com/PierreZ/zola-quorum-schematics"
+
+# ---------------------------------------------------------------------------
+# Documented theme options. Every key is optional; defaults live in templates.
+# Copy the matching keys into your own site's [extra]. See README.md.
+# ---------------------------------------------------------------------------
+[extra]
+logo = "Pierre Zemb"                          # nav brand (falls back to config.title)
+avatar = "images/avatar.jpg"                  # profile image beside the hero intro (static/ path or https URL; omit to hide)
+prompt_user = "root@pierrezemb.fr"           # console: user@host before the $
+prompt_path = "~/blog"                       # console: path after the colon
+read_replica = "node-0"                      # no-JS fallback label for the serving replica
+cluster_enabled = true                       # show the 3-node cluster schematic in the console
+home_post_limit = 5                          # how many of the latest posts to list on the home page
+read_modes = true                            # read-mode toggle: quorum R=2 ⇄ single R=1 (the corrupted-replica reveal)
+default_read_mode = "quorum"                  # initial read mode: "quorum" or "single"
+# dimline_start = "2019"                      # hero dimension line, left end (omit to hide)
+# dimline_end = "2026 · 6 yrs"                # hero dimension line, right end
+copyright = "© 2026 Pierre Zemb · built deterministically"
+theme_color = "#15324d"                       # <meta name=theme-color>
+# og_image = "og.png"                         # default OpenGraph/Twitter card image (static/ path or https URL)
+# specs = [{label, value}, ...]               # hero spec cells
+# nav = [{name, url}, ...]                     # top navigation links
+# social = [{name, url}, ...]                  # footer social links
+# [extra.search] enabled = true               # client-side search box
+# [extra.plausible] src = ".../pa-XXXXX.js"   # optional Plausible: per-site script (Oct 2025+)
+# [extra.plausible] domain = "example.com"    #   — or — the classic script (omit block to disable)
+# Per-page front-matter [extra]: canonical, image, hide_table_of_contents

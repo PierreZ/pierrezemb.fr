@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ taxonomy.name }} | {{ config.title }}{% endblock title %}
+{% block description %}Index of {{ taxonomy.name }}.{% endblock description %}
+
+{% block content %}
+<div class="sec-head">ls ./{{ taxonomy.name }}</div>
+<div class="taglist">
+  {%- set sorted_terms = terms | sort(attribute="page_count") | reverse %}
+  {%- for term in sorted_terms %}
+  <a class="tag" href="{{ term.permalink | safe }}">#{{ term.name }}<span class="cnt">{{ term.pages | length }}</span></a>
+  {%- else %}
+  <span class="tag tag--empty">no tags yet</span>
+  {%- endfor %}
+</div>
+{% endblock content %}

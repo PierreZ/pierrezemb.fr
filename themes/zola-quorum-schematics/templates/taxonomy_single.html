@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+
+{% block title %}#{{ term.name }} | {{ config.title }}{% endblock title %}
+{% block description %}Posts tagged #{{ term.name }}.{% endblock description %}
+
+{% block content %}
+<div class="sec-head">ls ./{{ taxonomy.name }}/{{ term.slug }}</div>
+<div class="bom">
+  {%- for page in term.pages %}
+  {{ m::bom_row(page=page) }}
+  {%- endfor %}
+</div>
+{% endblock content %}

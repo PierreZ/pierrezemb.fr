@@ -1,0 +1,12 @@
+{# Favicon: scalable SVG (modern) + manifest by default. With [extra.favicon] legacy = true
+   the site also serves favicon.ico (legacy, listed first so SVG-capable browsers still
+   prefer the SVG) and apple-touch-icon.png; supply both in static/ alongside the
+   android-chrome PNGs referenced by site.webmanifest. #}
+  {%- if config.extra.favicon and config.extra.favicon.legacy %}
+  <link rel="icon" href="{{ get_url(path='favicon.ico') | safe }}" sizes="32x32">
+  {%- endif %}
+  <link rel="icon" href="{{ get_url(path='favicon.svg') | safe }}" type="image/svg+xml">
+  {%- if config.extra.favicon and config.extra.favicon.legacy %}
+  <link rel="apple-touch-icon" href="{{ get_url(path='apple-touch-icon.png') | safe }}">
+  {%- endif %}
+  <link rel="manifest" href="{{ get_url(path='site.webmanifest') | safe }}">

@@ -15,7 +15,6 @@ $RECYCLE.BIN/
 # OSX
 .DS_Store
 
-themes/
 resources/
 
 .vscode

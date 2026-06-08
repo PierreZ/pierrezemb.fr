@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+
+{% block title %}{{ section.title }} | {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description | default(value=config.description) }}{% endblock description %}
+
+{% block content %}
+{%- if section.content %}
+<section class="hero">
+  {% if section.title %}<h1>{{ section.title }}</h1>{% endif %}
+  <div class="hero-intro">{{ section.content | safe }}</div>
+</section>
+{%- endif %}
+
+<div class="bom">
+  {%- for page in section.pages %}
+  {{ m::bom_row(page=page) }}
+  {%- else %}
+  <div class="row"><div class="date">—</div><div class="ttl">no posts yet</div></div>
+  {%- endfor %}
+</div>
+{% endblock content %}

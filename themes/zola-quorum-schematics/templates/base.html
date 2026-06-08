@@ -1,0 +1,91 @@
+{%- import "macros.html" as m -%}
+<!DOCTYPE html>
+<html lang="{{ lang | default(value=config.default_language) }}" data-theme="blueprint">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+  <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <link rel="preload" href="{{ get_url(path='fonts/Roboto-Variable.woff2') | safe }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ get_url(path='css/main.css') | safe }}">
+  <link rel="stylesheet" id="syntax-light" href="{{ get_url(path='giallo-light.css') | safe }}">
+  <link rel="stylesheet" id="syntax-dark" href="{{ get_url(path='giallo-dark.css') | safe }}" disabled>
+  {%- if config.generate_feeds %}
+  <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path='atom.xml') | safe }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ config.title }}" href="{{ get_url(path='rss.xml') | safe }}">
+  {%- endif %}
+  {% include "partials/head_meta.html" %}
+  {% include "partials/favicon.html" %}
+  {% block extra_head %}{% endblock extra_head %}
+
+  <script>
+  // Set theme before first paint (no flash). Persisted choice wins, else light (blueprint).
+  (function () {
+    try {
+      var saved = localStorage.getItem("bp-theme");
+      var dark = saved === "cyanotype";
+      var theme = dark ? "cyanotype" : "blueprint";
+      document.documentElement.setAttribute("data-theme", theme);
+      var l = document.getElementById("syntax-light");
+      var d = document.getElementById("syntax-dark");
+      if (l) l.disabled = dark;
+      if (d) d.disabled = !dark;
+    } catch (e) {}
+  })();
+  </script>
+</head>
+<body>
+{%- set bp_posts = get_section(path="posts/_index.md") -%}
+{%- set post_count = bp_posts.pages | length -%}
+{#- Page-aware console "read --quorum <target>" command. base.html can call macros and
+    see page/section/taxonomy/term directly; an included partial cannot (see CLAUDE.md),
+    so we compute here and the console.html include consumes these vars. -#}
+{%- set bp_kind = "list" -%}
+{%- set bp_noun = "document" -%}
+{%- set bp_count = post_count -%}
+{%- set bp_target = "home" -%}
+{%- if page and page.slug -%}
+  {%- set bp_kind = "doc" -%}
+  {%- set bp_target = page.components | join(sep="/") -%}
+  {%- set bp_replica = config.extra.read_replica | default(value="node-0") -%}
+{%- elif term -%}
+  {%- set bp_target = taxonomy.name ~ "/" ~ term.slug -%}
+  {%- set bp_count = term.pages | length -%}
+{%- elif terms -%}
+  {%- set bp_target = taxonomy.name -%}
+  {%- set bp_count = terms | length -%}
+  {%- set bp_noun = "tag" -%}
+{%- elif section and section.components | length > 0 -%}
+  {%- set bp_target = section.components | join(sep="/") -%}
+  {%- set bp_count = section.pages | length -%}
+{%- endif -%}
+{#- 404: no page, section, or taxonomy in context → the read found nothing. -#}
+{%- if not page and not section and not term and not terms -%}
+  {%- set bp_kind = "404" -%}
+  {%- set bp_target = "404" -%}
+{%- endif -%}
+
+<div class="sheet">
+  {% include "partials/nav.html" %}
+  {% include "partials/console.html" %}
+
+  <main>
+    {% block content %}{% endblock content %}
+  </main>
+
+  {% include "partials/footer.html" %}
+</div>
+
+<script src="{{ get_url(path='js/theme-toggle.js') | safe }}" defer></script>
+<script id="read-ctl" src="{{ get_url(path='js/read.js') | safe }}" data-default-mode="{{ config.extra.default_read_mode | default(value='quorum') }}" data-enabled="{{ config.extra.read_modes | default(value=true) }}" defer></script>
+<script id="mermaid-init" src="{{ get_url(path='js/mermaid-init.js') | safe }}" data-src="{{ get_url(path='js/mermaid.min.js') | safe }}" defer></script>
+{% if config.extra.search.enabled | default(value=false) %}
+<script src="{{ get_url(path='js/elasticlunr.min.js') | safe }}" defer></script>
+<script src="{{ get_url(path='search_index.' ~ config.default_language ~ '.js') | safe }}" defer></script>
+<script src="{{ get_url(path='js/search.js') | safe }}" defer></script>
+{% endif %}
+{% block extra_body %}{% endblock extra_body %}
+</body>
+</html>

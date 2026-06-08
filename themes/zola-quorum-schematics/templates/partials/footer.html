@@ -1,0 +1,15 @@
+<div class="foot">
+  <div class="cell">
+    <span class="label">revision history</span>
+    {{ config.extra.copyright | default(value=config.title) }} · last rev. {{ now() | date(format="%Y-%m-%d") }}
+  </div>
+  <div class="cell">
+    <span class="label">contact</span>
+    <div class="links">
+      {%- if config.extra.social %}
+        {%- for s in config.extra.social %}<a href="{{ s.url | safe }}"{% if s.url is starting_with("http") %} rel="me noopener" target="_blank"{% endif %}>{{ s.name }}</a>{% endfor %}
+      {%- endif %}
+      {%- if config.generate_feeds %}<a href="{{ get_url(path='rss.xml') | safe }}">rss</a>{% endif %}
+    </div>
+  </div>
+</div>

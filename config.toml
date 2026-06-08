@@ -56,6 +56,9 @@ og_locale = "en_US"
 [extra.search]
 enabled = true
 
+[extra.favicon]
+legacy = true
+
 [extra.plausible]
 # Per-site script (Oct 2025+): loads pa-*.js and self-bootstraps via plausible.init()
 src = "https://plausible.io/js/pa-YUTyBK3EWpBoZR4gYgoZp.js"

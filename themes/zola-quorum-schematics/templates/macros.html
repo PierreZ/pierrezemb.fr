@@ -1,0 +1,32 @@
+{# ==========================================================================
+   macros.html — reusable Tera helpers
+   ========================================================================== #}
+
+{# Recursive table-of-contents list. Renders page.toc and its nested children
+   (h2 → h3 → h4 …) as nested <ol>s, hierarchically numbered (1, 1.1, 1.2 …),
+   capped at `depth` levels deep. #}
+{% macro toc_list(items, prefix, depth) %}
+<ol>
+  {%- for h in items %}
+  {%- set num = prefix ~ loop.index %}
+  <li>
+    <span class="n">{{ num }}</span><a href="{{ h.permalink | safe }}">{{ h.title }}</a>
+    {%- if depth > 1 and h.children %}{{ self::toc_list(items=h.children, prefix=num ~ ".", depth=depth - 1) }}{% endif %}
+  </li>
+  {%- endfor %}
+</ol>
+{% endmacro toc_list %}
+
+{# A single nomenclature (BOM) row for a post listing. #}
+{% macro bom_row(page) %}
+  <div class="row">
+    <div class="date">{{ page.date | date(format="%Y-%m-%d") }}</div>
+    <div>
+      <a class="ttl" href="{{ page.permalink | safe }}">{{ page.title }}</a>
+      {%- if page.description %}<a class="desc" href="{{ page.permalink | safe }}">{{ page.description }}</a>{% endif %}
+      {%- if page.taxonomies.tags %}
+      <div class="tg">{% for t in page.taxonomies.tags %}<a href="{{ get_taxonomy_url(kind='tags', name=t) | safe }}">#{{ t }}</a>{% if not loop.last %} {% endif %}{% endfor %}</div>
+      {%- endif %}
+    </div>
+  </div>
+{% endmacro bom_row %}

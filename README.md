@@ -31,16 +31,16 @@ touch content/posts/my-new-post.md
 ## Deployment
 
 ```bash
-# Deploy to GitHub Pages (pushes to PierreZ/portfolio repository)
+# Build and push to PierreZ/portfolio; served by Clever Cloud
 ./deploy.sh
 ```
 
 ## Technology Stack
 
 - **Static Site Generator**: [Zola](https://www.getzola.org/)
-- **Theme**: zola-bearblog (minimalist Bear Blog theme)
+- **Theme**: zola-quorum-schematics (custom, vendored in `themes/`)
 - **Development Environment**: Nix Flakes
-- **Hosting**: GitHub Pages
+- **Hosting**: Clever Cloud (built site pushed to PierreZ/portfolio)
 
 ## Additional Resources
 
