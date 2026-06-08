@@ -1,12 +1,12 @@
-{# Favicon: scalable SVG (modern) + manifest by default. With [extra.favicon] legacy = true
-   the site also serves favicon.ico (legacy, listed first so SVG-capable browsers still
-   prefer the SVG) and apple-touch-icon.png; supply both in static/ alongside the
-   android-chrome PNGs referenced by site.webmanifest. #}
+{# Favicon. By default the theme ships a scalable SVG. With [extra.favicon] legacy = true
+   the site supplies its own raster set in static/ (favicon.ico + 16/32 PNG + apple-touch,
+   plus the android-chrome PNGs in site.webmanifest) and that replaces the SVG. #}
   {%- if config.extra.favicon and config.extra.favicon.legacy %}
-  <link rel="icon" href="{{ get_url(path='favicon.ico') | safe }}" sizes="32x32">
-  {%- endif %}
-  <link rel="icon" href="{{ get_url(path='favicon.svg') | safe }}" type="image/svg+xml">
-  {%- if config.extra.favicon and config.extra.favicon.legacy %}
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ get_url(path='favicon-32x32.png') | safe }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ get_url(path='favicon-16x16.png') | safe }}">
+  <link rel="icon" href="{{ get_url(path='favicon.ico') | safe }}" sizes="any">
   <link rel="apple-touch-icon" href="{{ get_url(path='apple-touch-icon.png') | safe }}">
+  {%- else %}
+  <link rel="icon" href="{{ get_url(path='favicon.svg') | safe }}" type="image/svg+xml">
   {%- endif %}
   <link rel="manifest" href="{{ get_url(path='site.webmanifest') | safe }}">
