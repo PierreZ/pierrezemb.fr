@@ -88,7 +88,7 @@ Write like a senior colleague sharing production-scarred experience over coffee.
 
 ### Sentence rhythm
 
-Target around 30 words per sentence. Build paragraphs where each sentence sets up the next, the way a whiteboard walkthrough flows. A paragraph runs as long as the idea needs, often 3 to 6 sentences but longer when one thought genuinely carries that far. Do not split a continuous explanation into stubs just to keep paragraphs short, and do not pad a finished idea to make a paragraph longer. Never use em dashes or semicolons for style. Avoid elaborate subordinate clauses. English is not the first language, and the simple sentence structure is a deliberate constraint, not an accident.
+Target around 30 words per sentence. Build paragraphs that flow, where one sentence leads into the next, but keep the connection plain, with commas and simple words like because and so, not subordinate clauses or a balanced setup-and-payoff rhythm. The failure mode is polish, not flow, so do not over-correct by chopping the prose into short clipped sentences, a run of short declaratives reads as ad copy. A paragraph runs as long as the idea needs, often 3 to 6 sentences but longer when one thought genuinely carries that far. Do not split a continuous explanation into stubs just to keep paragraphs short, and do not pad a finished idea to make a paragraph longer. Never use em dashes or semicolons for style. Avoid elaborate subordinate clauses. English is not the first language, and the simple sentence structure is a deliberate constraint, not an accident.
 
 Do not prescribe sentence-length variance as a pattern. Short sentences happen when an idea is short. Codifying "punch sentences" produces mechanical rhythm that reads as AI.
 
@@ -172,6 +172,10 @@ Patterns to avoid:
 - Vague numbers ("hundreds of") and reference lists at the end.
 - Closing paragraphs that re-summarize what was just said.
 - Telling the reader how to read ("I'd suggest reading that sentence twice", "let that sink in").
+- Rhetorical balance and rhythm: the balanced antithesis ("a mock cannot do X, while a fake does Y"), and the setup-pivot-payoff three-beat (a clause, then a "but", then a "so" that resolves it). These give a sentence a tidy cadence that reads as AI. State it flat instead.
+- Quotable closers and crafted lines: "earns the right to lie", "a ghost you saw once in CI", "a seed number you can drop in a ticket". Lines built to be quoted. The voice describes the mechanism, it does not perform.
+- Decorative micro-metaphors and personification dropped into a sentence, like giving code intent or reaching for a small image where a plain statement does the job. This is not the earned physical analogy above, which carries a whole concept. A sprinkled image inside a sentence is a tell.
+- Smoothing a draft when editing it: do not upgrade the author's plain, comma-joined sentences into subordinated grammar or rhetorical pivots, and do not chop them into short clipped ones either. Fix typos and grammar, keep the flow and the plainness.
 
 ### Standard footer
 ```markdown
