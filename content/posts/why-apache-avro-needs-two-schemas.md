@@ -1,5 +1,5 @@
 +++
-title = "Why Avro Needs Two Schemas"
+title = "Why Apache Avro Needs Two Schemas"
 description = "Avro payloads cannot be decoded without the writer schema, and that two-schema model is what makes rolling upgrades and schema evolution work."
 date = 2026-07-30
 draft = true
@@ -7,7 +7,7 @@ draft = true
 tags = ["avro", "database", "foundationdb", "software-engineering"]
 +++
 
-We have been using Avro for years as the binary encoding for [Materia](https://www.clever-cloud.com/materia/)'s records stored in FoundationDB. A few weeks ago, while writing the code that adds a new type of header for a new component, I made a mistake. I serialized the records, stored the bytes, and moved on. Only later did I realize I had forgotten something essential: I wasn't preserving the writer schema.
+We have been using [Apache Avro](https://avro.apache.org/) for years as one of the binary encodings for [Materia](https://www.clever-cloud.com/materia/)'s records stored in FoundationDB. A few weeks ago, while writing the code that adds a new type of header for a new component, I made a mistake. I serialized the records, stored the bytes, and moved on. Only later did I realize I had forgotten something essential: I wasn't preserving the writer schema.
 
 At first, it didn't seem like a problem. My application already knew the latest schema, so surely it could decode the data. Unfortunately, that's not how Avro works, and more importantly, that's not how long-lived data should work.
 
