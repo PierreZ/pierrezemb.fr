@@ -2,7 +2,6 @@
 title = "Why Apache Avro Needs Two Schemas"
 description = "Avro payloads cannot be decoded without the writer schema, and that two-schema model is what makes rolling upgrades and schema evolution work."
 date = 2026-07-30
-draft = true
 [taxonomies]
 tags = ["avro", "database", "foundationdb", "software-engineering"]
 +++
