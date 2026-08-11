@@ -12,6 +12,17 @@
 </section>
 {%- endif %}
 
+{%- if section.relative_path == "posts/_index.md" %}
+{%- set tag_tax = get_taxonomy(kind="tags") %}
+{%- set top_tags = tag_tax.items | sort(attribute="page_count") | reverse | slice(end=5) %}
+<div class="taglist featured-tags">
+  <span class="tf-cmd">sort ./tags | head -5</span>
+  {%- for t in top_tags %}
+  <a class="tag" href="{{ t.permalink | safe }}">#{{ t.name }}<span class="cnt">{{ t.pages | length }}</span></a>
+  {%- endfor %}
+</div>
+{%- endif %}
+
 <div class="bom">
   {%- set_global bom_year = "" %}
   {%- for page in section.pages %}

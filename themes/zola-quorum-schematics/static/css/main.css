@@ -157,8 +157,6 @@ pre, code, kbd { font-family: var(--font-mono); }
 .bom .desc { display: block; color: var(--ink-dim); font-size: .82rem; margin-top: .2rem; }
 .bom a.desc:hover { color: var(--cyan); text-decoration: none; }
 .bom .row:hover a.desc { color: var(--ink); }
-.bom .tg { color: var(--cyan); font-size: .7rem; margin-top: .3rem; }
-.bom .tg a { color: var(--cyan); position: relative; z-index: 1; }
 .bom .rt { display: block; color: var(--ink-faint); font-size: .68rem; margin-top: .2rem; font-variant-numeric: tabular-nums; }
 
 /* year separator between rows (posts listing only) */
@@ -179,6 +177,11 @@ pre, code, kbd { font-family: var(--font-mono); }
 .taglist .tag .cnt { color: var(--ink-dim); font-size: .72rem; font-variant-numeric: tabular-nums; }
 .taglist .tag:hover .cnt { color: var(--cyan); }
 .taglist .tag--empty { color: var(--ink-dim); }
+
+/* featured tags row (top of /posts/, above the year listing) */
+.featured-tags { align-items: center; padding-top: 1.2rem; }
+.featured-tags .tf-cmd { font-family: var(--font-mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-dim); }
+.featured-tags .tf-cmd::before { content: "$ "; color: var(--cyan); font-weight: 700; }
 
 /* ---- ARTICLE ---- */
 .article { padding: 1.8rem 1.6rem; }
