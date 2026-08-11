@@ -24,6 +24,7 @@
 }
 
 :root[data-theme="blueprint"] {
+  color-scheme: light;
   --paper:     #f6f7f4;
   --paper-2:   #eef0ea;
   --ink:       #15324d;
@@ -38,6 +39,7 @@
 }
 /* dark flip = blueprint negative = the classic cyanotype */
 :root[data-theme="cyanotype"] {
+  color-scheme: dark;
   --paper:     #0d1f2d;
   --paper-2:   #122838;
   --ink:       #cfe4ee;
@@ -160,7 +162,7 @@ pre, code, kbd { font-family: var(--font-mono); }
 .bom .rt { display: block; color: var(--ink-faint); font-size: .68rem; margin-top: .2rem; font-variant-numeric: tabular-nums; }
 
 /* year separator between rows (posts listing only) */
-.bom .yr { padding: 1rem 0 .5rem; margin-top: .4rem; border-top: 1px dashed var(--grid-bold); font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; color: var(--ink-dim); }
+.bom .yr { padding: 1.6rem 0 .9rem; margin-top: .8rem; border-top: 1px dashed var(--grid-bold); font-family: var(--font-mono); font-size: .92rem; font-weight: 600; letter-spacing: .06em; color: var(--ink-dim); }
 .bom .yr::before { content: "$ "; color: var(--cyan); font-weight: 700; }
 .bom > .yr:first-child { margin-top: 0; padding-top: 0; border-top: none; }
 

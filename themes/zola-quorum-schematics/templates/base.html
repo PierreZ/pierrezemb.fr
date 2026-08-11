@@ -4,6 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  // Set data-theme before first paint (no flash). Persisted choice wins, else follow OS preference.
+  (function () {
+    try {
+      var saved = localStorage.getItem("bp-theme");
+      var dark = saved ? saved === "cyanotype" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", dark ? "cyanotype" : "blueprint");
+    } catch (e) {}
+  })();
+  </script>
   <title>{% block title %}{{ config.title }}{% endblock title %}</title>
   <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -21,18 +31,14 @@
   {% block extra_head %}{% endblock extra_head %}
 
   <script>
-  // Set theme before first paint (no flash). Persisted choice wins, else follow OS preference.
+  // Sync the syntax-highlight stylesheet to the data-theme set above (can't run
+  // earlier: needs the #syntax-light / #syntax-dark <link> elements to exist).
   (function () {
-    try {
-      var saved = localStorage.getItem("bp-theme");
-      var dark = saved ? saved === "cyanotype" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-      var theme = dark ? "cyanotype" : "blueprint";
-      document.documentElement.setAttribute("data-theme", theme);
-      var l = document.getElementById("syntax-light");
-      var d = document.getElementById("syntax-dark");
-      if (l) l.disabled = dark;
-      if (d) d.disabled = !dark;
-    } catch (e) {}
+    var dark = document.documentElement.getAttribute("data-theme") === "cyanotype";
+    var l = document.getElementById("syntax-light");
+    var d = document.getElementById("syntax-dark");
+    if (l) l.disabled = dark;
+    if (d) d.disabled = !dark;
   })();
   </script>
 </head>
