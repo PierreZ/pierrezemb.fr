@@ -13,7 +13,7 @@
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = [ pkgs.git pkgs.zola ];
+          buildInputs = [ pkgs.git pkgs.zola pkgs.ffmpeg pkgs.gifsicle pkgs.pngquant pkgs.oxipng pkgs.jpegoptim ];
         };
       });
 }
