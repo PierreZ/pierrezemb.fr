@@ -3,7 +3,7 @@ title = "So, You Want to Learn More About Deterministic Simulation Testing?"
 description = "A curated collection of resources about deterministic simulation testing for distributed systems."
 date = 2025-04-11T00:00:00+02:00
 [taxonomies]
-tags = ["distributed", "testing", "reliability", "simulation", "deterministic"]
+tags = ["distributed-systems", "testing", "reliability", "simulation", "deterministic"]
 +++
 
 I recently attended [BugBash 2025](https://bugbash.antithesis.com/), a software reliability conference organized by [Antithesis](https://antithesis.com) in Washington, D.C. during April 3-4, 2025. The conference brought together industry experts like Kyle Kingsbury, Ankush Desai, and Mitchell Hashimoto to discuss various aspects of building reliable software, with deterministic simulation testing being a significant focus throughout many of the sessions and discussions.

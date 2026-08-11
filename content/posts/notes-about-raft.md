@@ -3,7 +3,7 @@ title = "Notes about Raft's paper"
 description = "List of ressources gleaned about Raft"
 date = "2020-07-30T07:24:27+01:00"
 [taxonomies]
-tags= ["distributed", "consensus", "raft", "algorithms", "notes"]
+tags= ["distributed-systems", "consensus", "raft", "algorithms", "notes"]
 +++
 
 ![raft_image](/images/notes-about-raft/raft.png)

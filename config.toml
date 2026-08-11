@@ -2,7 +2,7 @@
 # The URL the site will be built for
 base_url = "https://pierrezemb.fr"
 title = "Pierre Zemb's Blog"
-description = "Pierre Zemb personal blog"
+description = "Distributed systems, FoundationDB, Rust, and simulation testing, written from production experience."
 
 # Local custom theme, linked via flake shellHook into themes/
 theme = "zola-quorum-schematics"
@@ -37,6 +37,7 @@ dark_theme = "solarized-dark"
 include_title = true
 include_description = true
 include_content = true
+truncate_content_length = 500
 
 [extra]
 logo = "Pierre Zemb"
@@ -102,3 +103,11 @@ url = "https://x.com/PierreZ"
 [[extra.social]]
 name = "bluesky"
 url = "https://bsky.app/profile/pierrezemb.fr"
+
+[[extra.social]]
+name = "linkedin"
+url = "https://www.linkedin.com/in/%F0%9F%91%A8%F0%9F%8F%BB%E2%80%8D%F0%9F%92%BB-pierre-zemb-8004125b/"
+
+[[extra.social]]
+name = "mastodon"
+url = "https://fosstodon.org/@PierreZ"

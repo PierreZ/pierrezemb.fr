@@ -2,7 +2,7 @@
 title = "Thank You, DataFusion: Queries in Rust, Without the Pain"
 date = 2025-06-04
 [taxonomies]
-tags = ["rust", "datafusion", "sql", "query-engine", "databases"]
+tags = ["rust", "datafusion", "sql", "query-engine", "database"]
 +++
 
 ## That “YATTA!” Moment, Rebooted

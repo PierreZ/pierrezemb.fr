@@ -3,7 +3,7 @@ title = "Diving into Hbase's MemStore"
 date = "2019-11-17T10:24:27+01:00"
 draft = false
 [taxonomies]
-tags = ["database", "storage", "distributed", "hbase", "performance", "diving-into"]
+tags = ["database", "storage", "distributed-systems", "hbase", "performance", "diving-into"]
 +++
 
 ![hbase image](/images/hbase-data-model/hbase.jpg)

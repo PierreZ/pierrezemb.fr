@@ -3,7 +3,7 @@ title = "Notes about ETCD"
 description = "List of ressources gleaned about ETCD"
 date = "2021-01-11T00:24:27+01:00"
 [taxonomies]
-tags= ["distributed", "etcd", "storage", "consensus", "notes"]
+tags= ["distributed-systems", "etcd", "storage", "consensus", "notes"]
 +++
 
 ![etcd image](/images/notes-about-etcd/images/etcd.png)

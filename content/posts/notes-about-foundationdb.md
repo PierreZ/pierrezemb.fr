@@ -3,7 +3,7 @@ title = "Notes about FoundationDB"
 description = "List of ressources gleaned about FoundationDB"
 date = "2020-01-30T10:24:27+01:00"
 [taxonomies]
-tags= ["distributed", "foundationdb", "storage", "database", "notes"]
+tags= ["distributed-systems", "foundationdb", "storage", "database", "notes"]
 +++
 
 ![fdb image](/images/notes-about-foundationdb/fdb-white.jpg)

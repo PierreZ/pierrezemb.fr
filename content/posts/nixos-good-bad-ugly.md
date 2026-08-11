@@ -3,7 +3,7 @@ title = "Three Years of Nix and NixOS: The Good, the Bad, and the Ugly"
 description = "A review of Nix/NixOS after using it on all my machines for three years. I'll cover what works, what doesn't, and why it's the first OS that's stuck with me."
 date = 2025-07-02T00:37:27+01:00
 [taxonomies]
-tags = ["nixos", "nix", "linux", "devops"]
+tags = ["nix", "linux", "devops"]
 +++
 
 For years, I was a serial distro-hopper, working my way through Ubuntu, Arch, Gentoo, Exherbo, Void Linux, Fedora, Pop!_OS, and Manjaro. Every few months, a new Linux distribution would catch my eye, and I’d spend a weekend migrating my setup, hoping to find the perfect fit. That cycle broke three years ago when I switched to NixOS. It has since become the foundation for all my Linux machines, not because it’s perfect, but because it fundamentally changes the contract between the user and the operating system.

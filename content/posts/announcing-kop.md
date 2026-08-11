@@ -3,7 +3,7 @@ title = "Announcing Kafka-on-Pulsar: bring native Kafka protocol support to Apac
 description = "We are excited to announce that StreamNative and OVHcloud are open-sourcing “Kafka on Pulsar” (KoP).  KoP brings the native Apache Kafka protocol support to Apache Pulsar by introducing a Kafka protocol handler on Pulsar brokers"
 date = 2020-03-24T10:24:27+01:00
 [taxonomies]
-tags = ["messaging", "distributed", "kafka", "pulsar", "opensource"]
+tags = ["messaging", "distributed-systems", "kafka", "pulsar", "opensource"]
 [extra]
 canonical = "https://www.ovh.com/blog/announcing-kafka-on-pulsar-bring-native-kafka-protocol-support-to-apache-pulsar/"
 +++

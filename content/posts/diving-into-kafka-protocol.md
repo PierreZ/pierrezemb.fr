@@ -2,7 +2,7 @@
 title = "Diving into Kafka's Protocol"
 date = "2019-12-08T15:00:00+01:00"
 [taxonomies]
-tags = ["messaging", "distributed", "kafka", "networking", "diving-into"]
+tags = ["messaging", "distributed-systems", "kafka", "networking", "diving-into"]
 +++
 
 ![kafka image](/images/diving-into-kafka-protocol/apache-kafka.png)

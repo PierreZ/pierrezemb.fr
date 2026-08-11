@@ -3,7 +3,7 @@ title = "What if we embraced simulation-driven development?"
 description = "How deterministic simulation testing can help us build more reliable distributed systems and bridge the gap between development and production environments."
 date = 2025-04-18T11:12:12+02:00
 [taxonomies]
-tags = ["distributed", "testing", "reliability", "simulation", "deterministic"]
+tags = ["distributed-systems", "testing", "reliability", "simulation", "deterministic"]
 +++
 
 This article has been translated from my original French presentation at the upcoming Devoxx France 2025, titled "[What if we embraced simulation-driven development?](https://docs.google.com/presentation/d/1xm4yNGnV2Oi8Lk3ZHEvg4aDMNEFieSmW06CkItCigSc/edit?usp=sharing)".

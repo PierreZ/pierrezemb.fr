@@ -3,7 +3,7 @@ title = "Building Index-Backed Query Plans in DataFusion"
 description = "What I learned about manually constructing physical query plans for secondary index queries, and the library that came out of it."
 date = 2026-02-25
 [taxonomies]
-tags = ["rust", "datafusion", "sql", "query-engine", "databases", "distributed-systems"]
+tags = ["rust", "datafusion", "sql", "query-engine", "database", "distributed-systems"]
 +++
 
 When you build a system on top of a key-value store like FoundationDB, you eventually need secondary indexes. You create them, you maintain them, and then one day you need to query them. Not just scan a single index, but combine results from multiple indexes: intersect them for AND conditions, union them for OR conditions, and fetch the actual records at the end. That's a query engine's job. I didn't want to write a query engine. But I had to learn how one thinks.

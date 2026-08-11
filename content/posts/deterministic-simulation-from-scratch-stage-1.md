@@ -5,6 +5,9 @@ date = 2025-12-22
 draft = true
 [taxonomies]
 tags = ["moonpool", "rust", "simulation", "deterministic", "distributed-systems", "testing"]
+[extra]
+series = "Deterministic Simulation from Scratch"
+series_part = 1
 +++
 
 > This post is part of **Deterministic Simulation from Scratch**, a series about building [moonpool](https://github.com/PierreZ/moonpool), a deterministic simulation testing framework for Rust inspired by FoundationDB. Each Stage builds on the previous one. Start here or jump to any Stage: [Stage 2](/posts/deterministic-simulation-from-scratch-stage-2/), [Stage 3](/posts/deterministic-simulation-from-scratch-stage-3/), [Stage 4](/posts/deterministic-simulation-from-scratch-stage-4/).
