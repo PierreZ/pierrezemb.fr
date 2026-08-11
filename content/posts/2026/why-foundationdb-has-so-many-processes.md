@@ -25,30 +25,36 @@ When we learn distributed systems, we usually learn to partition: partition the 
 It calls the answer **compartmentalization**: decouple individual bottlenecks into distinct components, then scale those components independently. The MultiPaxos leader is its canonical example. The leader has two responsibilities, sequencing commands into the log and handling the communication for the whole protocol, and the coupling shows as soon as you count messages: per command, the leader touches seven messages when the cluster tolerates one failure, while every other node touches at most two. Scaling does not help, adding acceptors or replicas only gives the leader more nodes to talk to.
 
 {% mermaid() %}
-flowchart TB
-    subgraph t1["MultiPaxos: 7 messages touch the leader"]
-        direction TB
-        C1([Client]) -- "x" --> L1["Leader"]
-        L1 -- "replicate x, 1 per acceptor" --> A1["Acceptors"]
-        A1 -- "ack, 1 per acceptor" --> L2["Leader"]
-        L2 -- "x is chosen, 1 per replica" --> R1["Replicas"]
-        R1 -- "result of x" --> C2([Client])
-    end
+sequenceDiagram
+    participant C as Client
+    participant L as Leader
+    participant A as Acceptors
+    participant R as Replicas
+    C->>L: x
+    L->>A: replicate x, 1 per acceptor
+    A->>L: ack, 1 per acceptor
+    L->>R: x is chosen, 1 per replica
+    R->>C: result of x
+    Note over L: 7 messages in and out of the leader
 {% end %}
 
 There is no fundamental reason those two jobs have to live together. Sequencing is inherently serialized, communication is embarrassingly parallel, so the paper introduces **proxy leaders**: the leader keeps sequencing and hands each command to a proxy leader that runs the rest of the protocol, dropping the leader to two messages per command. I will not paraphrase the whole construction, the talk does it better, so here is just the paper's result: applied across the protocol, compartmentalization raises MultiPaxos throughput by 6x on a write-only workload and 16x on a workload with 90% reads, without adopting a new protocol.
 
 {% mermaid() %}
-flowchart TB
-    subgraph t2["Compartmentalized: 2 messages touch the leader, the rest moved to scalable proxy leaders"]
-        direction TB
-        C3([Client]) -- "x" --> L3["Leader"]
-        L3 -- "x at position 0" --> P1["Proxy leader"]
-        P1 -- "replicate x, 1 per acceptor" --> A2["Acceptors"]
-        A2 -- "ack, 1 per acceptor" --> P2["Proxy leader"]
-        P2 -- "x is chosen, 1 per replica" --> R2["Replicas"]
-        R2 -- "result of x" --> C4([Client])
-    end
+sequenceDiagram
+    participant C as Client
+    participant L as Leader
+    participant P as Proxy leader
+    participant A as Acceptors
+    participant R as Replicas
+    C->>L: x
+    L->>P: x at position 0
+    P->>A: replicate x, 1 per acceptor
+    A->>P: ack, 1 per acceptor
+    P->>R: x is chosen, 1 per replica
+    R->>C: result of x
+    Note over L: only 2 messages touch the leader
+    Note over P: the 7 messages moved here, and proxy leaders scale
 {% end %}
 
 ## How I read systems now
