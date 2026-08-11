@@ -10,7 +10,7 @@ tags = ["distributed-systems", "foundationdb", "consensus", "algorithms"]
 
 ## The architecture I couldn't explain
 
-One thing always puzzled me about FoundationDB. Compared to many distributed databases, its architecture looks almost excessive: GRV proxies, commit proxies, resolvers, log servers, storage servers, ratekeepers, data distributors, cluster controllers. Every responsibility seems to be its own process, and it was deliberately designed this way from the beginning. After years of operating FDB for [Materia](https://www.clever-cloud.com/materia/) at Clever Cloud, I understood what every component did, but I couldn't explain why the system had been split that way. Michael Whittaker's [**Scaling Replicated State Machines with Compartmentalization**](https://mwhittaker.github.io/publications/compartmentalized_paxos.html) (VLDB 2021) finally gave me the vocabulary I was missing.
+One thing always puzzled me about FoundationDB. Compared to many distributed databases, its architecture looks almost excessive: GRV proxies, commit proxies, resolvers, log servers, storage servers, and that's only the data plane. Every responsibility seems to be its own process, and it was deliberately designed this way from the beginning. After years of operating FDB for [Materia](https://www.clever-cloud.com/materia/) at Clever Cloud, I understood what every component did, but I couldn't explain why the system had been split that way. Michael Whittaker's [**Scaling Replicated State Machines with Compartmentalization**](https://mwhittaker.github.io/publications/compartmentalized_paxos.html) (VLDB 2021) finally gave me the vocabulary I was missing.
 
 Start with his talk, it explains the paper better than I could. The rest of this post is what his lens does to FoundationDB:
 
@@ -25,43 +25,30 @@ When we learn distributed systems, we usually learn to partition: partition the 
 It calls the answer **compartmentalization**: decouple individual bottlenecks into distinct components, then scale those components independently. The MultiPaxos leader is its canonical example. The leader has two responsibilities, sequencing commands into the log and handling the communication for the whole protocol, and the coupling shows as soon as you count messages: per command, the leader touches seven messages when the cluster tolerates one failure, while every other node touches at most two. Scaling does not help, adding acceptors or replicas only gives the leader more nodes to talk to.
 
 {% mermaid() %}
-sequenceDiagram
-    participant C as Client
-    participant L as Leader
-    participant A1 as Acceptor a1
-    participant A2 as Acceptor a2
-    participant R1 as Replica r1
-    participant R2 as Replica r2
-    C->>L: x
-    L->>A1: replicate x at position 0
-    L->>A2: replicate x at position 0
-    A1->>L: ack
-    A2->>L: ack
-    L->>R1: x is chosen
-    L->>R2: x is chosen
-    R1->>C: result of x
-    Note over L: 7 messages in and out of the leader
+flowchart TB
+    subgraph t1["MultiPaxos: 7 messages touch the leader"]
+        direction TB
+        C1([Client]) -- "x" --> L1["Leader"]
+        L1 -- "replicate x, 1 per acceptor" --> A1["Acceptors"]
+        A1 -- "ack, 1 per acceptor" --> L2["Leader"]
+        L2 -- "x is chosen, 1 per replica" --> R1["Replicas"]
+        R1 -- "result of x" --> C2([Client])
+    end
 {% end %}
 
 There is no fundamental reason those two jobs have to live together. Sequencing is inherently serialized, communication is embarrassingly parallel, so the paper introduces **proxy leaders**: the leader keeps sequencing and hands each command to a proxy leader that runs the rest of the protocol, dropping the leader to two messages per command. I will not paraphrase the whole construction, the talk does it better, so here is just the paper's result: applied across the protocol, compartmentalization raises MultiPaxos throughput by 6x on a write-only workload and 16x on a workload with 90% reads, without adopting a new protocol.
 
 {% mermaid() %}
-sequenceDiagram
-    participant C as Client
-    participant L as Leader
-    participant P as Proxy leader
-    participant A1 as Acceptor a1
-    participant A2 as Acceptor a2
-    participant R1 as Replica r1
-    C->>L: x
-    L->>P: x at position 0
-    P->>A1: replicate x at position 0
-    P->>A2: replicate x at position 0
-    A1->>P: ack
-    A2->>P: ack
-    P->>R1: x is chosen
-    R1->>C: result of x
-    Note over L: only 2 messages touch the leader
+flowchart TB
+    subgraph t2["Compartmentalized: 2 messages touch the leader, the rest moved to scalable proxy leaders"]
+        direction TB
+        C3([Client]) -- "x" --> L3["Leader"]
+        L3 -- "x at position 0" --> P1["Proxy leader"]
+        P1 -- "replicate x, 1 per acceptor" --> A2["Acceptors"]
+        A2 -- "ack, 1 per acceptor" --> P2["Proxy leader"]
+        P2 -- "x is chosen, 1 per replica" --> R2["Replicas"]
+        R2 -- "result of x" --> C4([Client])
+    end
 {% end %}
 
 ## How I read systems now
@@ -82,7 +69,9 @@ Looking back at FoundationDB, I stopped seeing dozens of processes and started s
 
 ## Every split has a cost
 
-Compartmentalization isn't free. Every isolated responsibility is another running component, another RPC path, another thing that can fail, be upgraded, and be reconfigured, and reconfiguration is a hard enough problem that the same author wrote [**Matchmaker Paxos**](https://mwhittaker.github.io/publications/matchmaker_paxos.html) about it, another paper I like a lot. The paper is upfront about the price: its 6x speedup used 6.66x the machines, a command now crosses six network delays instead of four, and running more machines shortens the expected time to f failures. The responsibilities can evolve independently, but the number of possible interactions grows quickly. I think this is also why FoundationDB invested so heavily in [deterministic simulation](/posts/diving-into-foundationdb-simulation/): once your architecture is dozens of independently reconfigurable components, validating all those interactions with traditional integration tests becomes increasingly difficult.
+Compartmentalization isn't free. Every isolated responsibility is another running component, another RPC path, another thing that can fail, be upgraded, and be reconfigured, and reconfiguration is a hard enough problem that the same author wrote [**Matchmaker Paxos**](https://mwhittaker.github.io/publications/matchmaker_paxos.html) about it, another paper I like a lot.
+
+The paper is upfront about the price: its 6x speedup used 6.66x the machines, a command now crosses six network delays instead of four, and running more machines shortens the expected time to f failures. The responsibilities can evolve independently, but the number of possible interactions grows quickly. I think this is also why FoundationDB invested so heavily in [deterministic simulation](/posts/diving-into-foundationdb-simulation/): once your architecture is dozens of independently reconfigurable components, validating all those interactions with traditional integration tests becomes increasingly difficult.
 
 ---
 
