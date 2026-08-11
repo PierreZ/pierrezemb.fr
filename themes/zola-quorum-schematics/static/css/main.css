@@ -256,7 +256,7 @@ blockquote p { margin-bottom: 0; }
 blockquote .who { display: block; margin-top: .55rem; color: var(--ink-dim); font-size: .78rem; }
 blockquote .who::before { content: "— "; }
 
-code.inline, .prose p > code, .prose li > code { background: var(--paper-2); border: 1px solid var(--grid-bold); padding: .05rem .3rem; border-radius: 2px; color: var(--cyan); font-size: .88em; }
+code.inline, .prose p > code, .prose li > code, .hero-intro code { background: var(--paper-2); border: 1px solid var(--grid-bold); padding: .05rem .3rem; border-radius: 2px; color: var(--cyan); font-size: .88em; }
 
 /* syntax-highlighted code blocks (Zola emits <pre class="...z-code...">) */
 .prose pre { background: var(--paper-2); border: 1px solid var(--grid-bold); border-left: 4px solid var(--cyan); padding: .9rem 1.1rem; overflow-x: auto; margin: 1.4rem 0; font-size: .82rem; line-height: 1.5; }
