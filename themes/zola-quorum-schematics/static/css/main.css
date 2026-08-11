@@ -163,7 +163,7 @@ pre, code, kbd { font-family: var(--font-mono); }
 
 /* year separator between rows (posts listing only) */
 .bom .row:has(+ .yr) { border-bottom: none; }
-.bom .yr { padding: .55rem 0 .9rem; margin-top: 1.4rem; border-top: 1px dashed var(--grid-bold); font-family: var(--font-mono); font-size: .92rem; font-weight: 600; letter-spacing: .06em; color: var(--ink-dim); }
+.bom .yr { padding: .95rem 0 .9rem; margin-top: 1.4rem; border-top: 1px dashed var(--grid-bold); font-family: var(--font-mono); font-size: .92rem; font-weight: 600; letter-spacing: .06em; color: var(--ink-dim); }
 .bom .yr::before { content: "$ "; color: var(--cyan); font-weight: 700; }
 .bom > .yr:first-child { margin-top: 1.2rem; padding-top: 0; border-top: none; }
 
