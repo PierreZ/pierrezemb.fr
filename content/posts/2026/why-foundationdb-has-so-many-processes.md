@@ -12,7 +12,7 @@ tags = ["distributed-systems", "foundationdb", "consensus", "algorithms"]
 
 One thing always puzzled me about FoundationDB. Compared to many distributed databases, its architecture looks almost excessive: GRV proxies, commit proxies, resolvers, log servers, storage servers, and that's only the data plane. Every responsibility seems to be its own process, and it was deliberately designed this way from the beginning. After years of operating FDB for [Materia](https://www.clever-cloud.com/materia/) at Clever Cloud, I understood what every component did, but I couldn't explain why the system had been split that way. Michael Whittaker's [**Scaling Replicated State Machines with Compartmentalization**](https://mwhittaker.github.io/publications/compartmentalized_paxos.html) (VLDB 2021) finally gave me the vocabulary I was missing.
 
-Start with his talk, it explains the paper better than I could. The rest of this post is what his lens does to FoundationDB:
+Start with his talk, it explains the paper better than I could:
 
 {{ youtube(id="LWFml1LFIqc", title="Scaling Replicated State Machines with Compartmentalization") }}
 
