@@ -10,7 +10,7 @@ tags = ["distributed-systems", "foundationdb", "consensus", "algorithms"]
 
 ## The architecture I couldn't explain
 
-One thing always puzzled me about FoundationDB. Compared to many distributed databases, its architecture looks almost excessive: GRV proxies, commit proxies, resolvers, log servers, storage servers, and that's only the data plane. Every responsibility seems to be its own process, and it was deliberately designed this way from the beginning. After years of operating FDB for [Materia](https://www.clever-cloud.com/materia/) at Clever Cloud, I understood what every component did, but I couldn't explain why the system had been split that way. Michael Whittaker's [**Scaling Replicated State Machines with Compartmentalization**](https://mwhittaker.github.io/publications/compartmentalized_paxos.html) (VLDB 2021) finally gave me the vocabulary I was missing.
+One thing always puzzled me about FoundationDB. Compared to many distributed databases, its architecture looks almost excessive: GRV proxies, commit proxies, resolvers, log servers, storage servers, and that's only the data plane. Each of these roles has a narrow responsibility, often in its own process. After years of operating FDB for [Materia](https://www.clever-cloud.com/materia/) at Clever Cloud, I understood what every component did, but I couldn't explain why the system had been split that way. Michael Whittaker's [**Scaling Replicated State Machines with Compartmentalization**](https://mwhittaker.github.io/publications/compartmentalized_paxos.html) (VLDB 2021) finally gave me the vocabulary I was missing.
 
 Start with his talk, it explains the paper better than I could:
 
@@ -22,7 +22,7 @@ When we learn distributed systems, we usually learn to partition: partition the 
 
 **Which responsibilities have we accidentally coupled together?**
 
-It calls the answer **compartmentalization**: decouple individual bottlenecks into distinct components, then scale those components independently. The MultiPaxos leader is its canonical example. The leader has two responsibilities, sequencing commands into the log and handling the communication for the whole protocol, and the coupling shows as soon as you count messages: per command, the leader touches seven messages when the cluster tolerates one failure, while every other node touches at most two. Scaling does not help, adding acceptors or replicas only gives the leader more nodes to talk to.
+It calls the answer **compartmentalization**: decouple individual bottlenecks into distinct components, then scale those components independently. The MultiPaxos leader is its canonical example, since it sequences commands into the log and handles communication for the whole protocol. For f = 1, each command gives the leader one client message, four messages exchanged with a quorum of two acceptors, and two messages to replicas, seven messages in total, so adding acceptors or replicas only gives it more nodes to talk to.
 
 {% mermaid() %}
 sequenceDiagram
@@ -31,11 +31,11 @@ sequenceDiagram
     participant A as Acceptors
     participant R as Replicas
     C->>L: x
-    L->>A: replicate x, 1 per acceptor
-    A->>L: ack, 1 per acceptor
-    L->>R: x is chosen, 1 per replica
+    L->>A: replicate x to quorum of 2 acceptors
+    A->>L: acknowledgements from 2 acceptors
+    L->>R: x is chosen, sent to 2 replicas
     R->>C: result of x
-    Note over L: 7 messages in and out of the leader
+    Note over L: 7 messages touch leader
 {% end %}
 
 There is no fundamental reason those two jobs have to live together. Sequencing is inherently serialized, communication is embarrassingly parallel, so the paper introduces **proxy leaders**: the leader keeps sequencing and hands each command to a proxy leader that runs the rest of the protocol, dropping the leader to two messages per command. I will not paraphrase the whole construction, the talk does it better, so here is just the paper's result: applied across the protocol, compartmentalization raises MultiPaxos throughput by 6x on a write-only workload and 16x on a workload with 90% reads, without adopting a new protocol.
@@ -49,35 +49,55 @@ sequenceDiagram
     participant R as Replicas
     C->>L: x
     L->>P: x at position 0
-    P->>A: replicate x, 1 per acceptor
-    A->>P: ack, 1 per acceptor
-    P->>R: x is chosen, 1 per replica
+    P->>A: replicate x to quorum of 2 acceptors
+    A->>P: acknowledgements from 2 acceptors
+    P->>R: x is chosen, sent to 2 replicas
     R->>C: result of x
-    Note over L: only 2 messages touch the leader
-    Note over P: the 7 messages moved here, and proxy leaders scale
+    Note over L: 2 messages touch leader
+    Note over P: 7 messages touch proxy
 {% end %}
 
 ## How I read systems now
 
 Since reading the paper, I read distributed systems through the same short list of questions.
 
-**How many RPCs does each component touch per request?** I start with the communication graph, not the algorithm: who receives every request, who fans out to the rest of the cluster. Counting messages finds the bottleneck long before I understand the protocol.
+**How many RPCs does each component touch per request?** I start with the communication graph, not the algorithm: who receives every request, who fans out to the rest of the cluster. Counting messages gives me a first hypothesis about the bottleneck long before I understand the protocol.
 
 **What is this component actually responsible for?** Persistence, sequencing, conflict detection, broadcasting, batching, replying to clients? When one component does many unrelated jobs, I wonder whether they really belong together.
 
 **Which steps are inherently serialized, and which are embarrassingly parallel?** Ordering commands is serialized, broadcasting them isn't, replying to clients isn't, and conflict detection might not be. Once I know which parts are fundamentally sequential, the architecture starts to explain itself.
 
-**Do reads have to travel the write path?** Writes must go through the leader and every replica, but reads commute, so the paper routes them around the leader with Paxos Quorum Reads, asking a quorum of acceptors for a log position and then reading from a single replica. Read-heavy is the norm: the paper cites the [Chubby](https://www.usenix.org/legacy/event/osdi06/tech/burrows.html) paper (OSDI 2006) observing fewer than 1% of operations as writes, and the [Spanner](https://www.usenix.org/conference/osdi12/technical-sessions/presentation/corbett) paper (OSDI 2012) fewer than 0.3%.
+**When I add instances, does the work per node go down, or does fan-out go up?** I want to know whether an added instance absorbs work or simply gives a singleton more nodes to contact.
 
-**Is batching a responsibility of its own?** The paper adds batchers and unbatchers, so the leader and the replicas only ever touch batches instead of individual messages.
+**Can this work be partitioned across independent groups?** The talk's acceptor-group example partitions the log across groups to scale the acceptors, so I ask whether the work can be split across independent groups in the same way.
 
-Looking back at FoundationDB, I stopped seeing dozens of processes and started seeing answers to those questions. The sequencer hands out versions, the one job that has to be serialized. Resolvers check conflicts in parallel. Commit proxies batch and broadcast to the log servers, and storage servers pull from them. The talk's second example, partitioning the log across acceptor groups to scale the acceptors, is the same move FDB makes when it spreads tagged mutations across the log servers. The read path is the paper's two-step read made concrete: a GRV proxy hands out a read version the way a quorum of acceptors hands out a log position, then a storage server caught up to that version serves the read, entirely separate from the commit path.
+Looking back at FoundationDB, I stopped seeing dozens of processes and started seeing answers to those questions. The master, the FDB sequencer, keeps version assignment serialized. GRV proxies batch read-version requests and keep client fan-in away from that singleton. Commit proxies batch transactions, send their conflict ranges to resolvers, then tag the mutations and synchronously push them to TLogs. Resolvers can partition conflict checking by key range, while TLogs are replicated, sharded persistent mutation queues. FDB uses a different protocol, and the useful analogy is the separation itself: its transaction system keeps serialized work apart from communication, conflict checking, and durable mutation handling, so each role can absorb a different part of the load.
+
+{% mermaid() %}
+flowchart TB
+    C[Client]
+    G[GRV proxy]
+    M[Master / sequencer]
+    CP[Commit proxy]
+    R[Resolvers]
+    T[TLogs<br/>replicated, sharded persistent mutation queues]
+    C -->|get read version| G
+    G -->|batched request| M
+    M -->|read version| G
+    G -->|read version| C
+    C -->|transaction| CP
+    CP -->|batched commit-version request| M
+    M -->|commit version| CP
+    CP -->|conflict ranges| R
+    R -->|conflict result| CP
+    CP -->|tagged mutations, synchronous push| T
+{% end %}
 
 ## Every split has a cost
 
 Compartmentalization isn't free. Every isolated responsibility is another running component, another RPC path, another thing that can fail, be upgraded, and be reconfigured, and reconfiguration is a hard enough problem that the same author wrote [**Matchmaker Paxos**](https://mwhittaker.github.io/publications/matchmaker_paxos.html) about it, another paper I like a lot.
 
-The paper is upfront about the price: its 6x speedup used 6.66x the machines, a command now crosses six network delays instead of four, and running more machines shortens the expected time to f failures. The responsibilities can evolve independently, but the number of possible interactions grows quickly. I think this is also why FoundationDB invested so heavily in [deterministic simulation](/posts/diving-into-foundationdb-simulation/): once your architecture is dozens of independently reconfigurable components, validating all those interactions with traditional integration tests becomes increasingly difficult.
+The paper is upfront about the price: its 6x speedup used 6.66x the machines, a command now crosses six network delays instead of four, and running more machines shortens the expected time to f failures. The responsibilities can evolve independently, but the number of possible interactions grows quickly. I think this is also why FoundationDB invested so heavily in [deterministic simulation](/posts/diving-into-foundationdb-simulation/): the hard part is exercising interacting roles and failure sequences, including generation recovery in the transaction system, and traditional integration tests make that increasingly difficult.
 
 ---
 
