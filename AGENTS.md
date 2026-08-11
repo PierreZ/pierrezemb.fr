@@ -106,6 +106,8 @@ tags = ["distributed-systems", "foundationdb", "rust", "testing"]
 
 New posts go in `content/posts/<year>/` matching their date, with the `path` line matching the filename. Multi-part series set `[extra]` with `series = "Series Title"` and `series_part = N` on each part; the theme renders a linked series box on those posts.
 
+Mermaid diagrams are always laid out vertically: `flowchart TB`, and `direction TB` inside subgraphs. The content column is narrow, so horizontal flowcharts shrink to illegibility. Sequence diagrams are vertical by nature and preferred for message-flow arguments.
+
 Common tags. Primary: `distributed-systems`, `foundationdb`, `rust`, `testing`, `observability`, `software-engineering`, `programming`, `async`, `database`. Meta: `personal`, `notes-about`, `diving-into`. Languages: `rust`, `java`. Tools: `tokio`, `kafka`, `etcd`, `hbase`. Concepts: `algorithms`, `consensus`, `simulation`, `deterministic`, `metaprogramming`.
 
 Post types:
