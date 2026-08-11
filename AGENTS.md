@@ -23,7 +23,7 @@ Deployment works by grafting the `.git` of the PierreZ/portfolio repo into a fre
 
 ## Layout
 
-- `content/posts/`: blog posts
+- `content/posts/<year>/`: blog posts, organized in per-year folders. Each year folder has an `_index.md` with `transparent = true` and `render = false`, so pages roll up to the `posts` section and no `/posts/<year>/` page is generated. Every post pins its URL with `path = "posts/<slug>"` front-matter so URLs stay flat at `/posts/<slug>/` regardless of folder
 - `content/`: root pages (`contact.md`, `talks.md`, `podcasts.md`)
 - `static/images/<post-name>/`: images for a given post, referenced as `![Alt](/images/<post-name>/file.png)`
 - `templates/`: only the `atom.xml` / `rss.xml` feed templates; everything else comes from the theme
@@ -97,11 +97,14 @@ Frontmatter template:
 title = "Post Title"
 description = "One-sentence description for social media"
 date = 2025-01-01
+path = "posts/post-slug"  # Always: keeps URLs flat despite the per-year folders
 draft = true  # Remove when ready to publish
 [taxonomies]
 tags = ["distributed-systems", "foundationdb", "rust", "testing"]
 +++
 ```
+
+New posts go in `content/posts/<year>/` matching their date, with the `path` line matching the filename. Multi-part series set `[extra]` with `series = "Series Title"` and `series_part = N` on each part; the theme renders a linked series box on those posts.
 
 Common tags. Primary: `distributed-systems`, `foundationdb`, `rust`, `testing`, `observability`, `software-engineering`, `programming`, `async`, `database`. Meta: `personal`, `notes-about`, `diving-into`. Languages: `rust`, `java`. Tools: `tokio`, `kafka`, `etcd`, `hbase`. Concepts: `algorithms`, `consensus`, `simulation`, `deterministic`, `metaprogramming`.
 
