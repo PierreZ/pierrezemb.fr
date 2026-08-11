@@ -4,7 +4,7 @@ date = "2016-05-13T17:19:23.788Z"
 [extra]
 canonical = "https://medium.com/@PierreZ/event-driven-architecture-101-d8e13cc4c656"
 [taxonomies]
-tags= ["architecture", "messaging", "distributed", "design"]
+tags= ["architecture", "messaging", "distributed-systems", "design"]
 +++
 
 **update 2019:** this is a repost on my own blog. original article can be read on [medium](https://medium.com/@PierreZ/event-driven-architecture-101-d8e13cc4c656).
@@ -21,7 +21,7 @@ _I’m still a student, so my point of view could be far from reality, be gentle
 
 # the Unix philosophy
 
-![image](/images/eventdriven-architecture-101/2.gif)
+<video autoplay loop muted playsinline style="max-width:100%;border:1px solid #b9c6cf;" src="/images/eventdriven-architecture-101/2.mp4" aria-label="image"></video>
 
 I’m a huge fan of GNU/Linux. I just love my terminal. It’s been difficult at the beginning, but now, I consider myself fluent with it. My favorite feature ? **Pipes or |**. For those who don’t know, it’s the ability to pass the result of the command to another command. For example, to count how many files you have in a folder, you’ll find yourself doing something like this:
 
@@ -37,7 +37,7 @@ Why should I care? It’s 2016, not 1978! Well…
 
 # Back in 2016
 
-![image](/images/eventdriven-architecture-101/3.gif)
+<video autoplay loop muted playsinline style="max-width:100%;border:1px solid #b9c6cf;" src="/images/eventdriven-architecture-101/3.mp4" aria-label="image"></video>
 
 Cloud changed everything in terms of software engineering. **We can now deploy applications without thinking about the underlying server**. How cool is that? Let’s take some steps back. Now that you can easily deploy a huge application, what can be accomplished? Well, if I can deploy one app with ease, **Why should I deploy only one huge app ?** why can’t I deploy multiples applications instead of one? **Let’s call theses applications micro services** because we are in 2016.
 

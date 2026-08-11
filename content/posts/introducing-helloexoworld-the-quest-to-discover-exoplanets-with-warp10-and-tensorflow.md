@@ -37,7 +37,7 @@ Let’s quote our good old friend [**Wikipedia**](https://en.wikipedia.org/wiki/
 
 do you know how many exoplanets that have been discovered? [**3,529 confirmed planets** as of 10/09/2017](https://exoplanetarchive.ipac.caltech.edu/). I was amazed by the number of them. I started digging into the [**detection methods**](https://en.wikipedia.org/wiki/Methods_of_detecting_exoplanets). Turns out there is one method heavily used, called **the transit method**. It’s like a eclipse: when the exoplanet is passing in front of the star, the photometry is varying during the transit, as shown below:
 
-![image](/images/introducing-helloexoworld-the-quest-to-discover-exoplanets-with-warp10-and-tensorflow/4.gif)
+<video autoplay loop muted playsinline style="max-width:100%;border:1px solid #b9c6cf;" src="/images/introducing-helloexoworld-the-quest-to-discover-exoplanets-with-warp10-and-tensorflow/4.mp4" aria-label="image"></video>
 
 animation illustrating how a dip in the observed brightness of a star may indicate the presence of an exoplanet. ***Credits: NASA’s Goddard Space Flight Center***
 
