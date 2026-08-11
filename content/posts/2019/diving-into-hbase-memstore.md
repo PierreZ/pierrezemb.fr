@@ -1,5 +1,6 @@
 +++
 title = "Diving into Hbase's MemStore"
+description = "A code-level dive into HBase's MemStore, from the ConcurrentSkipListMap backing HBase 1.x to the in-memory compactions Accordion introduced in HBase 2.0."
 date = "2019-11-17T10:24:27+01:00"
 path = "posts/diving-into-hbase-memstore"
 draft = false

@@ -1,5 +1,6 @@
 +++
 title = "Introducing HelloExoWorld: The quest to discover exoplanets with Warp10 and Tensorflow"
+description = "A personal project importing NASA's Kepler and K2 telescope data into Warp10 and building a TensorFlow model to detect exoplanet transits from the dips in starlight."
 date = "2017-10-11T10:23:11.770Z"
 path = "posts/introducing-helloexoworld-the-quest-to-discover-exoplanets-with-warp10-and-tensorflow"
 [extra]

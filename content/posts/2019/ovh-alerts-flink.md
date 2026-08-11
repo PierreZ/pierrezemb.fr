@@ -1,5 +1,6 @@
 +++
 title = "Handling OVH's alerts with Apache Flink"
+description = "How OVH built Beacon, an Apache Flink pipeline handling alert deduplication, escalation, and notification on top of its Metrics Data Platform, and what running Flink in production taught us."
 date = "2019-02-03T15:37:27+01:00"
 path = "posts/ovh-alerts-flink"
 [extra]

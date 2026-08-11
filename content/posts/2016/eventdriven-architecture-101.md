@@ -1,5 +1,6 @@
 +++
 title = "Event-driven architecture 101"
+description = "An introduction to event-driven architecture: queue messaging systems applying the Unix pipe philosophy to microservices, and the simplicity, modularity, and scalability it buys you."
 date = "2016-05-13T17:19:23.788Z"
 path = "posts/eventdriven-architecture-101"
 [extra]

@@ -1,5 +1,6 @@
 +++
 title = "Diving into ETCD's linearizable reads"
+description = "A code-level dive into how etcd achieves linearizable reads with the ReadIndex protocol on top of Raft, including how it enables safe follower reads."
 date = "2020-09-18T05:24:27+01:00"
 path = "posts/diving-into-etcd-linearizable"
 draft = false

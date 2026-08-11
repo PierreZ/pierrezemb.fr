@@ -1,5 +1,6 @@
 +++
 title = "Engage maximum warp speed in time series analysis with WarpScript"
+description = "An introduction to WarpScript, the stack-oriented language behind the Warp10 time series platform we ran at OVH's Metrics Data Platform to store and analyze sensor data."
 date = "2017-10-08T20:43:05.198Z"
 path = "posts/engage-maximum-warp-speed-in-time-series-analysis-with-warpscript"
 [extra]

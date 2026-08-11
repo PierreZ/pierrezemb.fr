@@ -1,5 +1,6 @@
 +++
 title = "Let’s talk about containers"
+description = "A look at what containers actually are, from Docker's write-once-run-everywhere hype to why a statically compiled Unix process, not a small VM, is the right mental model."
 date = "2016-01-04T18:52:19.698Z"
 path = "posts/lets-talk-about-containers"
 [extra]

@@ -1,5 +1,6 @@
 +++
 title = "Key design tip: reverse number scanning in ordered key-value stores"
+description = "A key design trick for ordered key-value stores like HBase, FoundationDB, and RocksDB: reverse a number by subtracting it from its max value so a forward scan finds the highest one first."
 date = "2025-03-27T05:24:27+01:00"
 path = "posts/reverse-number-scanning"
 draft = false

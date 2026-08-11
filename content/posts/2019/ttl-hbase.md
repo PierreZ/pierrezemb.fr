@@ -1,5 +1,6 @@
 +++
 title = "Playing with TTL in HBase"
+description = "A hands-on walkthrough of HBase's TTL feature, how cell timestamps and compaction interact to expire data, and how to control it by setting your own version timestamp."
 date = "2019-05-27T22:07:11+02:00"
 path = "posts/ttl-hbase"
 [taxonomies]

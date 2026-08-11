@@ -1,5 +1,6 @@
 +++
 title = "Thank You, DataFusion: Queries in Rust, Without the Pain"
+description = "Why Apache DataFusion, a composable Rust-native SQL engine rather than a rigid framework, finally let me plug real queries into our FoundationDB-based system after years of watching from the sidelines."
 date = 2025-06-04
 path = "posts/thank-you-datafusion"
 [taxonomies]

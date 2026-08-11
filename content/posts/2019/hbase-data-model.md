@@ -1,5 +1,6 @@
 +++
 title = "Hbase Data Model"
+description = "An overview of HBase's data model, row keys, column families and qualifiers, and why key design determines whether you get good performance or a hotspotted region."
 date = "2019-01-27T20:24:27+01:00"
 path = "posts/hbase-data-model"
 [taxonomies]

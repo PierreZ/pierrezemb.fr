@@ -1,5 +1,6 @@
 +++
 title = "What can be gleaned about GFS successor codenamed Colossus?"
+description = "Piecing together, from scattered public talks and papers, how Google evolved GFS into Colossus, and why a Kubernetes-native distributed file system is still missing."
 date= "2019-08-04T15:07:11+02:00"
 path = "posts/colossus-google"
 [taxonomies]

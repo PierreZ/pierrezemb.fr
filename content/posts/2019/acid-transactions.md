@@ -1,5 +1,6 @@
 +++
 title = "What are ACID transactions?"
+description = "A walkthrough of the ACID properties of database transactions, from the 1983 Haerder and Reuter paper that coined them to isolation levels and PostgreSQL's MVCC implementation."
 date = 2019-02-03
 path = "posts/acid-transactions"
 [taxonomies]

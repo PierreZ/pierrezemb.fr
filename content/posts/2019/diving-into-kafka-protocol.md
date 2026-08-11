@@ -1,5 +1,6 @@
 +++
 title = "Diving into Kafka's Protocol"
+description = "A walkthrough of Kafka's wire protocol, from the API_VERSIONS handshake through producing and the consumer group coordination protocol, with a sequence diagram for each exchange."
 date = "2019-12-08T15:00:00+01:00"
 path = "posts/diving-into-kafka-protocol"
 [taxonomies]
