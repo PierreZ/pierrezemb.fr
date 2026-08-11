@@ -27,6 +27,25 @@
   </div>
   {%- endif %}
 
+  {%- if page.extra.series %}
+  {%- set series_section = get_section(path="posts/_index.md") %}
+  {%- set series_posts = series_section.pages | filter(attribute="extra.series", value=page.extra.series) | sort(attribute="extra.series_part") %}
+  <div class="series">
+    <div class="series-h">series: {{ page.extra.series }} &middot; part {{ page.extra.series_part }} of {{ series_posts | length }}</div>
+    <ol class="series-list">
+      {%- for p in series_posts %}
+      <li>
+        {%- if p.permalink == page.permalink %}
+        <span class="cur"><span class="arrow">&#9656;</span> part {{ p.extra.series_part }}: {{ p.title }}</span>
+        {%- else %}
+        <a href="{{ p.permalink | safe }}">part {{ p.extra.series_part }}: {{ p.title }}</a>
+        {%- endif %}
+      </li>
+      {%- endfor %}
+    </ol>
+  </div>
+  {%- endif %}
+
   {%- if page.toc and not page.extra.hide_table_of_contents %}
   <nav class="toc">
     <div class="h">index of sections</div>
@@ -37,5 +56,20 @@
   <div class="prose">
     {{ page.content | safe }}
   </div>
+
+  {%- if is_post and (page.higher or page.lower) %}
+  <nav class="pn">
+    {%- if is_post and page.higher %}
+    <a class="pn-item pn-prev" href="{{ page.higher.permalink | safe }}"><span class="pn-lbl">&larr; prev</span><span class="pn-ttl">{{ page.higher.title }}</span></a>
+    {%- else %}
+    <span class="pn-item pn-empty"></span>
+    {%- endif %}
+    {%- if is_post and page.lower %}
+    <a class="pn-item pn-next" href="{{ page.lower.permalink | safe }}"><span class="pn-lbl">next &rarr;</span><span class="pn-ttl">{{ page.lower.title }}</span></a>
+    {%- else %}
+    <span class="pn-item pn-empty"></span>
+    {%- endif %}
+  </nav>
+  {%- endif %}
 </article>
 {% endblock content %}

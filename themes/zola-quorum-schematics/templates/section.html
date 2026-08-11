@@ -13,7 +13,13 @@
 {%- endif %}
 
 <div class="bom">
+  {%- set_global bom_year = "" %}
   {%- for page in section.pages %}
+  {%- set cur_year = page.date | date(format="%Y") %}
+  {%- if cur_year != bom_year %}
+  <div class="yr">ls ./{{ cur_year }}/</div>
+  {%- set_global bom_year = cur_year %}
+  {%- endif %}
   {{ m::bom_row(page=page) }}
   {%- else %}
   <div class="row"><div class="date">—</div><div class="ttl">no posts yet</div></div>

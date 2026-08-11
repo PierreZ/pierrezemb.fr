@@ -1,5 +1,5 @@
 <div class="console">
-  <div class="log">
+  <div class="log" aria-hidden="true">
     <div class="ln" id="console-cmd"><span class="sig">{{ config.extra.prompt_user | default(value="user@host") }}</span>:<span class="path">{{ config.extra.prompt_path | default(value="~/blog") }}</span>$ <span id="read-cmd" data-target="{{ bp_target }}">./read --quorum {{ bp_target }}</span></div>
     <div class="ln out">
       {%- if bp_kind == "doc" -%}

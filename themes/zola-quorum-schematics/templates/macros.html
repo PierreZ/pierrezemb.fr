@@ -20,7 +20,7 @@
 {# A single nomenclature (BOM) row for a post listing. #}
 {% macro bom_row(page) %}
   <div class="row">
-    <div class="date">{{ page.date | date(format="%Y-%m-%d") }}</div>
+    <div class="date">{{ page.date | date(format="%Y-%m-%d") }}<span class="rt">~{{ page.reading_time }} min</span></div>
     <div>
       <a class="ttl" href="{{ page.permalink | safe }}">{{ page.title }}</a>
       {%- if page.description %}<a class="desc" href="{{ page.permalink | safe }}">{{ page.description }}</a>{% endif %}

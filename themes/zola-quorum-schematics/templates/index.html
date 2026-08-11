@@ -32,4 +32,5 @@
   {{ m::bom_row(page=page) }}
   {%- endfor %}
 </div>
+<a class="more-row" href="{{ get_url(path='@/posts/_index.md') | safe }}">eza ./posts | wc -l &rarr; {{ posts.pages | length }} posts, read them all</a>
 {% endblock content %}

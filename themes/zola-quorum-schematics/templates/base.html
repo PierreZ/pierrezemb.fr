@@ -21,11 +21,11 @@
   {% block extra_head %}{% endblock extra_head %}
 
   <script>
-  // Set theme before first paint (no flash). Persisted choice wins, else light (blueprint).
+  // Set theme before first paint (no flash). Persisted choice wins, else follow OS preference.
   (function () {
     try {
       var saved = localStorage.getItem("bp-theme");
-      var dark = saved === "cyanotype";
+      var dark = saved ? saved === "cyanotype" : window.matchMedia("(prefers-color-scheme: dark)").matches;
       var theme = dark ? "cyanotype" : "blueprint";
       document.documentElement.setAttribute("data-theme", theme);
       var l = document.getElementById("syntax-light");
@@ -37,6 +37,7 @@
   </script>
 </head>
 <body>
+<a class="skip-link" href="#main">skip to content</a>
 {%- set bp_posts = get_section(path="posts/_index.md") -%}
 {%- set post_count = bp_posts.pages | length -%}
 {#- Page-aware console "read --quorum <target>" command. base.html can call macros and
@@ -71,7 +72,7 @@
   {% include "partials/nav.html" %}
   {% include "partials/console.html" %}
 
-  <main>
+  <main id="main">
     {% block content %}{% endblock content %}
   </main>
 
@@ -82,9 +83,7 @@
 <script id="read-ctl" src="{{ get_url(path='js/read.js') | safe }}" data-default-mode="{{ config.extra.default_read_mode | default(value='quorum') }}" data-enabled="{{ config.extra.read_modes | default(value=true) }}" defer></script>
 <script id="mermaid-init" src="{{ get_url(path='js/mermaid-init.js') | safe }}" data-src="{{ get_url(path='js/mermaid.min.js') | safe }}" defer></script>
 {% if config.extra.search.enabled | default(value=false) %}
-<script src="{{ get_url(path='js/elasticlunr.min.js') | safe }}" defer></script>
-<script src="{{ get_url(path='search_index.' ~ config.default_language ~ '.js') | safe }}" defer></script>
-<script src="{{ get_url(path='js/search.js') | safe }}" defer></script>
+<script src="{{ get_url(path='js/search.js') | safe }}" defer data-elasticlunr="{{ get_url(path='js/elasticlunr.min.js') | safe }}" data-index="{{ get_url(path='search_index.' ~ config.default_language ~ '.js') | safe }}" id="search-ctl"></script>
 {% endif %}
 {% block extra_body %}{% endblock extra_body %}
 </body>

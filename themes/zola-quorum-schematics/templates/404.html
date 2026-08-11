@@ -24,14 +24,14 @@
     <p>Leading hypotheses, in rough order of operational embarrassment:</p>
     <ul>
       <li>The write is still sitting in someone's outbox. <em>Eventual</em> consistency
-      means eventually — not now.</li>
+      means eventually, not now.</li>
       <li>A network partition swallowed it. It may come back after the next leader
       election. It may not.</li>
       <li>It was tombstoned, and the compaction already ran. There is no undo for entropy.</li>
       <li>You're reading at a timestamp from the future. Retry with a snapshot the cluster
       has actually seen.</li>
     </ul>
-    <p>Recommended recovery — fall back to a node you trust:</p>
+    <p>Recommended recovery: fall back to a node you trust.</p>
     <p>
       <a href="{{ config.base_url | safe }}">→ cd ~</a> &nbsp;·&nbsp;
       <a href="{{ get_url(path='@/posts/_index.md') | safe }}">→ ls ./posts</a>
