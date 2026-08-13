@@ -10,7 +10,7 @@ set -e;
 
 echo "Deleting old publication"
 rm -rf public
-zola build
+ZOLA_SOURCE_REVISION="$(git rev-parse HEAD)" zola build
 
 # retrieve .git folder from portfolio
 git clone git@github.com:PierreZ/portfolio --branch master portfolio --depth 1
