@@ -95,7 +95,7 @@ sequenceDiagram
     CP-->>C: commit result
 {% end %}
 
-FoundationDB does not minimize the total number of round trips. It keeps the RPC count low at the serialized role. The Master sees batched version requests and live committed version reports, while GRV and commit proxies carry the client traffic and coordinate the fan-out to resolvers and TLogs.
+FoundationDB does not minimize the total number of round trips. It keeps the RPC count low at the serialized role. The Master sees batched version requests and live committed version reports, while GRV and commit proxies carry the client traffic. Commit proxies coordinate the fan-out to resolvers and TLogs.
 
 The remaining work is divided along its own boundaries. Resolvers partition conflict checking by key range, TLogs durably retain mutation streams for storage servers, and storage servers serve reads directly once clients locate the relevant ranges. The scalable responsibilities have their own pools, while the Master remains a singleton. FDB's process count comes from those separate scaling decisions.
 

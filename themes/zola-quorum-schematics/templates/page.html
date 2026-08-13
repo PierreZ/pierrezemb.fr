@@ -4,6 +4,12 @@
 {% block title %}{{ page.title }} | {{ config.title }}{% endblock title %}
 {% block description %}{{ page.description | default(value=config.description) }}{% endblock description %}
 
+{% block extra_head %}
+{%- if "posts" in page.components %}
+<link rel="alternate" type="text/markdown" href="{{ m::github_markdown_source(relative_path=page.relative_path) | safe }}">
+{%- endif %}
+{% endblock extra_head %}
+
 {% block content %}
 {%- set is_post = "posts" in page.components -%}
 <article class="article">
@@ -21,6 +27,7 @@
   <div class="meta-row">
     {%- if page.date %}<span class="m"><b>{{ page.date | date(format="%Y-%m-%d") }}</b></span>{% endif %}
     <span class="m">read: <b>~{{ page.reading_time }} min</b></span>
+    <span class="m"><a href="{{ m::github_markdown_source(relative_path=page.relative_path) | safe }}">markdown</a></span>
     {%- if page.taxonomies.tags %}
     <span class="m tags">tags: {% for t in page.taxonomies.tags %}<a href="{{ get_taxonomy_url(kind='tags', name=t) | safe }}">#{{ t }}</a>{% if not loop.last %} {% endif %}{% endfor %}</span>
     {%- endif %}

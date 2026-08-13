@@ -27,3 +27,9 @@
     </div>
   </div>
 {% endmacro bom_row %}
+
+{%- macro github_markdown_source(relative_path) -%}
+{%- set revision = get_env(name="ZOLA_SOURCE_REVISION", default="master") -%}
+{%- set source = "https://raw.githubusercontent.com/PierreZ/pierrezemb.fr/" ~ revision ~ "/content/" ~ relative_path -%}
+{{ source | safe }}
+{%- endmacro github_markdown_source -%}
