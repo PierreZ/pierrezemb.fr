@@ -12,6 +12,7 @@ If you’d like to have me as a speaker at your conference or meet-up, please ge
 * FinistDevs / FinistAI: [Testing: Prevention vs Discovery](/slides/2026-03-prevention-vs-discovery.pdf)
 * BugBash: [Borrowing FoundationDB's Simulator for Layer Development](/slides/2026-04-fdb-sim.pdf)
 * SunnyTech: [What if we embraced simulation-driven development? 🤔](/slides/2026-07-simulation-driven-development.pdf)
+* La Nuit des Communautés Bretonne #3: [Software engineer: same job, only more interesting](/slides/2026-09-same-job.pdf)
 
 ## 2025
 
