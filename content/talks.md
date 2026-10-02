@@ -13,6 +13,7 @@ If you’d like to have me as a speaker at your conference or meet-up, please ge
 * BugBash: [Borrowing FoundationDB's Simulator for Layer Development](/slides/2026-04-fdb-sim.pdf)
 * SunnyTech: [What if we embraced simulation-driven development? 🤔](/slides/2026-07-simulation-driven-development.pdf)
 * La Nuit des Communautés Bretonne #3: [Software engineer: same job, only more interesting](/slides/2026-09-same-job.pdf)
+* Volcamp: [Houston, we have a problem with etcd](https://docs.google.com/presentation/d/1JYvmSJKeNJosbzKaruujm2dBV7ZKHAuO1DFWzgCpE38/edit?usp=sharing)
 
 ## 2025
 
