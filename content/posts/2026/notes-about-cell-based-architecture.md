@@ -14,46 +14,29 @@ ARC338 (Vosshall, re:Invent 2018) https://www.youtube.com/watch?v=swQbA4zub20 --
 
 <!-- 0. Intro: the dilemma -->
 
-- Notes About series meta-intro
-- The recurring choice: densify into one big cluster, or run an army of clusters (infra cash, SREs)
-- Cells sit in the middle of both extremes
-- The two AWS sources: whitepaper (Oliveira, September 2023) and ARC338 (Vosshall, re:Invent 2018)
-- One sentence and a link: cells are compartmentalization at fleet scope ([compartmentalization post](/posts/foundationdb-architecture-through-compartmentalization/))
-- Scope: cells that hold data, not stateless cells
+## The deployment layout of a distributed system
+
+When you are working with multi-tenant systems, there is one recurring decision that everyone needs to make: how are you going to densify? Are you going to have a single, almighty distributed cluster to hold everything, or are you going to create a cluster per usage?
 
 ```
- dense             cells              sprawl
- 1 cluster         N capped cells     1 cluster/customer
- |------------------|------------------|
- blast: 100%       blast: 1/N         blast: 1 customer
- cost: low         cost: per cell     cost: per customer
+ one dense cluster           one cluster per usage
+
+   A   B   C   D               A      B      C      D
+   |   |   |   |               |      |      |      |
+ +----------------+          +---+  +---+  +---+  +---+
+ |    cluster     |          | 1 |  | 2 |  | 3 |  | 4 |
+ +----------------+          +---+  +---+  +---+  +---+
+ 1 cluster to operate        4 clusters to operate
+ failure hits A,B,C,D        failure hits 1 usage
 ```
 
-## The dense end: one big cluster
+Big clusters have a big impact when they fail, but they are efficient in terms of SRE time and infrastructure cost. One cluster per usage is expensive, but the blast radius of a failure is minimal. Can we have something in the middle? This is what cell-based design is all about, and the [AWS whitepaper on the topic](https://docs.aws.amazon.com/pdfs/wellarchitected/latest/reducing-scope-of-impact-with-cell-based-architecture/reducing-scope-of-impact-with-cell-based-architecture.pdf) asks a pretty interesting question:
 
-- What densifying buys: economies of scale, one system to tune
-- OVHcloud HBase: 255 machines, tuned to its limit, custom balancer for servers holding 180 to 900 regions ([hbase-custom-data-balancing](/posts/hbase-custom-data-balancing/))
-- The cost: when there is an incident or a noisy tenant, the blast radius is the whole platform
-- ARC338 framing: blast radius as vocabulary, poison pills, COE question "How could you cut the blast radius for a similar event in half?"
-- AWS's own dense failure (ARC338 Q&A): S3 2008, one NIC flipping one bit, S3 down
-- → So why not split everything?
+> "Is it better for 100% of customers to experience a 5% failure rate, or 5% of customers to experience a 100% failure rate?"
 
-## The sprawl end: one cluster per customer
+## Cell overall design
 
-- What it buys: perfect isolation
-- OVHcloud etcd: "three etcd nodes per customer is not a valid approach at scale", shared clusters hitting their ceiling ([2025 year in review](/posts/2025-year-in-review/), [KubeCon talk](https://www.youtube.com/watch?v=IrJyrGQ_R9c))
-- The cost: fixed cost per cluster (ARC338), plus the whitepaper's downsides (complexity, cost, tooling, a routing layer)
-- → AWS sits in between
-
-## Cells: one entry point, many backends
-
-- Definition: one entry point and many backends, so load and blast radius are divided by N, except at the routing layer
-- ARC338: a zonal service is "an entry point plus a routing layer over isolated compartments"
-- Vocabulary: cell, thin router, control plane, partition key
-- Cells do not have to multiply infrastructure: "30 hosts can stay 30 hosts"
-- Whitepaper question: "Is it better for 100% of customers to see a 5% failure rate, or for 5% of customers to see a 100% failure rate?"
-- Scope line: [Slack's cells](https://slack.engineering/slacks-migration-to-a-cellular-architecture/) are AZs you drain traffic away from, this post is about cells that hold data
-- → The design comes down to spreading data and moving it
+The main idea is to design your system so that customers have a single entry point, but internally, they are routed to different backends, called cells:
 
 ```
                clients
@@ -67,25 +50,30 @@ ARC338 (Vosshall, re:Invent 2018) https://www.youtube.com/watch?v=swQbA4zub20 --
       +------+ +------+ +------+
 ```
 
+A **cell** is a complete copy of your workload that shares no state with the others. The **thin router** only sends each request to the right cell based on a **partition key**, like the customer ID, and the **control plane** provisions cells and migrates customers between them. Load and blast radius are divided by the number of cells, except at the router, and it does not have to mean more infrastructure: 30 hosts can stay 30 hosts, grouped behind a router.
+
+When cells hold data, the design comes down to spreading data and moving it.
+
+
 ## The partition key
 
-- The most important decision, made first
-- Cut with the grain: the natural split with minimal cross-cell interactions
-- The key must be easy to get from most API calls
-- Calls against the grain go through the router, never cell to cell
-- Mapping: a fixed set of buckets plus a bucket-to-cell table, and always an override table
-- FDB angle: a transaction cannot span clusters, so the grain is the largest set of data that must commit together
-- → The key decides who lands together, the size decides how many fit
+To spread customers across cells, you need a key to shard on, and the first candidate in a multi-tenant system is the tenant:
 
 ```
- key = (customer, object)
-         |
- hash(key) % 16384  ->  bucket 4242
-         |
- in override table? --yes--> cell 7
-         | no
- bucket table: 4242 -> cell 2
+           +-------------+
+           | thin router |
+           +-------------+
+            /     |     \
+      +------+ +------+ +------+
+      |cell 1| |cell 2| |cell 3|
+      | A, D | | B, E | | C, F |
+      +------+ +------+ +------+
 ```
+
+But that means a tenant can never outgrow the capacity of its cell. S3 has a better key, the bucket, so the partition key becomes (tenant, bucket) and a large tenant can spread its buckets over several cells. Whatever the key, the router must find it cheaply in every request, as a parameter or a direct transformation of one, otherwise the router stops being thin.
+
+The router then has to turn a key into a cell. A full map of every key is flexible, but it grows with the number of tenants, and a new tenant must be written to it before its first request. Hashing the key into a fixed number of buckets, tens of thousands in the whitepaper, and mapping only buckets to cells keeps the map small and lets a new key route without any write. An override table on top forces specific keys into specific cells, for testing, quarantine, or heavy tenants.
+
 
 ## Sizing the cell
 
@@ -198,6 +186,7 @@ ARC338 (Vosshall, re:Invent 2018) https://www.youtube.com/watch?v=swQbA4zub20 --
 - Exact whitepaper wording of every quote, against the PDF
 - FDB limits: not public, describe without numbers or use public FDB limits
 - The HBase "nothing moved a tenant" claim
+- S3 (tenant, bucket) partition key: not in the whitepaper, which only says "CustomerID plus a second dimension", find a source
 -->
 
 ---
