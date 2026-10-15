@@ -75,13 +75,12 @@ But that means a tenant can never outgrow the capacity of its cell. S3 has a bet
 The router then has to turn a key into a cell. A full map of every key is flexible, but it grows with the number of tenants, and a new tenant must be written to it before its first request. Hashing the key into a fixed number of buckets, tens of thousands in the whitepaper, and mapping only buckets to cells keeps the map small and lets a new key route without any write. An override table on top forces specific keys into specific cells, for testing, quarantine, or heavy tenants.
 
 
-## Sizing the cell
+## Sizing and shaping cells
 
 - Three forces: big enough for the largest workload, small enough to load test to failure, big enough for economies of scale
 - Express the limit in business terms: TPS or GB stored per cell
 - FDB: the limits are known (storage size, TPS), so a full cluster is a known event, not a surprise
 - "Your first cell size will be wrong" (whitepaper)
-- → Cells do not have to be the same size, or even the same shape
 
 | Smaller cells | Larger cells |
 |---|---|
@@ -91,8 +90,7 @@ The router then has to turn a key into a cell. A full map of every key is flexib
 | Easier and cheaper to test at max size | Fewer customer splits across cells |
 | Less idle capacity | Better utilization and economies of scale |
 
-## Not every cell has to look the same
-
+- Cells do not have to be the same size, or even the same shape
 - A cell can differ on purpose: replication, storage engine, version, hardware
 - A canary on real data, with blast radius capped at 1/N
 - The alternative: an integration cluster nobody keeps up to date, fake data, fake load
@@ -100,39 +98,7 @@ The router then has to turn a key into a cell. A full map of every key is flexib
 - The override table decides who lands in the experimental cell, internal tenants first
 - Whitepaper: "The first cell can act as a canary cell"
 - Nuance: real data means real customers, and every variant you keep must be operated and tested
-- → Even with the right size and shape, one customer may still not fit
-
-## What if a customer is bigger than your cell?
-
-- The question, with a hypothetical: a cell holds 10 PB, a customer needs 100 PB
-- S3-style answer: the grain is the object, not the customer, so split below the customer with a composite key
-- The cost moves to customer-wide operations: scatter-gather, batches, coordinated writes (ARC338's three cross-cell cases)
-- Real case, [Unified Grid](https://slack.engineering/unified-grid-how-we-re-architected-slack-for-our-largest-customers/): one shard per workspace, customers outgrew it, messages re-sharded by channel ID
-- The rule underneath: the grain is the consistency boundary, not the customer
-- When the consistency boundary is bigger than a cell: bigger cells (toward dense), dedicated cells (sprawl limited to outliers), or a second key dimension
-- → Every answer requires moving data
-
-```
- cell = 10 PB, customer X = 100 PB
-
- grain = customer      grain = object
- +-----------+         +----+ +----+     +-----+
- | X: 100 PB |  --->   | X1 | | X2 | ... | X10 |
- +-----------+         +----+ +----+     +-----+
- does not fit          fits, but LIST, quotas and
-                       bucket delete go cross-cell
-```
-
-```
- customer bigger than a cell?
-   |
-   +-- can its data split into independent units?
-         |
-         +-- yes: composite key, pay in cross-cell ops
-         |
-         +-- no:  bigger cells     (toward dense)
-                  dedicated cells  (toward sprawl)
-```
+- → A wrong size and a cell variant both get fixed the same way: by moving tenants
 
 ## Moving data is the core capability
 
@@ -142,7 +108,6 @@ The router then has to turn a key into a cell. A full map of every key is flexib
 - Every operation becomes a move: rebalancing, evacuating a failing cell, isolating a noisy tenant, outgrowing a cell, undoing an experiment
 - Without moves, a layout gets stuck at one extreme: a full cell gets densified, or each new big customer gets its own cell
 - OVHcloud HBase: regions moved inside one cluster, nothing moved a tenant out of it (to confirm)
-- → If everything must move, so does the directory
 
 ```
             old cell          new cell
@@ -152,8 +117,7 @@ The router then has to turn a key into a cell. A full map of every key is flexib
  forget     deleted
 ```
 
-## No cell zero
-
+- If everything must move, so does the directory: no cell zero
 - The router is the one thing you cannot split: keep it thin, no business logic, constant work
 - Dispatching is isolated per cell, so a slow cell does not starve the others
 - Static stability: map in memory, the last known map keeps serving
