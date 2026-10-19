@@ -74,7 +74,7 @@ But that means a tenant can never outgrow the capacity of its cell. S3 has a bet
 
 ### Routing and assigning the partition key
 
-The naive transformation way will be to hash the partition key, and then assign it to a cell, like this with 3 cells:
+The naive transformation is to hash the partition key, and then assign it to a cell, like this with 3 cells:
 
 | Tenant | hash(key) | hash mod 3 | Cell (mod + 1) |
 |---|---|---|---|
@@ -96,7 +96,7 @@ The problem is that adding a cell means that we need to move a lot of tenants on
 | E | 53 | 1 | `Moving(From(Cell(3)), To(Cell(2)))` |
 | F | 68 | 0 | `Moving(From(Cell(3)), To(Cell(1)))` |
 
-One better way is to use a fixed bucket count:
+A better way is to use a fixed bucket count:
 
 | Tenant | hash(key) | hash mod 12 | Bucket |
 |---|---|---|---|
@@ -141,7 +141,7 @@ Like this, adding a new cell is easy:
 
 The hash step never changes, so the bucket is a stable identity for a tenant, and adding or removing a cell only touches the second table. The bucket count is the grain of a move: with 12 buckets the smallest move is a twelfth of the data, with tens of thousands it is a tiny slice, which is why the whitepaper's number is that large. A new tenant needs no write at all, its hash lands in a bucket that already points to a cell, so the control plane is not on the path of the first request. The whitepaper's other option, a full map with one row per tenant, has to be written before that first request and grows with the number of tenants, which is a lot of state to load in every router.
 
-We still need to have some override tables for testing/quarantine/heavy tenants, which give us something like this:
+We still need an override table for testing, quarantine and heavy tenants. The whitepaper makes it a rule: "Regardless of partition mapping approach, it's important to also use an override table to force specific keys to specific cells". In our example it looks like this:
 
 | Tenant | State | Reason |
 |---|---|---|
@@ -184,78 +184,75 @@ The directory stays small: the bucket table has a fixed number of rows whatever 
 
 <!-- Purpose: a cell has a known ceiling and a chosen shape, both decisions get revised, so the section ends on moving. FDB appears only as hints that the dials exist. -->
 
-Size:
+Now that we talked about routing a lot, we can focus on the cells themselves! The next question is "how big a cell should be?" And this is a tough decision, because it's a mixup of both technical and business decisions. I started to have this kind of long list of axes to look at. One cell needs to be:
 
-- Three forces (whitepaper): "Big enough to fit the largest workloads", "Small enough to test at full scale", "Big enough to gain economies of scale benefits". They cannot all hold at once, so the first size is a guess
-- "Small enough to test at full scale" is the FDB ethos: one cluster is something you can simulate and load test to failure, a dense cluster of everything is not
-- Express the limit in business terms, the whitepaper's questions: "How many transactions per second can a cell handle?", "How many GB of transfer per second or stored capacity does it support?"
-- FDB hint: the ceiling is documented before you measure anything. [Known limitations](https://apple.github.io/foundationdb/known-limitations.html): "performance testing and tuning with clusters of up to 500 cores/processes", "tested with databases up to 100 TB". A full cell is a known event, not a surprise
-- Whitepaper: "the cell size you initially set isn't ideal". The first size will be wrong
-- The table below is the intro's dilemma one level down: smaller versus larger cells is one dense cluster versus one cluster per usage again. Keep it only with that framing
+* big enough to accept the largest workloads without splitting a customer across cells,
+* big enough to gain economies of scale benefits and amortize the fixed cost of a cell,
+* big enough to keep the number of cells operable,
+* small enough that losing or draining one cell is a small share of customers,
+* small enough to stay below the quotas and the scaling cliffs you have not met yet,
+* known and enforced, expressed in transactions per second, tenants or GB stored, with load shedding at the limit,
+* operated with headroom, half the tested ceiling, so spikes, failovers and incoming moves have room.
 
-| Smaller cells | Larger cells |
-|---|---|
-| More cells to manage | Fewer cells to manage |
-| An outage touches a small share | An outage touches a large share |
-| Less likely to hit quotas and unknown limits | More likely to hit them |
-| Easier and cheaper to test at max size | Fewer customer splits across cells |
-| Less idle capacity | Better utilization and economies of scale |
+That's a pretty long list! Take FoundationDB as an example. The [limitations are defined](https://apple.github.io/foundationdb/known-limitations.html):
 
-Shape:
+> FoundationDB has undergone performance testing and tuning with clusters of up to 500 cores/processes
 
-- Cells do not have to be the same size, or even the same shape. A cell variant is a canary on real data, blast radius capped at 1/N. Whitepaper: "the first cell deployed to in a phased cell deployment can be a canary cell"
-- The alternative everyone has: an integration cluster nobody keeps up to date, fake data, fake load
-- FDB hints, all per-cluster [configuration](https://apple.github.io/foundationdb/configuration.html): redundancy mode (double for a cheap cell, three_data_hall or three_datacenter for low-volume data that must survive anything), hardware (NVMe-dense cells for storage-heavy tenants, cheaper disks for cheap tenants), storage engine (ssd versus redwood), major version (one cell on the new major, compare its behavior with a same-shape cell on the old one)
-- Who lands in the variant: the override table from the routing section, internal tenants first
-- Nuance: every shape has its own ceiling, so limits are measured per shape. Every variant is one more thing to operate, upgrade and test. Real data means real customers on the canary
-- Scope note (whitepaper): "Cells were not intended to mitigate dependency failures or single points of failure. Therefore, they were not designed as failover domains." A resilient shape is DR inside one cell, not a property of the cell architecture
+> FoundationDB has been tested with databases up to 100 TB
 
-<!-- Transition: a wrong size and a wrong shape are fixed the same way, by moving tenants -->
+These are the hard technical limitations. But there are a lot of things we can choose for a FoundationDB-based cell:
 
-- → A wrong size and a wrong shape both get fixed the same way: by moving tenants
+* the redundancy, from double for a cheap cell to three_data_hall or three_datacenter for data that must survive anything,
+* the hardware, NVMe-dense machines for storage-heavy tenants, cheaper disks for cheap tenants,
+* the storage engine, ssd or redwood,
+* the major version, one cell on the new release while the others stay,
+* the size cap, in transactions per second and GB stored, since a cheap cell and a resilient cell do not have the same ceiling,
+* the tenancy, shared, dedicated to one customer, or internal-only for a canary,
+* the backup and restore policy, how often and how far back.
 
-## Moving data is the core capability
-
-<!-- Purpose: the thesis section. Every revision of the layout is a move, so the move is the primitive to build first, and it applies to the directory and the control plane too. Order: operations, stuck extremes, whitepaper support, mechanism, evidence, directory and control plane. -->
-
-- Callback to the design section, said once there: when cells hold data, the design comes down to spreading data and moving it
-- Every operation becomes a move: rebalancing, evacuating a failing cell, isolating a noisy tenant, outgrowing a cell, undoing a shape experiment, and adopting cells in the first place (cell zero, next section)
-- Without moves, a layout gets stuck at one extreme of the intro's dilemma: a full cell gets densified, or each new big customer gets its own cell
-- Whitepaper support, its own words: "For data and state heavy workloads, the problem of allocation becomes a core competency." Among the placement inputs: "The cost of moving a partition key between cells." And: "Stateful cell-based architectures will almost certainly require online cell migration to adjust placement when cells are added or removed."
-- Whitepaper, when to move: "when a customer or partitioned key starts to dominate a cell, you need to migrate some tenants or customers to other cells". Best practice: "Start with a cell migration mechanism from day one"
-- Mechanism: clone, flip, redirect, forget (whitepaper). ARC338 live-migration analogy: build an invisible clone in the target, sync while the source keeps changing, freeze briefly for the final sync, flip atomically, coordinated at the router
-- In the bucket tables above, a move is one row going from Assigned to Moving and back to Assigned, and redirect is publishing the new version of the directory
-- Evidence: OVHcloud HBase, regions moved inside one cluster, nothing ever moved a tenant out of it (to confirm). The dense-cluster extreme, lived
+This could give us something like this:
 
 ```
-            old cell          new cell
- clone      authoritative     copy, catching up
- flip       copy              authoritative
- redirect                     <- router sends traffic
- forget     deleted
+                   thin router
+                        |
+       +-----------+----+------+-----------+
+       |           |           |           |
+  +---------+ +---------+ +---------+ +---------+
+  | cell 1  | | cell 2  | | cell 3  | | cell 4  |
+  | triple  | | double  | | 3 halls | | triple  |
+  | ssd     | | ssd     | | redwood | | redwood |
+  | SATA    | | SATA    | | NVMe    | | NVMe    |
+  | 7.3     | | 7.3     | | 7.3     | | 7.4     |
+  +---------+ +---------+ +---------+ +---------+
+  shared      cheap       critical    canary
+  tenants     tier        low volume  internal
 ```
 
-Directory and control plane:
+None of these choices is final. The cheap cell fills up, the canary becomes a regular cell once the release is trusted, a tenant outgrows the shared cell, and each revision means moving tenants from one shape to another.
 
-- If everything must move, so does the directory. Pinning it to one cell creates the one cell you can never drain or retire
-- Static stability is what makes it possible: routers hold the whole published map in memory and keep serving on the last known map. Whitepaper: "Even if the control plane, Amazon S3 or a zone is unavailable, the router is still able to direct traffic to the cells." So the directory's home is off the request path
-- The mapping choice decides how big the directory is: the bucket table is B rows, the override table is the exceptions, both small enough to move. A full map is not
-- Depending on what you store, the whole control plane state is a tenant: tenant registry, capacity per cell, moves in flight, overrides, all small key-value data. A general-purpose store like FDB can host its own control plane as one more tenant. A specialized cell (blobs, time series) cannot, and then you need the whitepaper's separate store, its S3 bucket or DynamoDB table
-- The recursion: the thing that places tenants is placed like a tenant, and moves itself with the same four steps
-- Bootstrap: a router needs the map to find the map's cell. The publish location (object storage, config) is the seed, and routers never read the control-plane tenant on the request path
-- Nuance: the other way to avoid a cell you can never retire is a directory that can be rebuilt from the cells, each cell knowing its own tenants. The claim to make is narrower than "never pin": the directory must not be the one thing you cannot recreate elsewhere. Moving it or rebuilding it both satisfy that
-- The router stays the one thing you cannot split. Whitepaper: "thinnest possible layer", and "all the recommendations described so far and later must also be followed for the cell router"
+## Moving data is the core capability, and the worst one
+
+One of the most important parts of multi-cell designs is the ability to **move data**. Every operation becomes a move: rebalancing, evacuating a failing cell, isolating a noisy tenant, outgrowing a cell, undoing a shape experiment, and adopting cells in the first place. Without it, you are stuck with the disadvantages of a big cell (one big customer can impact others) but also of a small cell (you cannot drain a cell that is very low in terms of usage).
+
+Why the worst one? The whitepaper is honest about it: "Migrating clients from one cell to another is a tricky topic, depending on the nature of your workload it may require a lot of coordination and orchestration." For stateful cells it goes further: "Stateful cell-based architectures will almost certainly require online cell migration to adjust placement when cells are added or removed." The move itself is four steps: **clone** the data into the new cell as a non-authoritative copy while the old cell keeps serving, **flip** the copy to authoritative, **redirect** the traffic, and **forget** the data in the old cell. In the tables above, that is the bucket row going from `Assigned` to `Moving` and back to `Assigned`, and the hard part is the flip, because the data keeps changing while you copy it and every router has to switch at the same moment.
+
+The most hidden fact here is that, depending on what you are storing, one of the tenants can hold the directory data, which means you **definitely want to be able to move it** 🙃
 
 ```
- pinned directory           movable directory
- +----------------+         routers: map in memory
- | pinned cell    |                ^ refresh
- |  directory     |         control plane state is a tenant:
- |  + tenants     |         lives in any cell,
- +----------------+         moves like one
- a pinned cell can never be
- drained or retired
+                  thin router
+                 map in memory <-------- refresh --+
+                       |                           |
+        +--------------+--------------+            |
+        |  requests    |              |            |
+  +-----------+  +-----------+  +-----------+      |
+  |  cell 1   |  |  cell 2   |  |  cell 3   |      |
+  | tenant A  |  | tenant C  |  | tenant E  |      |
+  | tenant B  |  | tenant D  |  | tenant F  |      |
+  |           |  |           |  | directory |------+
+  +-----------+  +-----------+  +-----------+
 ```
+
+The routers keep the whole map in memory and only talk to the directory to refresh it, so the cell holding it is on the refresh path, not on the request path. The whitepaper calls this **static stability**: "Even if the control plane, Amazon S3 or a zone is unavailable, the router is still able to direct traffic to the cells." It also means the directory is one more tenant with one more row in the table, and the cell holding it can be drained like any other.
 
 ## Operating many cells
 
