@@ -74,4 +74,4 @@ committing (the "dirty Git tree" line is from Nix, not Zola — ignore it).
 - Every new tunable goes through `config.extra.*` with a `| default(...)` in the
   template, and must be documented in `README.md` (the full `[extra]` table) and listed
   in `theme.toml`.
-- Keep long-form articles readable: line width ~68–70ch, nothing moving during reading.
+- Keep long-form articles readable: prose fills the sheet width, nothing moving during reading.

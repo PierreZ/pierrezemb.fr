@@ -271,9 +271,6 @@ code.inline, .prose p > code, .prose li > code, .hero-intro code { background: v
 .prose pre table td { border: none; padding: 0 .8rem; }
 .prose pre mark { background: var(--selection); color: inherit; }
 
-/* long-form line length: ~70ch for text blocks; pre, tables, diagrams, images stay full width */
-.prose > :is(p, ul, ol, blockquote, h1, h2, h3, h4, h5, h6, .footnote-definition) { max-width: 70ch; }
-
 /* syntax tokens: raise the github-light / github-dark defaults to >=4.5:1 on --paper-2.
    Scoped per scheme; the extra :root[data-theme] part outranks the giallo selectors. */
 .giallo-ln { color: var(--ink-dim); }
