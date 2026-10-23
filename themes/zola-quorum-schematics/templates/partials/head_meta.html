@@ -19,6 +19,12 @@
   {%- set og_title = "#" ~ term.name -%}
   {%- set og_desc = config.description -%}
   {%- set og_image = config.extra.og_image | default(value="") -%}
+{%- elif terms -%}
+  {%- set og_url = get_url(path=taxonomy.name, trailing_slash=true) -%}
+  {%- set og_type = "website" -%}
+  {%- set og_title = "Tags" -%}
+  {%- set og_desc = "Every tag used on " ~ config.title ~ ", most used first." -%}
+  {%- set og_image = config.extra.og_image | default(value="") -%}
 {%- else -%}
   {%- set og_url = config.base_url -%}
   {%- set og_type = "website" -%}
@@ -26,14 +32,19 @@
   {%- set og_desc = config.description -%}
   {%- set og_image = config.extra.og_image | default(value="") -%}
 {%- endif -%}
+  {%- set bp_is_404 = not page and not section and not term and not terms %}
+  {%- if not bp_is_404 %}
   <link rel="canonical" href="{{ og_url | safe }}">
+  {%- endif %}
   {%- if config.author %}
   <meta name="author" content="{{ config.author }}">
   {%- endif %}
   <meta name="theme-color" content="{{ config.extra.theme_color | default(value='#15324d') }}">
   <meta property="og:site_name" content="{{ config.title }}">
   <meta property="og:type" content="{{ og_type }}">
+  {%- if not bp_is_404 %}
   <meta property="og:url" content="{{ og_url | safe }}">
+  {%- endif %}
   <meta property="og:title" content="{{ og_title | striptags }}">
   <meta property="og:description" content="{{ og_desc }}">
   {%- if config.extra.og_locale %}

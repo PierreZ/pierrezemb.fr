@@ -21,7 +21,7 @@
     {%- endif %}
   </div>
 
-  <h2 class="title">{{ page.title }}</h2>
+  <h1 class="title">{{ page.title }}</h1>
 
   {%- if is_post %}
   <div class="meta-row">
@@ -54,7 +54,7 @@
   {%- endif %}
 
   {%- if page.toc and not page.extra.hide_table_of_contents %}
-  <nav class="toc">
+  <nav class="toc" aria-label="table of contents">
     <div class="h">index of sections</div>
     {{ m::toc_list(items=page.toc, prefix="", depth=4) }}
   </nav>
@@ -65,7 +65,7 @@
   </div>
 
   {%- if is_post and (page.higher or page.lower) %}
-  <nav class="pn">
+  <nav class="pn" aria-label="previous and next posts">
     {%- if is_post and page.higher %}
     <a class="pn-item pn-prev" href="{{ page.higher.permalink | safe }}"><span class="pn-lbl">&larr; prev</span><span class="pn-ttl">{{ page.higher.title }}</span></a>
     {%- else %}

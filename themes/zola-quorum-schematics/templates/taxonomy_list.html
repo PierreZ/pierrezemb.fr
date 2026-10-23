@@ -4,6 +4,7 @@
 {% block description %}Index of {{ taxonomy.name }}.{% endblock description %}
 
 {% block content %}
+<h1 class="sr-only">Tags</h1>
 <div class="sec-head">ls ./{{ taxonomy.name }}</div>
 <div class="taglist">
   {%- set sorted_terms = terms | sort(attribute="page_count") | reverse %}

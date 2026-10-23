@@ -30,6 +30,7 @@ cluster_enabled = true                       # show the 3-node cluster schematic
 home_post_limit = 5                          # how many of the latest posts to list on the home page
 read_modes = true                            # read-mode toggle: quorum R=2 ⇄ single R=1 (the corrupted-replica reveal)
 default_read_mode = "quorum"                  # initial read mode: "quorum" or "single"
+# avatar_alt = "Portrait of the author"         # alt text of the avatar (falls back to config.author, then title)
 # dimline_start = "2019"                      # hero dimension line, left end (omit to hide)
 # dimline_end = "2026 · 6 yrs"                # hero dimension line, right end
 copyright = "© 2026 Pierre Zemb · built deterministically"
@@ -42,3 +43,4 @@ theme_color = "#15324d"                       # <meta name=theme-color>
 # [extra.plausible] src = ".../pa-XXXXX.js"   # optional Plausible: per-site script (Oct 2025+)
 # [extra.plausible] domain = "example.com"    #   — or — the classic script (omit block to disable)
 # Per-page front-matter [extra]: canonical, image, hide_table_of_contents
+# Home section front-matter [extra]: hero_title (HTML allowed; falls back to the section title)

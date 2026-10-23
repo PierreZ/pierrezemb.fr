@@ -29,7 +29,7 @@ committing (the "dirty Git tree" line is from Nix, not Zola — ignore it).
   `static/js/read.js` (which superseded the old `render.js` + `chaos.js`): one silently-faulty
   replica is rolled per load; a quorum read read-repairs it when touched, a single read serves
   its typoglycemia corruption when it lands on it. `read_modes` arms the toggle + reveal;
-  `default_read_mode`, `degraded_consistency` tune it. Mode persists in `localStorage["bp-read"]`.
+  `default_read_mode`, `degraded_consistency` tune it. Mode persists in `sessionStorage["bp-read"]` (stale `localStorage` values are deleted).
 - `templates/{404,index,section,page,taxonomy_list,taxonomy_single}.html`. The 404 sets
   `bp_kind="404"` so the console reads "key not found" and the cluster (`cluster--down`) shows
   all replicas failed; `read.js` bails on that state.
@@ -55,6 +55,8 @@ committing (the "dirty Git tree" line is from Nix, not Zola — ignore it).
   these are generated, so they're git-ignored. The theme links both and the JS toggle
   switches the active one (we deliberately avoid `@media prefers-color-scheme` on them so
   the manual toggle can win).
+- **Stale `static/giallo-*.css`.** After changing `[markdown.highlighting]` theme names, delete the
+  generated `static/giallo-light.css` and `static/giallo-dark.css`, or the stale ones shadow the new themes.
 - **`zola serve --interface 0.0.0.0`** bakes `http://0.0.0.0:1111/...` into asset URLs,
   which browsers can't load → unstyled page. Use `127.0.0.1` (the default).
 - **`zola check`** validates external links; demo social domains are listed under

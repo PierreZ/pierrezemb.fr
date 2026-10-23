@@ -5,6 +5,7 @@
 {% block description %}Posts tagged #{{ term.name }}.{% endblock description %}
 
 {% block content %}
+<h1 class="sr-only">#{{ term.name }}</h1>
 <div class="sec-head">ls ./{{ taxonomy.name }}/{{ term.slug }}</div>
 <div class="bom">
   {%- for page in term.pages %}

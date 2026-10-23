@@ -127,7 +127,7 @@ its date, reading time, and tags.
 
 The cluster has one silently-faulty replica, **rolled at random on each page load**. The
 `read: quorum`/`read: single` button (next to the color-theme toggle) — or **clicking the
-cluster block** — switches how the page is read; the mode persists in `localStorage`.
+cluster block** — switches how the page is read; the mode persists in `sessionStorage` (per tab session).
 
 - **quorum (R=2):** reads two replicas. If the faulty one is among them it's out-voted and
   **read-repaired** — `✓ quorum read R=2 · nodes nA,nB · nX corrupted → read-repaired`, with
@@ -151,13 +151,21 @@ cluster block** — switches how the page is read; the mode persists in `localSt
 | Key | Default | Description |
 |-----|---------|-------------|
 | `avatar` | – | Profile image beside the hero intro (path under `static/` or an https URL). Omit to hide |
+| `avatar_alt` | `author`, then `title` | Alt text of the avatar image |
 | `specs` | – | Array of `{ label, value }` cells (`domain` / `focus` / `lang` …) |
 | `dimline_start` | – | Left end of the dimension line |
 | `dimline_end` | – | Right end of the dimension line |
 
-The hero `<h1>` comes from the home section's `title` (HTML is allowed — wrap a word in
-`<span class="u">…</span>` for the cyan underline), and the intro paragraphs from the
-section body.
+The hero `<h1>` comes from the home section's `[extra] hero_title` (HTML is allowed, wrap a
+word in `<span class="u">…</span>` for the cyan underline), falling back to the section
+`title`. Keep `title` plain text: it feeds `<title>`, social cards and the search index.
+The intro paragraphs come from the section body.
+
+```toml
+title = "Hi, I'm Jane"
+[extra]
+hero_title = "Hi, I'm <span class=\"u\">Jane</span>"
+```
 
 ```toml
 specs = [

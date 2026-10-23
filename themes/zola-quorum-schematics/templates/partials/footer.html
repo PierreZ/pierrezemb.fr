@@ -1,4 +1,4 @@
-<div class="foot">
+<footer class="foot">
   <div class="cell">
     <span class="label">revision history</span>
     {{ config.extra.copyright | default(value=config.title) }} · last rev. {{ now() | date(format="%Y-%m-%d") }}
@@ -12,4 +12,4 @@
       {%- if config.generate_feeds %}<a href="{{ get_url(path='rss.xml') | safe }}">rss</a>{% endif %}
     </div>
   </div>
-</div>
+</footer>

@@ -12,7 +12,7 @@
       <span class="cursor"></span></div>
   </div>
   {%- if config.extra.read_modes | default(value=true) %}
-  <button class="readmode" id="readbtn" type="button" aria-label="switch read mode" aria-pressed="false" title="switch to single read (R=1)">read: quorum</button>
+  <button class="readmode" id="readbtn" type="button" title="switch to single read (R=1)">read: quorum</button>
   {%- endif %}
   {%- if config.extra.cluster_enabled | default(value=true) %}
   <div class="cluster-cell">

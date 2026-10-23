@@ -10,6 +10,8 @@
   {% if section.title %}<h1>{{ section.title }}</h1>{% endif %}
   <div class="hero-intro">{{ section.content | safe }}</div>
 </section>
+{%- else %}
+<h1 class="sr-only">{{ section.title }}</h1>
 {%- endif %}
 
 {%- if section.relative_path == "posts/_index.md" %}
