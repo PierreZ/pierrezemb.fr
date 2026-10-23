@@ -30,7 +30,7 @@ Big clusters are efficient in terms of SRE time and infrastructure cost, but the
 
 > "Is it better for 100% of customers to experience a 5% failure rate, or 5% of customers to experience a 100% failure rate?"
 
-My answer is the second one. A full outage for a few customers is a clear signal: you know who is affected and you can act on them. A 5% failure rate for everyone is the HBase experience, where every user of the platform sees errors at once and the incident belongs to the whole platform. In the diagram above, a failure of the dense cluster hits A, B, C and D together, and with N cells a failure hits 1/N of the customers.
+AWS's answer for this problem is **cell-based architecture**. Let's see how it works.
 
 ## Cell overall design
 
@@ -182,35 +182,15 @@ None of these choices is final: the cheap cell fills up, the canary becomes a re
 
 ## Moving data is the core capability, and the worst one
 
-On the etcd clusters at OVHcloud, which I [talked about at KubeCon](https://www.youtube.com/watch?v=IrJyrGQ_R9c), what forced a move was almost always a noisy neighbor, usually a Kubernetes operator in one customer's cluster that was a bit too aggressive with etcd, and every other customer of that cell paid for it. Moving that customer was an offline and manual procedure, where we blocked writes, copied the data to another etcd cluster, verified it, switched traffic and deleted the old copy. The procedure was buggy when one of the two etcd clusters already had latency or performance issues, and sometimes the move made both cells unstable.
-
-<!-- TODO: one concrete incident, a move that made both cells unstable, what happened on each side -->
-
-The deeper problem was that etcd does not scale out. Adding machines to an etcd cluster adds no capacity, because every member stores the whole dataset and every write goes through a single Raft leader, so every cell had the same low ceiling. Moving a noisy neighbor to another cell only moved the problem to that cell. A move fixes placement and does not add capacity, so it only helps when some cell has room for the tenant, which is the "big enough to accept the largest workloads" line of the sizing list.
-
-<!-- TODO: one number for the etcd ceiling, like the storage quota from the current etcd docs -->
-
-Around the time I left OVHcloud in May 2021, I was hacking on an [etcd layer on top of FoundationDB](https://forums.foundationdb.org/t/a-foundationdb-layer-for-apiserver-as-an-alternative-to-etcd/2697) as a side project, and that idea became the etcd shim behind Clever Cloud's Kubernetes offer almost from day one, because FoundationDB scales out by adding machines. We are not the only ones: [AWS](https://aws.amazon.com/blogs/containers/under-the-hood-amazon-eks-ultra-scale-clusters/) and [Google](https://cloud.google.com/blog/products/containers-kubernetes/gke-65k-nodes-and-counting?hl=en) also moved their largest Kubernetes clusters away from plain etcd. Once a cell can grow, moving a tenant out of it becomes useful again, and this is when moves become the core capability.
+On the etcd clusters at OVHcloud, which I [talked about at KubeCon](https://www.youtube.com/watch?v=IrJyrGQ_R9c), what forced a move was almost always a noisy neighbor, usually a Kubernetes operator in one customer's cluster that was a bit too aggressive with etcd, and every other customer of that cell paid for it. Moving that customer was an offline and manual procedure, where we blocked writes, copied the data to another etcd cluster, verified it, switched traffic and deleted the old copy. The procedure was buggy when one of the two etcd clusters already had latency or performance issues, which was the case by definition for the noisy cell, and the copy added reads on that struggling cell and writes on the target, so sometimes the move made both cells unstable.
 
 Almost every operation on a cell-based system is a move. Rebalancing, evacuating a failing cell, isolating a noisy tenant, letting a tenant outgrow its cell and undoing a shape experiment are all moves, and so is adopting cells in the first place. Without moves, a layout drifts back to one of the two extremes, where a full cell gets densified or each new big customer gets its own cell.
 
 The whitepaper says it in its own words: "For data and state heavy workloads, the problem of allocation becomes a core competency." It also gives the trigger I lived with etcd, "when a customer or partitioned key starts to dominate a cell, you need to migrate some tenants or customers to other cells", and turns it into a best practice: "Start with a cell migration mechanism from day one".
 
-The mechanism it describes has four steps. You **clone** the tenant's data to the new cell as a non-authoritative copy, **flip** the new copy to authoritative, **redirect** the traffic, and **forget** the data in the old cell. In the [ARC338 talk at re:Invent 2018](https://www.youtube.com/watch?v=swQbA4zub20), Peter Vosshall compares it to the live migration of a virtual machine: build an invisible clone in the target, sync it while the source keeps changing, freeze both briefly for the final sync, then flip atomically, coordinated at the router.
+The mechanism it describes has four steps. You **clone** the tenant's data to the new cell as a non-authoritative copy, **flip** the new copy to authoritative, **redirect** the traffic, and **forget** the data in the old cell. In the bucket tables above, this is one row going from `Assigned` to `Moving` and back to `Assigned`, and the redirect is publishing a new version of the directory. In the [ARC338 talk at re:Invent 2018](https://www.youtube.com/watch?v=swQbA4zub20), Peter Vosshall compares it to the live migration of a virtual machine: build an invisible clone in the target, sync it while the source keeps changing, freeze both briefly for the final sync, then flip atomically, coordinated at the router.
 
-```
-            old cell          new cell
- clone      authoritative     copy, catching up
- flip       copy              authoritative
- redirect                     <- router sends traffic
- forget     deleted
-```
-
-Our manual etcd procedure was the same four steps done offline, with blocking writes and copying as the clone, switching traffic as the flip and the redirect, deleting as the forget, and a verify step that the whitepaper does not list. The real difference between offline and online is how long writes stay blocked, the whole copy in our case and only the final sync in the live migration version, and shrinking that window is the hard part. In the bucket tables above, a move is one row going from `Assigned` to `Moving` and back to `Assigned`, and the redirect is publishing a new version of the directory.
-
-<!-- TODO: why the verify step was needed, or what went wrong without it -->
-
-Why the worst one? A move starts when a cell is already in trouble, and the copy adds reads on the struggling source and writes on the target, which is how our etcd moves sometimes made both cells unstable. A move is also the one operation that touches two cells by definition, so it crosses the isolation boundary that cells exist for. Peter Vosshall explains in the same talk that every new AWS engineer learns to never touch more than one zone at a time, and a move is the one operation that cannot follow that rule. This is the reason for the headroom in the sizing list, because a cell that receives a tenant needs room for it before the copy starts.
+Our manual etcd procedure was the same four steps done offline, with blocking writes and copying as the clone, switching traffic as the flip and the redirect, deleting as the forget, and a verify step that the whitepaper does not list. The real difference between offline and online is how long writes stay blocked, the whole copy in our case and only the final sync in the live migration version, and shrinking that window is the hard part. A move is also the one operation that touches two cells at once, so it cannot follow the rule Peter Vosshall says every new AWS engineer learns, never touch more than one zone at a time, and the receiving cell needs headroom before the copy starts.
 
 ## The control plane is a tenant
 
@@ -241,13 +221,11 @@ This works when the control plane data fits the tenant split and the cells are s
 
 ## Operating many cells
 
-For operators, the main goal of all this is to keep each distributed system under a load that makes operations easy. Running a system at 80 or 90% of its capacity leaves no room for failures, incidents and spikes, and at OVHcloud I [got paged too often when etcd hit its performance ceiling](/posts/2025-year-in-review/).
+For operators, the main goal of all this is to keep each distributed system under a load that makes operations easy. Running a system at 80 or 90% of its capacity leaves no room for failures, incidents and spikes, and at OVHcloud I [got paged too often when etcd hit its performance ceiling](/posts/2025-year-in-review/). With cells, a cell close to its ceiling moves tenants out, so the move is what keeps every cell at a load where an incident or a spike still fits.
 
-With one dense cluster, a cluster close to its ceiling can only be grown or run hot, and with etcd we could not even grow it. With cells, a cell close to its ceiling moves tenants out, so the move is what keeps every cell at a load where an incident, a failover or a spike still fits. The whitepaper asks for the same thing when it says not to run cells at their limit and to keep headroom for failover and spikes, and the "half the tested ceiling" rule in my sizing list is how I put a number on it.
+Adopting cells does not need a big migration either. The whitepaper says "Your current instance/stack is your cell zero", so you put a router in front of what you already have, and the first migration out of it is your first move.
 
-Adopting cells does not need a big migration either. The whitepaper's advice is that "Your current instance/stack is your cell zero", so you put a router in front of what you already have, and the first migration out of it is your first move, which means the move exists before the second cell does.
-
-The rest of the whitepaper's practices are about keeping cells isolated in day-to-day operations: automation from day one, because cells "can grow to tens, hundreds or more cells", deployments in waves with the canary cell first and automated rollback, and cell-aware observability where every request can be traced to its cell. The isolation only helps if operations respect it. In the Q&A of ARC338, Peter Vosshall came back to the 2017 S3 outage, where an engineer who knew the philosophy still made a command-line mistake, and this is why the one-zone-at-a-time rule comes with automated operational tooling.
+The rest is automation from day one, deployments in waves starting with the canary cell, and cell-aware observability. The isolation only helps if operations respect it, and in ARC338 Peter Vosshall recalled the 2017 S3 outage, where an engineer who knew the philosophy still made a command-line mistake.
 
 At what load do your clusters run today, and could you move a tenant out of the hottest one tomorrow?
 
@@ -255,8 +233,7 @@ At what load do your clusters run today, and could you move a tenant out of the 
 
 <!-- To check before publishing:
 - HBase numbers: 2M/6M writes/reads (2025 review) vs 2.5M/6.5M (AGENTS.md)
-- Whitepaper quotes in the draft are verbatim, especially "thinnest possible layer", "can grow to tens, hundreds or more cells", "Your current instance/stack is your cell zero"
-- etcd storage quota numbers from the current etcd docs
+- Whitepaper quotes in the draft are verbatim, especially "thinnest possible layer" and "Your current instance/stack is your cell zero"
 - Record Layer: slides come from Apple's talk (youtube SvoUHHM9IKU), already used in notes-about-foundationdb, credit the talk. Paper: SIGMOD 2019, arxiv 1901.04452
 - S3 (tenant, bucket) partition key: not in the whitepaper, which only says "CustomerID plus a second dimension", find a source
 - External links resolve: Redis cluster spec, FDB known-limitations, KubeCon talk, ARC338, EKS and GKE posts
