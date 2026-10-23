@@ -26,11 +26,11 @@ Both experiences come from the same recurring decision that everyone working on 
  failure hits A,B,C,D        failure hits 1 usage
 ```
 
-Big clusters are efficient in terms of SRE time and infrastructure cost, but they have a big impact when they fail. One cluster per usage keeps the blast radius of a failure minimal, and you pay for it with one more cluster to operate for every usage. Can we have something in the middle? This is what cell-based design is all about, and the [AWS whitepaper on the topic](https://docs.aws.amazon.com/pdfs/wellarchitected/latest/reducing-scope-of-impact-with-cell-based-architecture/reducing-scope-of-impact-with-cell-based-architecture.pdf), written by Robisson Oliveira in September 2023, asks a pretty interesting question:
+Big clusters are efficient in terms of SRE time and infrastructure cost, but they have a big impact when they fail. One cluster per usage keeps the blast radius of a failure minimal, and you pay for it with one more cluster to operate for every usage. Can we have something in the middle? The [AWS whitepaper on the topic](https://docs.aws.amazon.com/pdfs/wellarchitected/latest/reducing-scope-of-impact-with-cell-based-architecture/reducing-scope-of-impact-with-cell-based-architecture.pdf), written by Robisson Oliveira in September 2023, asks a pretty interesting question:
 
 > "Is it better for 100% of customers to experience a 5% failure rate, or 5% of customers to experience a 100% failure rate?"
 
-AWS's answer for this problem is **cell-based architecture**. Let's see how it works.
+AWS's answer to this problem is **cell-based architecture**.
 
 ## Cell overall design
 
@@ -73,7 +73,7 @@ To spread customers across cells, you need a key to shard on, and the obvious ca
       +------+ +------+ +------+
 ```
 
-The problem is that a tenant can never outgrow its cell, so the largest tenant decides the size of every cell. The whitepaper suggests adding a second dimension to the key, like the bucket for S3, so the partition key becomes (tenant, bucket) and a large tenant can spread its buckets over several cells.
+The problem is that a tenant can never outgrow its cell, so the largest tenant decides the size of every cell. The whitepaper suggests adding a second dimension to the key, aligned with your business and next to the customer ID, so a large tenant can spread over several cells.
 
 Whatever the key, the router must find it cheaply in every request, otherwise it stops being thin. For our Kubernetes control planes, a proxy read the tenant from the TLS client certificate of each API server, and it also handled per-tenant monitoring and quotas.
 
@@ -184,19 +184,19 @@ On the etcd clusters at OVHcloud, which I [talked about at KubeCon](https://www.
 
 Almost every operation on a cell-based system is a move. Rebalancing, evacuating a failing cell, isolating a noisy tenant, letting a tenant outgrow its cell and undoing a shape experiment are all moves, and so is adopting cells in the first place. Without moves, a layout drifts back to one of the two extremes, where a full cell gets densified or each new big customer gets its own cell.
 
-The whitepaper says it in its own words: "For data and state heavy workloads, the problem of allocation becomes a core competency." It also gives the trigger I lived with etcd, "when a customer or partitioned key starts to dominate a cell, you need to migrate some tenants or customers to other cells", and turns it into a best practice: "Start with a cell migration mechanism from day one".
+The whitepaper says it in its own words: "For data and state heavy workloads, the problem of allocation becomes a core competency." It also gives the trigger I lived with etcd, "when a customer or partitioned key starts to dominate a cell, you need to migrate some tenants or customers to other cells", and turns it into a best practice: "Start with a cell migration mechanism from day one". Apple does it in CloudKit, where Scott Gray [describes](https://www.youtube.com/watch?v=SvoUHHM9IKU) machinery that watches how load spreads across FoundationDB clusters and moves contiguous key ranges between them to rebalance it.
 
 The mechanism it describes has four steps. You **clone** the tenant's data to the new cell as a non-authoritative copy, **flip** the new copy to authoritative, **redirect** the traffic, and **forget** the data in the old cell. In the bucket tables above, this is one row going from `Assigned` to `Moving` and back to `Assigned`, and the redirect is publishing a new version of the directory. In the [ARC338 talk at re:Invent 2018](https://www.youtube.com/watch?v=swQbA4zub20), Peter Vosshall compares it to the live migration of a virtual machine: build an invisible clone in the target, sync it while the source keeps changing, freeze both briefly for the final sync, then flip atomically, coordinated at the router.
 
-Our manual etcd procedure was the same four steps done offline, with blocking writes and copying as the clone, switching traffic as the flip and the redirect, deleting as the forget, and a verify step that the whitepaper does not list. The real difference between offline and online is how long writes stay blocked, the whole copy in our case and only the final sync in the live migration version, and shrinking that window is the hard part. A move is also the one operation that touches two cells at once, so it cannot follow the rule Peter Vosshall says every new AWS engineer learns, never touch more than one zone at a time, and the receiving cell needs headroom before the copy starts.
+Our manual etcd procedure was the same four steps done offline, with blocking writes and copying as the clone, switching traffic as the flip and the redirect, deleting as the forget, and a verify step that the whitepaper does not list. The real difference between offline and online is how long writes stay blocked, the whole copy in our case and only the final sync in the live migration version, and shrinking that window is the hard part. A move is also the one operation that touches two cells at once, so it cannot follow the rule that Peter Vosshall says every new AWS engineer learns, never touch more than one zone at a time. The receiving cell also needs headroom before the copy starts.
 
 ## The control plane is a tenant
 
-If every piece of the system must move, the control plane must move too, otherwise its cell becomes the one you can never drain or retire. Apple's [talk on the Record Layer](https://www.youtube.com/watch?v=SvoUHHM9IKU) shows how CloudKit runs on FoundationDB:
+If every piece of the system must move, the control plane must move too, otherwise its cell becomes the one you can never drain or retire. Scott Gray's CloudKit talk also shows how Apple runs it on FoundationDB and the Record Layer:
 
-![Record stores and sharding in CloudKit, from Apple's Record Layer talk](/images/notes-about-foundationdb/record-extract-3.png)
+![Record stores and sharding in CloudKit, from Scott Gray's CloudKit talk](/images/notes-about-foundationdb/record-extract-3.png)
 
-Each FoundationDB cluster is a cell holding many **record stores**, one per user and per application, and each record store is a virtual database with its own records, indexes and metadata. The slide draws the directory service as a separate box, and I have no insight into how Apple runs it, but I see no reason why it has to be an external system. When I look at this picture, the control plane is only one more specialized record store somewhere in the infrastructure, a tenant like any other:
+Each FoundationDB cluster is a cell holding millions of users and tens of millions of **record stores**, one per user and per application, and each record store is a virtual database with its records, indexes and metadata in one contiguous range of keys. A directory service keeps track of which cluster owns each user, and I have no insight into how Apple runs it, but I see no reason why it has to be an external system. When I look at this picture, the control plane is only one more specialized record store somewhere in the infrastructure, a tenant like any other:
 
 ```
                clients
