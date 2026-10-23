@@ -77,8 +77,6 @@ The problem is that a tenant can never outgrow its cell, so the largest tenant d
 
 Whatever the key, the router must find it cheaply in every request, otherwise it stops being thin. For our Kubernetes control planes, a proxy read the tenant from the TLS client certificate of each API server, and it also handled per-tenant monitoring and quotas.
 
-<!-- TODO: confirm the TLS proxy was at OVHcloud, and say so in the sentence -->
-
 ### Mapping keys to cells
 
 The router applies the mapping from partition key to cell on every request, and the same mapping decides how many tenants move every time a cell is added. The naive transformation is to hash the partition key and take it modulo the number of cells. The problem is that adding a cell then moves a lot of tenants on day one, and going from 3 to 4 cells in this example moves every single one of them:
@@ -228,16 +226,6 @@ Adopting cells does not need a big migration either. The whitepaper says "Your c
 The rest is automation from day one, deployments in waves starting with the canary cell, and cell-aware observability. The isolation only helps if operations respect it, and in ARC338 Peter Vosshall recalled the 2017 S3 outage, where an engineer who knew the philosophy still made a command-line mistake.
 
 At what load do your clusters run today, and could you move a tenant out of the hottest one tomorrow?
-
-<!-- Alternative closing question: can you move every piece of your system, including the part that knows where everything is? -->
-
-<!-- To check before publishing:
-- HBase numbers: 2M/6M writes/reads (2025 review) vs 2.5M/6.5M (AGENTS.md)
-- Whitepaper quotes in the draft are verbatim, especially "thinnest possible layer" and "Your current instance/stack is your cell zero"
-- Record Layer: slides come from Apple's talk (youtube SvoUHHM9IKU), already used in notes-about-foundationdb, credit the talk. Paper: SIGMOD 2019, arxiv 1901.04452
-- S3 (tenant, bucket) partition key: not in the whitepaper, which only says "CustomerID plus a second dimension", find a source
-- External links resolve: Redis cluster spec, FDB known-limitations, KubeCon talk, ARC338, EKS and GKE posts
--->
 
 ---
 
