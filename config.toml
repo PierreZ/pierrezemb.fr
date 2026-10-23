@@ -12,6 +12,7 @@ taxonomies = [
 ]
 
 generate_feeds = true
+feed_limit = 20
 feed_filenames = [
   "atom.xml",
   "rss.xml"
@@ -30,8 +31,8 @@ insert_anchor_links = "right"
 
 [markdown.highlighting]
 style = "class"
-light_theme = "solarized-light"
-dark_theme = "solarized-dark"
+light_theme = "github-light"
+dark_theme = "github-dark"
 
 [search]
 include_title = true

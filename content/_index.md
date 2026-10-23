@@ -1,5 +1,8 @@
 +++
-title = "👋 Hi, I'm <span class=\"u\">Pierre Zemb</span>"
+title = "Hi, I'm Pierre Zemb"
+
+[extra]
+hero_title = "👋 Hi, I'm <span class=\"u\">Pierre Zemb</span>"
 +++
 
 I'm a Senior Engineer building data infrastructure at [Clever Cloud](https://www.clever-cloud.com/). I've built and operated a variety of stateful distributed systems throughout my career.

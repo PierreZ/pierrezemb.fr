@@ -43,15 +43,15 @@
         {% endfor %}
         <link rel="alternate" type="text/html" href="{{ page.permalink | safe }}"/>
         <id>{{ page.permalink | safe }}</id>
-        {% if page.summary %}
-        <summary type="html">{{ page.summary }}</summary>
-        {% else %}
         {%- if page.taxonomies.tags %}
         {%- for tag in page.taxonomies.tags %}
-        <category term="{{ tag | safe }}" schema="https://pierrezemb.fr/tags/" label="{{ tag | safe }}"/>
+        <category term="{{ tag | safe }}" scheme="https://pierrezemb.fr/tags/" label="{{ tag | safe }}"/>
         {%- endfor %}
         {%- endif %}
-        <content type="html" xml:base="{{ page.permalink | escape_xml | safe }}">{{ page.content }}</content>
+        {% if page.summary %}
+        <summary type="html">{{ page.summary | replace(from='src="/', to='src="' ~ config.base_url ~ '/') | replace(from='href="/', to='href="' ~ config.base_url ~ '/') }}</summary>
+        {% else %}
+        <content type="html" xml:base="{{ page.permalink | escape_xml | safe }}">{{ page.content | replace(from='src="/', to='src="' ~ config.base_url ~ '/') | replace(from='href="/', to='href="' ~ config.base_url ~ '/') }}</content>
         {% endif %}
     </entry>
     {%- endfor %}

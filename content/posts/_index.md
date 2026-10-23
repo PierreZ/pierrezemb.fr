@@ -1,6 +1,6 @@
 +++
 title = "Posts"
-description = "Subscribe to [Atom feed](/posts/atom.xml)"
+description = "Every post on distributed systems, FoundationDB, Rust and simulation testing, newest first."
 sort_by = "date"
 insert_anchor_links = "left"
 +++
