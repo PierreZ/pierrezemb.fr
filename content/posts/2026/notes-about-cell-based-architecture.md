@@ -10,7 +10,7 @@ tags = ["distributed-systems", "notes", "foundationdb", "software-engineering"]
 
 ## The deployment layout of a distributed system
 
-At OVHcloud, I operated the HBase cluster behind the Metrics platform, 255 machines taking 2 million writes and 6 million reads per second in a single cluster. HBase was weak to network issues, and every incident triggered region split inconsistencies that hit every user of the platform at the same time. After HBase, I worked on etcd for Kubernetes control planes. Spawning three etcd nodes per customer is not a valid approach at scale, so we put hundreds of customers on each etcd cluster, and because of etcd's limitations, we had to move them manually and painfully across these clusters of three machines.
+At OVHcloud, I operated the HBase cluster behind the Metrics platform, 255 machines taking 2 million writes and 6 million reads per second in a single cluster. HBase was fragile under network issues, and every incident triggered region split inconsistencies that hit every user of the platform at the same time. After HBase, I worked on etcd for Kubernetes control planes. Spawning three etcd nodes per customer is not a valid approach at scale, so we put hundreds of customers on each etcd cluster, and because of etcd's limitations, we had to move them manually and painfully across these clusters of three machines.
 
 Both experiences come from the same recurring decision that everyone working on multi-tenant systems needs to make: how are you going to densify? Are you going to have a single, almighty distributed cluster to hold everything, or are you going to create a cluster per usage?
 
@@ -32,7 +32,7 @@ Big clusters are efficient in terms of SRE time and infrastructure cost, but the
 
 AWS's answer to this problem is **cell-based architecture**.
 
-## Cell overall design
+## Overall cell design
 
 The main idea is to design your system so that customers have a single entry point, but internally, they are routed to different backends, called cells:
 
@@ -138,17 +138,17 @@ The router checks the override table first and falls back to the bucket table, w
 
 ## Sizing and shaping cells
 
-Now that we have talked about routing a lot, we can focus on the cells themselves! The next question is "how big should a cell be?", and this is a tough one, because it mixes technical and business decisions. I ended up with this kind of long list of axes to look at, and one cell needs to be:
+The next question is "how big should a cell be?", and this is a tough one, because it mixes technical and business decisions. I ended up with this kind of long list of axes to look at, and one cell needs to be:
 
 * big enough to accept the largest workloads without splitting a customer across cells,
-* big enough to gain economies of scale benefits and amortize the fixed cost of a cell,
+* big enough to gain economies of scale and amortize the fixed cost of a cell,
 * big enough to keep the number of cells operable,
 * small enough that losing or draining one cell is a small share of customers,
 * small enough to stay below the quotas and the scaling cliffs you have not met yet,
 * known and enforced, expressed in transactions per second, tenants or GB stored, with load shedding at the limit,
 * operated with headroom, half the tested ceiling, so spikes, failovers and incoming moves have room.
 
-That's a pretty long list, and these axes pull against each other, with the business side pushing the size up, because a bigger cell lowers the cost per tenant and leaves room for the next big customer. The whitepaper's cell sizing section weighs the same trade-off, with smaller cells giving more cells to manage and a smaller share of customers per outage, and larger cells giving better utilization and fewer customers split across cells. At OVHcloud, the axis that bit me was the scaling cliff of etcd.
+These axes pull against each other, with the business side pushing the size up, because a bigger cell lowers the cost per tenant and leaves room for the next big customer. The whitepaper's cell sizing section weighs the same trade-off, with smaller cells giving more cells to manage and a smaller share of customers per outage, and larger cells giving better utilization and fewer customers split across cells. At OVHcloud, the axis that bit me was the scaling cliff of etcd, whose whole keyspace must fit on every member under a recommended 8GB limit.
 
 With FoundationDB, the [known limitations](https://apple.github.io/foundationdb/known-limitations.html) are written down:
 
@@ -156,7 +156,7 @@ With FoundationDB, the [known limitations](https://apple.github.io/foundationdb/
 
 > FoundationDB has been tested with databases up to 100 TB
 
-These are the hard technical limitations, but inside them there are a lot of things we can choose for a FoundationDB-based cell, like the redundancy mode, the hardware, the storage engine, the major version, and many more! Mixing these choices could give us something like this:
+These are the hard technical limitations, but inside them there are a lot of things we can choose for a FoundationDB-based cell, like the redundancy mode, the hardware, the storage engine, the major version, and more. Mixing these choices could give us something like this, which is a design exercise and not what we run at Clever Cloud today:
 
 ```
                    thin router
@@ -166,7 +166,7 @@ These are the hard technical limitations, but inside them there are a lot of thi
   +---------+ +---------+ +---------+ +---------+
   | cell 1  | | cell 2  | | cell 3  | | cell 4  |
   | triple  | | double  | | 3 halls | | triple  |
-  | ssd     | | ssd     | | redwood | | redwood |
+  | ssd-2   | | ssd-2   | | redwood | | redwood |
   | SATA    | | SATA    | | NVMe    | | NVMe    |
   | 7.3     | | 7.3     | | 7.3     | | 7.4     |
   +---------+ +---------+ +---------+ +---------+
@@ -184,7 +184,7 @@ On the etcd clusters at OVHcloud, which I [talked about at KubeCon](https://www.
 
 Almost every operation on a cell-based system is a move: rebalancing, evacuating a failing cell, isolating a noisy tenant, letting a tenant outgrow its cell, undoing a shape experiment, and adopting cells in the first place. The whitepaper gives the trigger I lived with etcd, "when a customer or partitioned key starts to dominate a cell, you need to migrate some tenants or customers to other cells", and its best practice is "Start with a cell migration mechanism from day one". Apple does it in CloudKit, where Scott Gray [describes](https://www.youtube.com/watch?v=SvoUHHM9IKU) machinery that moves contiguous key ranges between FoundationDB clusters to rebalance load.
 
-The whitepaper's move has four steps: **clone** the tenant's data to the new cell as a non-authoritative copy, **flip** it to authoritative, **redirect** the traffic, and **forget** the data in the old cell, which in the bucket tables above is one row going from `Assigned` to `Moving` and back. Our etcd procedure was the same four steps done offline. The real difference with the live migration Peter Vosshall describes in the [ARC338 talk at re:Invent 2018](https://www.youtube.com/watch?v=swQbA4zub20) is how long writes stay blocked, the whole copy in our case and only a brief final sync in his, and shrinking that window is the hard part. A move is also the one operation that touches two cells at once, which breaks the rule he says every new AWS engineer learns, never touch more than one zone at a time, and the receiving cell needs headroom before the copy starts.
+The whitepaper's move has four steps: **clone** the tenant's data to the new cell as a non-authoritative copy, **flip** it to authoritative, **redirect** the traffic, and **forget** the data in the old cell, which in the bucket tables above is one row going from `Assigned` to `Moving` and back. Our etcd procedure was the same four steps done offline. The real difference with the live migration Peter Vosshall describes in the [ARC338 talk at re:Invent 2018](https://www.youtube.com/watch?v=swQbA4zub20) is how long writes stay blocked, the whole copy in our case and only a brief final sync in his, and shrinking that window is the hard part. Moves also have consequences above the storage layer. CloudKit syncs devices by scanning an index ordered by FoundationDB commit versions, and the [Record Layer paper at SIGMOD 2019](https://arxiv.org/abs/1901.04452) explains that versions from two clusters are uncorrelated, so Apple added a per-user count of moves, called the **incarnation**, to sort every change made after a move after the ones made before it. A move is also the one operation that touches two cells at once, which breaks the rule he says every new AWS engineer learns, never touch more than one zone at a time, and the receiving cell needs headroom before the copy starts.
 
 ## The control plane is a tenant
 
@@ -203,7 +203,7 @@ Each FoundationDB cluster is a cell holding millions of users and tens of millio
             /     |     \                 |
       +------+ +------+ +------+          |
       |cell 1| |cell 2| |cell 3|          |
-      | A, D | | B, E | | C, F |          |
+      |  C   | | A,D,E| | B, F |          |
       |      | |  CP  | |      |          |
       +------+ +--^---+ +------+          |
                   |                       |
@@ -211,7 +211,7 @@ Each FoundationDB cluster is a cell holding millions of users and tens of millio
               control plane state = tenant CP
 ```
 
-This works when the control plane data fits the tenant split and the cells are strongly consistent, which is the case with FoundationDB. It then becomes an application of the **eat your own dog food** principle: the control plane lives in the same cells, with the same guarantees and the same moves as every customer. It also forces you to handle the move of your most critical tenant, and to do it fast, because while the control plane moves, nobody can onboard a customer or move anyone else. Routers keep serving on their last published map in the meantime, so traffic does not stop.
+This works when the control plane data fits the tenant split and the cells are strongly consistent, which is the case with FoundationDB. It then becomes an application of the **eat your own dog food** principle: the control plane lives in the same cells, with the same guarantees and the same moves as every customer. It also forces you to handle the move of your most critical tenant, and to do it fast, because while the control plane moves, nobody can move anyone else. Routers keep serving on their last published map in the meantime, so traffic does not stop.
 
 ## Operating many cells
 
