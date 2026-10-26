@@ -150,9 +150,9 @@ In Pierre's voice:
 
 ### Personal stake and concrete detail
 
-This is the most distinctive rule of the voice. Every claim is grounded in something specific: a system operated (HBase 250+ nodes, 70-machine Hadoop, 800 GB JVM heaps), an incident debugged (the August 2024 Pulsar metastable spiral, the Hadoop NPE on recovery), a paper with venue and year (OSDI 2018 on partition failures, HotOS 2021 on metastable failures), a named person (Kyle Kingsbury, Peter Alvaro, Marc Bowes, Charity Majors), or code with a commit hash. Never "studies have shown" or "many engineers find". Cite specifics or do not cite at all.
+This is the most distinctive rule of the voice. Every claim is grounded in something specific: a system operated (HBase 255 machines, 70-machine Hadoop, 800 GB JVM heaps), an incident debugged (the August 2024 Pulsar metastable spiral, the Hadoop NPE on recovery), a paper with venue and year (OSDI 2018 on partition failures, HotOS 2021 on metastable failures), a named person (Kyle Kingsbury, Peter Alvaro, Marc Bowes, Charity Majors), or code with a commit hash. Never "studies have shown" or "many engineers find". Cite specifics or do not cite at all.
 
-Numbers are exact: 2.5M writes/sec, 6.5M reads/sec, 500M timeseries, 13-hour incident, 80% catastrophic, 648 test combinations. Never "hundreds of", never "a lot". Systems are named: HBase, Hadoop, Kafka, Pulsar, BookKeeper, ETCD, FoundationDB, never "a distributed database". Dates are real: "August 2024 outage", "OSDI 2018", "September 2010". The reader always knows which, when, how much.
+Numbers are exact: 2M writes/sec, 6M reads/sec, 500M timeseries, 13-hour incident, 80% catastrophic, 648 test combinations. Never "hundreds of", never "a lot". Systems are named: HBase, Hadoop, Kafka, Pulsar, BookKeeper, ETCD, FoundationDB, never "a distributed database". Dates are real: "August 2024 outage", "OSDI 2018", "September 2010". The reader always knows which, when, how much.
 
 Use bold for key terms and named concepts. Never italics.
 
