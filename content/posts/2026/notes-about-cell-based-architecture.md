@@ -1,9 +1,8 @@
 +++
 title = "Notes about cell-based architecture"
 description = "Cell-based architecture as the middle ground between one dense cluster and one cluster per customer, and why moving data is the core capability."
-date = 2026-10-23
+date = 2026-10-27
 path = "posts/notes-about-cell-based-architecture"
-draft = true
 [taxonomies]
 tags = ["distributed-systems", "notes", "foundationdb", "software-engineering"]
 +++
@@ -180,11 +179,13 @@ None of these choices is final: the cheap cell fills up, the canary becomes a re
 
 ## Moving data is the core capability, and the worst one
 
-On the etcd clusters at OVHcloud, which I [talked about at KubeCon](https://www.youtube.com/watch?v=IrJyrGQ_R9c), what forced a move was almost always a noisy neighbor, usually a Kubernetes operator in one customer's cluster that was a bit too aggressive with etcd, and every other customer of that cell paid for it. Moving that customer was an offline and manual procedure, where we blocked writes, copied the data to another etcd cluster, verified it, switched traffic and deleted the old copy. The noisy cell was struggling by definition, and the copy added reads on it and writes on the target, so sometimes the move made both cells unstable.
+On the etcd clusters at OVHcloud, which I [talked about at KubeCon](https://www.youtube.com/watch?v=IrJyrGQ_R9c), what forced a move was almost always a noisy neighbor, usually a Kubernetes operator in one customer's cluster that was a bit too aggressive with etcd. Moving that customer was an offline and manual procedure, where we blocked writes, copied the data to another etcd cluster, verified it, switched traffic and deleted the old copy. The noisy cell was already struggling, so sometimes the copy made both cells unstable.
 
-Almost every operation on a cell-based system is a move: rebalancing, evacuating a failing cell, isolating a noisy tenant, letting a tenant outgrow its cell, undoing a shape experiment, and adopting cells in the first place. The whitepaper gives the trigger I lived with etcd, "when a customer or partitioned key starts to dominate a cell, you need to migrate some tenants or customers to other cells", and its best practice is "Start with a cell migration mechanism from day one". Apple does it in CloudKit, where Scott Gray [describes](https://www.youtube.com/watch?v=SvoUHHM9IKU) machinery that moves contiguous key ranges between FoundationDB clusters to rebalance load.
+Almost every operation on a cell-based system is a move, from rebalancing and evacuating a failing cell to isolating a noisy tenant or adopting cells in the first place, which is why the whitepaper's best practice is "Start with a cell migration mechanism from day one". Apple does it in CloudKit, where Scott Gray [describes](https://www.youtube.com/watch?v=SvoUHHM9IKU) moving contiguous key ranges between FoundationDB clusters to rebalance load.
 
-The whitepaper's move has four steps: **clone** the tenant's data to the new cell as a non-authoritative copy, **flip** it to authoritative, **redirect** the traffic, and **forget** the data in the old cell, which in the bucket tables above is one row going from `Assigned` to `Moving` and back. Our etcd procedure was the same four steps done offline. The real difference with the live migration Peter Vosshall describes in the [ARC338 talk at re:Invent 2018](https://www.youtube.com/watch?v=swQbA4zub20) is how long writes stay blocked, the whole copy in our case and only a brief final sync in his, and shrinking that window is the hard part. Moves also have consequences above the storage layer. CloudKit syncs devices by scanning an index ordered by FoundationDB commit versions, and the [Record Layer paper at SIGMOD 2019](https://arxiv.org/abs/1901.04452) explains that versions from two clusters are uncorrelated, so Apple added a per-user count of moves, called the **incarnation**, to sort every change made after a move after the ones made before it. A move is also the one operation that touches two cells at once, which breaks the rule he says every new AWS engineer learns, never touch more than one zone at a time, and the receiving cell needs headroom before the copy starts.
+The whitepaper names the steps of a move **clone**, **flip**, **redirect** and **forget**, which in the bucket tables above is one row going from `Assigned` to `Moving` and back. We blocked writes during the whole copy, and in the live migration Peter Vosshall describes in the [ARC338 talk at re:Invent 2018](https://www.youtube.com/watch?v=swQbA4zub20), writes are only blocked for a brief final sync, and shrinking that window is the hard part.
+
+A move touches two cells at once, which breaks the rule Peter Vosshall says every new AWS engineer learns, never touch more than one zone at a time, so the receiving cell needs headroom before the copy starts. It also has consequences above the storage layer: CloudKit syncs devices with an index ordered by FoundationDB commit versions, which are uncorrelated between clusters, so Apple added a per-user count of moves called the **incarnation**, as the [Record Layer paper at SIGMOD 2019](https://arxiv.org/abs/1901.04452) explains.
 
 ## The control plane is a tenant
 
