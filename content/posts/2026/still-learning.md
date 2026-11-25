@@ -8,15 +8,6 @@ draft = true
 tags = ["llm", "software-engineering", "personal"]
 +++
 
-<!--
-Notes for the rewrite (delete before publishing)
-- Fill the TODOs: the concrete thing in the hook, the Raft leaks, the paper example, and one example per verb.
-- Say "evidence", not "proof": FoundationDB has simulation evidence, not a proof.
-- Keep two images, the abstraction and its leaks. The house appears once, in section 3.
-- Verbs 2 and 3 overlap a bit; merge them if the list feels long.
-- Rewrite in your own voice: this draft is scaffolding, not the post.
--->
-
 As you may have guessed from [previous blogposts](/tags/llm/), I'm having a lot of fun in this new age for software engineering. But I see many people struggling to use LLM, for many reasons. Today I want to talk about one of the fear I had that turned out to be massively wrong: **if the LLM writes the code, how do we still learn?**
 
 ## I never learned by typing
