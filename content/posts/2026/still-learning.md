@@ -1,7 +1,7 @@
 +++
-title = "Still Learning: Software Engineering in the LLM Era"
+title = "Still Learning, despite LLM writing all my code"
 description = "TODO: one sentence for social media"
-date = 2026-11-22
+date = 2026-11-25
 path = "posts/still-learning"
 draft = true
 [taxonomies]
@@ -12,64 +12,56 @@ tags = ["llm", "software-engineering", "personal"]
 Notes for the rewrite (delete before publishing)
 - Fill the TODOs: the concrete thing in the hook, the Raft leaks, the paper example, and one example per verb.
 - Say "evidence", not "proof": FoundationDB has simulation evidence, not a proof.
-- Keep two images, the box and its leaks. The house appears once, in section 3.
+- Keep two images, the abstraction and its leaks. The house appears once, in section 3.
 - Verbs 2 and 3 overlap a bit; merge them if the list feels long.
 - Rewrite in your own voice: this draft is scaffolding, not the post.
 -->
 
-I have never learned as much as in the last two years, and an LLM wrote most of my code. <!-- TODO: name one concrete thing you learned, in one clause, so this doesn't read as a boast. -->
-
-Yet I keep hearing the opposite fear, from juniors and seniors alike: if the LLM writes the code, how do we still learn?
-
-The usual answer online is blunt. You are an engineer, not a code monkey, and nobody mourns writing their own compiler. It is half right. It explains why typing code was never the job. It says nothing about how we keep getting better at the job.
+As you may have guessed from [previous blogposts](/tags/llm/), I'm having a lot of fun in this new age for software engineering. But I see many people struggling to use LLM, for many reasons. Today I want to talk about one of the fear I had that turned out to be massively wrong: **if the LLM writes the code, how do we still learn?**
 
 ## I never learned by typing
 
-At some point in my career, I stopped learning by implementing things alone. Starting from scratch means walking from 0 to 80% on your own, with your own biases. You make the simple mistakes everyone made before you, and you end up with a simplistic view of the problem.
+I discovered coding kind of late, when I arrived in my engineering school. I learned C, and spent countless nights building up my coding skill from the ground up. Then I started to work, and at some point, I stopped learning by implementing things alone and from scratch. Starting from scratch means walking from 0 to 80% on your own, with your own biases. You make the simple mistakes everyone made before you, and you end up with a simplistic view of the problem. So I read code that works instead. Most of my "Diving into" posts started that way: etcd's linearizable reads, HBase's MemStore, FoundationDB's simulation framework.
 
-So I read code that works instead. Most of my "Diving into" posts started that way: etcd's linearizable reads, HBase's MemStore, FoundationDB's simulation framework.
+Reading is not memorising. Nobody remembers each line, we remember the structure, the happy path, the error path, the shape of the code. Writing is not memorising either: ask someone to explain code they wrote a few months ago. They walk to the whiteboard and draw boundaries, messages, and what each part guarantees. The flow is gone; the guarantees stay. That drawing is what is left of the code, whoever typed it.
 
-Reading is not memorising. Nobody remembers each line. We remember the structure, the happy path, the error path, the shape of the code.
+LLMs made reading cheap. For years, I have felt stuck by the language barrier: how can I discover and learn easily in a language that I don't master? With experience, you do have some sort of insight that let you kind of read almost any programming language, but sometimes it just tough. Nowadays, I can ask questions about any codebase, in any language, by cloning the dependency at the version I use.
 
-Writing is not memorising either. Ask someone to explain code they wrote a few months ago. They walk to the whiteboard and draw boundaries, messages, and what each part guarantees. The flow is gone; the guarantees stay. That drawing is what is left of the code, whoever typed it.
+Reading academic papers was another struggle, because it needed a lot of time to completely absorb and get the grasp of the design. Now I can turn a paper into a visualisation I can step through and break. 
 
-LLMs made reading cheap. I can ask questions about any codebase, in any language, by cloning the dependency at the version I use. I can turn a paper into a visualisation I can step through and break. <!-- TODO: one example of a paper you visualised. -->
+## We already trust abstractions
 
-## We already trust boxes
+Delivering software has always meant building abstractions: a set of interactions you know, with guarantees you can state. Defining APIs, components, modules and micro-services is what software architecture is about.
 
-Delivering software has always meant building a box: a set of interactions you know, with guarantees you can state.
+We also live with abstractions we never opened. Have you read your whole stack? Your compiler, the Linux kernel, all your dependencies? I bet not. SREs have always worked this way: their job is to operate systems they did not write, and they learn them from the outside through metrics, probes and incidents. Some systems are also so complex that you cannot keep the full map in your head, so you have to trust the software to behave like you think it would.
 
-We already live with boxes we never opened. Nobody reads the code of all their dependencies. I picked FoundationDB because of the evidence behind it, years of deterministic simulation, not because I had read its storage engine.
+This is something SREs are trained to do, as they are mostly operating software they didn't write.
 
-SREs have always worked this way. Their job is to operate systems they did not write, and they learn them from the outside: metrics, probes, incidents. That is real knowledge, and it is the difference between software that is shipped and software that is operated.
+## The leaks are the learning opportunities
 
-But there is an asymmetry. FoundationDB earned its trust. So did the compiler. The box an LLM just built for me starts at zero: plausible code, no track record. Reading its shape will not catch a subtle concurrency bug.
+Joel Spolsky named it in 2002 with [the Law of Leaky Abstractions](https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/): "All non-trivial abstractions, to some degree, are leaky." Sooner or later, a detail from underneath shows through, and you have to understand what the abstraction was hiding from you. It can take multiple forms:
 
-So the work moves. Until now, we drew the plans and laid the bricks ourselves. The LLM lays the bricks now, but someone still has to inspect the house. That someone is us, and the job is correctness and quality.
+* That fast query that turned out to become slower and slower,
+* caching invalidation,
+* a network call that looks like a function call, until it hangs for 15 minutes,
+* memory you never have to free, until the garbage collector pauses everything,
+* a retry that looks safe, until it runs your transaction twice.
 
-## The leaks are the curriculum
+A leak is the moment the abstraction forces you to open it, and it tells you exactly where to look. You don't study the whole engine; you study the part that broke a guarantee. Every item above is a **learning opportunities**, and to be fair, this is what separates juniors from seniors engineers.
 
-Joel Spolsky named it in 2002: every non-trivial abstraction leaks. Sooner or later, a detail from inside the box shows through.
+Do we need to code to see the leaks? No, but you need to be close to production and accountable for the abstractions you are maintaining.
 
-Anyone can now generate a Raft implementation. The paper fits in a weekend. Making it viable in production is the last 20%, and that 20% is mostly leaks: <!-- TODO: pick two or three you have lived through, such as fsync failures, membership changes, lease reads under clock drift, snapshots -->.
+## Owning the abstractions
 
-A leak is the moment the box forces you to open it, and it tells you exactly where to look. You don't study the whole engine; you study the part that broke a guarantee. That is when I read a dependency's code: not upfront, but on demand, because it surprised me. Those moments are where my engineering values came from.
+So what is left for us when the LLM writes most of the code? [Cindy Sridharan put it in a list](https://x.com/copyconstruct/status/2123943098527174884) that matches how I see the job today:
 
-One honest caveat: you need fundamentals to recognise a leak in the first place. LLMs don't remove that. They make fundamentals cheaper to acquire, because you can interrogate any implementation. <!-- TODO: is that enough for someone starting out? Say what you actually think, even if it is "I don't know". -->
+* understand the fundamentals,
+* run experiments to prove the shortcomings in existing designs,
+* analyze alternative designs and tradeoffs quantitatively,
+* run continuous verification loops to categorically prove/disprove your implementation,
+* communicate about all of this clearly.
 
-## How I hunt leaks
-
-Here is the loop I use now that an LLM writes most of my code:
-
-1. Understand the fundamentals, so you can tell a leak from noise. <!-- TODO: example or link -->
-2. Run experiments that provoke the leaks of existing designs, instead of trusting the paper. <!-- TODO: example -->
-3. Compare alternatives quantitatively. Code is cheap now: build two designs and measure how each one leaks. <!-- TODO: example -->
-4. Run continuous verification loops that catch leaks before your users do. I wrote about feedback loops and simulation earlier this year.
-5. Communicate clearly. If you can't explain the leak, you didn't learn it.
-
-The LLM builds the engine. Our job is the evidence that the box keeps its guarantees, and building that evidence is how we keep learning.
-
-What is the last leak that taught you something?
+Most of this list is about testing, and there are many testing strategies that can help you design the right abstractions for your software. Writing [a fake that proves correctness](/posts/designing-fakes-that-prove-correctness/) forces you to state the few methods your code actually calls and what each of them guarantees, and making that fake fail the way production does shows you the leaks before your users see them. [Deterministic simulation](/posts/simulation-driven-development/) pushes the same idea further, by running the abstraction through crashes and network partitions over thousands of seeds, each one replayable.
 
 ---
 
