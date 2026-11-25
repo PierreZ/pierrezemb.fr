@@ -2,7 +2,7 @@
 title = "If the LLM Writes the Code, How Do We Still Learn?"
 description = "I was afraid that letting LLMs write my code would stop me from learning, and it turned out I had stopped learning by typing years ago."
 date = 2026-11-25
-path = "posts/still-learning"
+path = "posts/how-do-we-still-learn"
 draft = true
 [taxonomies]
 tags = ["llm", "software-engineering", "personal"]
