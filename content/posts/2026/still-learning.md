@@ -16,7 +16,7 @@ I discovered coding late, when I arrived at engineering school. I learned C, and
 
 Reading all that code never meant learning it by heart. Nobody remembers each line, we remember the structure, the happy path, the error path, the shape of the code. Writing is not learning by heart either: ask someone to explain code they wrote a few months ago. They walk to the whiteboard and draw boundaries, messages, and what each part guarantees, because the line-by-line detail is gone and **only the guarantees stay**. That is true whoever typed the code.
 
-And **reading is exactly what LLMs made cheap**. For years, the language barrier blocked me, because experience lets you follow the syntax of almost any language, but not a large codebase written in one you have not mastered. Nowadays, I can ask questions about any codebase, in any language, which is how I read FoundationDB's C++ internals before writing [moonpool](https://github.com/PierreZ/moonpool). Reading academic papers was another struggle, because absorbing a design took me a lot of time. Now I can turn a paper into a visualization I can step through and break, as I did with Lamport's Paxos papers, starting from [Paxos Made Simple](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf).
+And **reading is exactly what LLMs made cheap**. For years, the language barrier blocked me, because experience lets you follow the syntax of almost any language, but not a large codebase written in one you have not mastered. Nowadays, I can ask questions about any codebase, in any language, which is how I read FoundationDB's C++ internals before writing [moonpool](https://github.com/PierreZ/moonpool). Reading academic papers was another struggle, because absorbing a design took me a lot of time. Now I can turn a paper into a visualization I can step through and break, as I did with Lamport's Paxos papers, starting from [Paxos Made Simple](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf), and a concept is always easier to understand when I can see it move.
 
 ## We already trust abstractions
 
@@ -30,9 +30,11 @@ That trust never holds forever, as Joel Spolsky described in 2002 with [the Law 
 
 * a fast query that gets slower and slower,
 * a cache that serves stale data after an update,
-* a network call that looks like a function call, until it hangs for 15 minutes,
 * memory you never have to free, until the garbage collector pauses everything,
-* a retry that looks safe, until it runs your transaction twice.
+* a network call that looks like a function call, until it hangs for 15 minutes,
+* an `fsync` that looks safe to retry after an error, until the retry succeeds because the kernel already dropped your dirty pages, as PostgreSQL found with [fsyncgate](https://wiki.postgresql.org/wiki/Fsync_Errors) in 2018,
+* a retry that looks safe, until it hits an operation that is not idempotent and charges your customer twice,
+* retries that keep the system overloaded long after the trigger is gone, one of the [metastable failures](https://sigops.org/s/conferences/hotos/2021/papers/hotos21-s11-bronson.pdf) described at HotOS 2021.
 
 A **leak** is the moment the abstraction forces you to open it, and it tells you where to start looking. You don't study the whole engine, only the part that broke a guarantee. Every item above is a learning opportunity, for whoever is there to see it. Do we need to write the code to be that person? No, but we need to be **close to production and accountable** for the abstractions we maintain. This is one of the main reasons I am still part of the on-call rotation: I see the leaks and the software issues first-hand, which helps me build better software.
 
@@ -51,6 +53,8 @@ Two items on this list are about verification, and I think everyone should now u
 They also make delegating safe. Do you prefer to spend your days writing glue code, or learning? Most projects have one core component that matters far more than the wiring around it, so delegate the glue to the LLM and spend the days you get back on the core, its guarantees, its failure modes and its tests.
 
 Whether it is the core or the glue, someone has to decide what the abstraction guarantees, check that the implementation keeps it, and get paged when it does not. That is our job and where the learning happens, because every leak these tools find is ours to understand and fix. Keeping the system small is our job too, because as Bryan Cantrill points out, [LLMs lack the virtue of laziness](https://bcantrill.dtrace.org/2026/04/12/the-peril-of-laziness-lost/): work costs them nothing, so left unchecked they make systems larger, not better.
+
+## Juniors learn faster now
 
 The fear is even stronger for engineers who are just starting, and Spolsky had already seen it with the code-generation tools of 2002: abstractions "save us time working, but they don't save us time learning". LLMs don't change that, but they change how fast a junior can [meet the leaks](/posts/simulation-driven-development/#benefits-for-developer-education) that took me years of on-call to find. If you are starting, get close to production early by owning projects and carrying a pager, as [Marc Brooker advises juniors](https://brooker.co.za/blog/2026/03/25/ic-junior.html), use the LLM as a tutor for the fundamentals, and learn the testing strategies above. Code is now cheap enough to prototype a design and watch it under load or failures, so you can try three designs in an afternoon, when a wrong design cost me nights of C before I saw it break.
 
