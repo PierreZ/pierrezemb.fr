@@ -1,6 +1,6 @@
 +++
-title = "LLMs Write Most of My Code, and I Am Still Learning"
-description = "LLMs write most of my code now, and I still learn the way I have for years: by reading code that works and by being on call when abstractions leak."
+title = "If the LLM Writes the Code, How Do We Still Learn?"
+description = "I was afraid that letting LLMs write my code would stop me from learning, and it turned out I had stopped learning by typing years ago."
 date = 2026-11-25
 path = "posts/still-learning"
 draft = true
